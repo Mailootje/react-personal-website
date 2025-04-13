@@ -642,6 +642,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to generate QR code" });
     }
   });
+  
+  // Special route for clearing session storage (helps with testing animation)
+  app.get("/api/clear-session", (req, res) => {
+    res.send(`
+      <script>
+        sessionStorage.clear();
+        console.log("Session storage cleared!");
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 1000);
+      </script>
+      <div style="font-family: system-ui; padding: 20px; text-align: center;">
+        <h1>Session cleared!</h1>
+        <p>Redirecting to homepage...</p>
+      </div>
+    `);
+  });
 
   const httpServer = createServer(app);
 
