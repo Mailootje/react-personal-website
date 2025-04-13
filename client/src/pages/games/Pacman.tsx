@@ -198,22 +198,47 @@ export default function PacmanGame() {
           case 'ArrowUp':
           case 'w':
           case 'W':
-            setPacman(prev => ({ ...prev, nextDirection: Direction.UP }));
+            setPacman(prev => {
+              // Set both direction and nextDirection to immediately start moving
+              if (prev.y > 0 && level1[prev.y - 1][prev.x] !== EntityType.WALL) {
+                return { ...prev, direction: Direction.UP, nextDirection: Direction.UP };
+              } else {
+                return { ...prev, nextDirection: Direction.UP };
+              }
+            });
             break;
           case 'ArrowRight':
           case 'd':
           case 'D':
-            setPacman(prev => ({ ...prev, nextDirection: Direction.RIGHT }));
+            setPacman(prev => {
+              if (prev.x < GRID_WIDTH - 1 && level1[prev.y][prev.x + 1] !== EntityType.WALL) {
+                return { ...prev, direction: Direction.RIGHT, nextDirection: Direction.RIGHT };
+              } else {
+                return { ...prev, nextDirection: Direction.RIGHT };
+              }
+            });
             break;
           case 'ArrowDown':
           case 's':
           case 'S':
-            setPacman(prev => ({ ...prev, nextDirection: Direction.DOWN }));
+            setPacman(prev => {
+              if (prev.y < GRID_HEIGHT - 1 && level1[prev.y + 1][prev.x] !== EntityType.WALL) {
+                return { ...prev, direction: Direction.DOWN, nextDirection: Direction.DOWN };
+              } else {
+                return { ...prev, nextDirection: Direction.DOWN };
+              }
+            });
             break;
           case 'ArrowLeft':
           case 'a':
           case 'A':
-            setPacman(prev => ({ ...prev, nextDirection: Direction.LEFT }));
+            setPacman(prev => {
+              if (prev.x > 0 && level1[prev.y][prev.x - 1] !== EntityType.WALL) {
+                return { ...prev, direction: Direction.LEFT, nextDirection: Direction.LEFT };
+              } else {
+                return { ...prev, nextDirection: Direction.LEFT };
+              }
+            });
             break;
           case 'p':
           case 'P':
@@ -229,12 +254,39 @@ export default function PacmanGame() {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [gameState]);
+  }, [gameState, level1]);
   
   // Handle touch controls
   const handleTouchControl = (direction: Direction) => {
     if (gameState === GameState.PLAYING) {
-      setPacman(prev => ({ ...prev, nextDirection: direction }));
+      setPacman(prev => {
+        // Check if we can move in the requested direction right away
+        switch (direction) {
+          case Direction.UP:
+            if (prev.y > 0 && level1[prev.y - 1][prev.x] !== EntityType.WALL) {
+              return { ...prev, direction: Direction.UP, nextDirection: Direction.UP };
+            }
+            break;
+          case Direction.RIGHT:
+            if (prev.x < GRID_WIDTH - 1 && level1[prev.y][prev.x + 1] !== EntityType.WALL) {
+              return { ...prev, direction: Direction.RIGHT, nextDirection: Direction.RIGHT };
+            }
+            break;
+          case Direction.DOWN:
+            if (prev.y < GRID_HEIGHT - 1 && level1[prev.y + 1][prev.x] !== EntityType.WALL) {
+              return { ...prev, direction: Direction.DOWN, nextDirection: Direction.DOWN };
+            }
+            break;
+          case Direction.LEFT:
+            if (prev.x > 0 && level1[prev.y][prev.x - 1] !== EntityType.WALL) {
+              return { ...prev, direction: Direction.LEFT, nextDirection: Direction.LEFT };
+            }
+            break;
+        }
+        
+        // If we can't move in that direction right away, just queue it up
+        return { ...prev, nextDirection: direction };
+      });
     }
   };
   
