@@ -696,16 +696,34 @@ export default function UnitConverter() {
     }
   };
   
+  // Get the FromUnit and ToUnit objects for displaying unit names
+  const fromUnit = currentCategory.units.find(unit => unit.id === fromUnitId);
+  const toUnit = currentCategory.units.find(unit => unit.id === toUnitId);
+  
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
+    <div className="min-h-screen bg-black text-white flex flex-col">
       <Header />
-      <main className="flex-grow">
+      <div className="fixed inset-0 z-0 bg-black">
+        <video 
+          className="absolute h-full w-full object-cover opacity-10"
+          autoPlay 
+          loop 
+          muted 
+          playsInline
+          style={{ filter: 'blur(2px)' }}
+        >
+          <source src="/assets/videos/background.webm" type="video/webm" />
+          <source src="/assets/videos/background.mp4" type="video/mp4" />
+        </video>
+      </div>
+      
+      <main className="flex-grow z-10 relative">
         <section className="py-20 px-6">
           <Container maxWidth="lg">
             <div className="mb-8">
               <div 
                 onClick={() => window.location.href = "/apps"}
-                className="inline-flex items-center text-primary hover:text-primary/80 transition-colors cursor-pointer"
+                className="inline-flex items-center text-blue-400 hover:text-blue-300 transition-colors cursor-pointer"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Apps
@@ -718,9 +736,11 @@ export default function UnitConverter() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">Unit Converter</h1>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
-                Convert between different units of measurement
+              <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-600 text-transparent bg-clip-text">
+                Unit Converter
+              </h1>
+              <p className="text-gray-400 max-w-2xl mx-auto">
+                Convert between different units of measurement precisely and instantly
               </p>
             </motion.div>
             
@@ -729,10 +749,10 @@ export default function UnitConverter() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
             >
-              <Card className="max-w-3xl mx-auto">
-                <CardHeader>
-                  <CardTitle>Unit Converter</CardTitle>
-                  <CardDescription>
+              <Card className="max-w-3xl mx-auto bg-gray-900 border-gray-800 shadow-lg shadow-blue-900/10">
+                <CardHeader className="border-b border-gray-800 pb-4">
+                  <CardTitle className="text-2xl text-white">Unit Converter</CardTitle>
+                  <CardDescription className="text-gray-400">
                     Select a category and units to convert between
                   </CardDescription>
                   
@@ -740,49 +760,62 @@ export default function UnitConverter() {
                   <Tabs 
                     value={activeCategory} 
                     onValueChange={setActiveCategory}
-                    className="mt-4"
+                    className="mt-6"
                   >
-                    <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 w-full">
+                    <TabsList className="grid grid-cols-4 lg:grid-cols-8 w-full bg-gray-800 p-1">
                       {conversionCategories.map(cat => (
                         <TabsTrigger 
                           key={cat.id} 
                           value={cat.id}
-                          className="flex items-center justify-center"
+                          className="flex items-center justify-center data-[state=active]:bg-blue-600 data-[state=active]:text-white"
                         >
-                          <span className="hidden md:inline-flex items-center">
-                            <span className="mr-2">{cat.icon}</span>
+                          <span className="hidden lg:inline-flex items-center">
+                            <span className="mr-2 text-blue-400">{cat.icon}</span>
                             {cat.name}
                           </span>
-                          <span className="md:hidden">{cat.icon}</span>
+                          <span className="lg:hidden flex items-center flex-col gap-1 py-1">
+                            <span className="text-blue-400">{cat.icon}</span>
+                            <span className="text-xs">{cat.name}</span>
+                          </span>
                         </TabsTrigger>
                       ))}
                     </TabsList>
                   </Tabs>
                 </CardHeader>
                 
-                <CardContent className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
+                <CardContent className="space-y-6 pt-6">
+                  <div className="bg-gray-800/50 p-4 rounded-lg text-center mb-6">
+                    <h3 className="text-xl font-semibold text-white mb-1">{currentCategory.name} Converter</h3>
+                    <p className="text-gray-400 text-sm">
+                      Convert between different {currentCategory.name.toLowerCase()} units
+                    </p>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-11 gap-4 items-center">
                     {/* From Unit Input */}
-                    <div className="md:col-span-2 space-y-2">
-                      <Label htmlFor="from-value">From</Label>
-                      <div className="space-y-2">
+                    <div className="md:col-span-5 space-y-3">
+                      <Label htmlFor="from-value" className="text-gray-300 flex items-center text-sm font-medium">
+                        <span className="text-blue-400 mr-2">From</span>
+                        {fromUnit && <span className="text-xs text-gray-400">({fromUnit.name})</span>}
+                      </Label>
+                      <div className="space-y-3">
                         <Input
                           id="from-value"
                           type="text"
                           value={inputValue}
                           onChange={(e) => setInputValue(e.target.value)}
-                          className="font-mono"
+                          className="font-mono bg-gray-800 border-gray-700 focus:border-blue-500 focus:ring-blue-500 text-white"
                         />
                         <Select
                           value={fromUnitId}
                           onValueChange={setFromUnitId}
                         >
-                          <SelectTrigger>
+                          <SelectTrigger className="bg-gray-800 border-gray-700 text-white focus:ring-blue-500">
                             <SelectValue placeholder="Select unit" />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="bg-gray-800 border-gray-700 text-white">
                             {currentCategory.units.map(unit => (
-                              <SelectItem key={unit.id} value={unit.id}>
+                              <SelectItem key={unit.id} value={unit.id} className="focus:bg-blue-600 focus:text-white">
                                 {unit.name}
                               </SelectItem>
                             ))}
@@ -792,38 +825,41 @@ export default function UnitConverter() {
                     </div>
                     
                     {/* Swap Button */}
-                    <div className="flex justify-center">
+                    <div className="flex justify-center md:col-span-1">
                       <Button 
                         variant="outline" 
                         size="icon" 
                         onClick={swapUnits}
-                        className="h-10 w-10 rounded-full"
+                        className="h-12 w-12 rounded-full bg-blue-600 hover:bg-blue-700 border-none text-white transform transition-transform hover:scale-110"
                       >
-                        <ArrowRight className="h-4 w-4" />
+                        <ArrowRight className="h-5 w-5" />
                       </Button>
                     </div>
                     
                     {/* To Unit Input */}
-                    <div className="md:col-span-2 space-y-2">
-                      <Label htmlFor="to-value">To</Label>
-                      <div className="space-y-2">
+                    <div className="md:col-span-5 space-y-3">
+                      <Label htmlFor="to-value" className="text-gray-300 flex items-center text-sm font-medium">
+                        <span className="text-blue-400 mr-2">To</span>
+                        {toUnit && <span className="text-xs text-gray-400">({toUnit.name})</span>}
+                      </Label>
+                      <div className="space-y-3">
                         <Input
                           id="to-value"
                           type="text"
                           value={convertedValue}
                           readOnly
-                          className="font-mono"
+                          className="font-mono bg-gray-800 border-gray-700 text-white"
                         />
                         <Select
                           value={toUnitId}
                           onValueChange={setToUnitId}
                         >
-                          <SelectTrigger>
+                          <SelectTrigger className="bg-gray-800 border-gray-700 text-white focus:ring-blue-500">
                             <SelectValue placeholder="Select unit" />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="bg-gray-800 border-gray-700 text-white">
                             {currentCategory.units.map(unit => (
-                              <SelectItem key={unit.id} value={unit.id}>
+                              <SelectItem key={unit.id} value={unit.id} className="focus:bg-blue-600 focus:text-white">
                                 {unit.name}
                               </SelectItem>
                             ))}
@@ -834,9 +870,12 @@ export default function UnitConverter() {
                   </div>
                   
                   {/* Conversion Information */}
-                  <div className="bg-muted/50 rounded-md p-4 text-sm">
-                    <h4 className="font-medium mb-2">Conversion Formula</h4>
-                    <p className="text-muted-foreground">
+                  <div className="bg-gray-800/50 rounded-lg p-5 text-sm mt-6 border border-gray-700">
+                    <h4 className="font-medium mb-2 text-white flex items-center">
+                      <RefreshCw className="h-4 w-4 mr-2 text-blue-400" /> 
+                      Conversion Formula
+                    </h4>
+                    <p className="text-gray-400">
                       {activeCategory === "temperature" ? (
                         <>
                           Temperature conversions:
@@ -864,39 +903,81 @@ export default function UnitConverter() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="mt-8 max-w-3xl mx-auto"
+              className="mt-12 max-w-3xl mx-auto"
             >
-              <h3 className="text-xl font-semibold mb-4">Common Conversions</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                <div className="bg-card rounded-lg p-4 border border-border">
-                  <h4 className="font-medium mb-2">1 Meter (m)</h4>
-                  <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>= 100 centimeters (cm)</li>
-                    <li>= 1,000 millimeters (mm)</li>
-                    <li>= 0.001 kilometers (km)</li>
-                    <li>= 39.37 inches (in)</li>
-                    <li>= 3.28 feet (ft)</li>
+              <h3 className="text-2xl font-semibold mb-6 text-center text-white">Common Conversions</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <div className="bg-gray-900 rounded-xl p-5 border border-gray-800 shadow-lg shadow-blue-900/10 transform transition-transform hover:scale-105">
+                  <h4 className="font-medium mb-3 text-lg text-blue-400">1 Meter (m)</h4>
+                  <ul className="text-sm text-gray-400 space-y-2">
+                    <li className="flex justify-between">
+                      <span>100 cm</span>
+                      <span className="text-gray-500">centimeters</span>
+                    </li>
+                    <li className="flex justify-between">
+                      <span>1,000 mm</span>
+                      <span className="text-gray-500">millimeters</span>
+                    </li>
+                    <li className="flex justify-between">
+                      <span>0.001 km</span>
+                      <span className="text-gray-500">kilometers</span>
+                    </li>
+                    <li className="flex justify-between">
+                      <span>39.37 in</span>
+                      <span className="text-gray-500">inches</span>
+                    </li>
+                    <li className="flex justify-between">
+                      <span>3.28 ft</span>
+                      <span className="text-gray-500">feet</span>
+                    </li>
                   </ul>
                 </div>
                 
-                <div className="bg-card rounded-lg p-4 border border-border">
-                  <h4 className="font-medium mb-2">1 Kilogram (kg)</h4>
-                  <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>= 1,000 grams (g)</li>
-                    <li>= 1,000,000 milligrams (mg)</li>
-                    <li>= 2.205 pounds (lb)</li>
-                    <li>= 35.274 ounces (oz)</li>
-                    <li>= 0.157 stone (st)</li>
+                <div className="bg-gray-900 rounded-xl p-5 border border-gray-800 shadow-lg shadow-blue-900/10 transform transition-transform hover:scale-105">
+                  <h4 className="font-medium mb-3 text-lg text-blue-400">1 Kilogram (kg)</h4>
+                  <ul className="text-sm text-gray-400 space-y-2">
+                    <li className="flex justify-between">
+                      <span>1,000 g</span>
+                      <span className="text-gray-500">grams</span>
+                    </li>
+                    <li className="flex justify-between">
+                      <span>1,000,000 mg</span>
+                      <span className="text-gray-500">milligrams</span>
+                    </li>
+                    <li className="flex justify-between">
+                      <span>2.205 lb</span>
+                      <span className="text-gray-500">pounds</span>
+                    </li>
+                    <li className="flex justify-between">
+                      <span>35.274 oz</span>
+                      <span className="text-gray-500">ounces</span>
+                    </li>
+                    <li className="flex justify-between">
+                      <span>0.157 st</span>
+                      <span className="text-gray-500">stone</span>
+                    </li>
                   </ul>
                 </div>
                 
-                <div className="bg-card rounded-lg p-4 border border-border">
-                  <h4 className="font-medium mb-2">Temperature</h4>
-                  <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>0°C = 32°F = 273.15K</li>
-                    <li>20°C = 68°F = 293.15K</li>
-                    <li>37°C = 98.6°F = 310.15K</li>
-                    <li>100°C = 212°F = 373.15K</li>
+                <div className="bg-gray-900 rounded-xl p-5 border border-gray-800 shadow-lg shadow-blue-900/10 transform transition-transform hover:scale-105">
+                  <h4 className="font-medium mb-3 text-lg text-blue-400">Temperature</h4>
+                  <ul className="text-sm text-gray-400 space-y-2">
+                    <li className="flex justify-between">
+                      <span>0°C</span>
+                      <span className="text-gray-500">32°F / 273.15K</span>
+                    </li>
+                    <li className="flex justify-between">
+                      <span>20°C</span>
+                      <span className="text-gray-500">68°F / 293.15K</span>
+                    </li>
+                    <li className="flex justify-between">
+                      <span>37°C</span>
+                      <span className="text-gray-500">98.6°F / 310.15K</span>
+                    </li>
+                    <li className="flex justify-between">
+                      <span>100°C</span>
+                      <span className="text-gray-500">212°F / 373.15K</span>
+                    </li>
                   </ul>
                 </div>
               </div>
