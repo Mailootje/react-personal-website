@@ -420,8 +420,14 @@ export default function Tetris() {
   
   // Lock the current tetromino in place
   const settleBlock = useCallback(() => {
-    if (!currentTetromino) return;
+    if (!currentTetromino) {
+      console.log("Cannot settle: no current tetromino");
+      return;
+    }
     
+    console.log("Settling block at position:", currentTetromino.position);
+    
+    // Create a deep copy of the grid to avoid state mutation issues
     const newGrid = [...grid.map(row => [...row])];
     const { shape, color, position } = currentTetromino;
     
@@ -448,12 +454,17 @@ export default function Tetris() {
       }
     }
     
+    console.log("Completed lines:", completedLines);
+    
     // Remove completed lines and add empty rows at the top
     if (completedLines.length > 0) {
       const removedLines = completedLines.length;
       
-      // Remove completed lines
-      for (const line of completedLines) {
+      // Sort the completed lines in descending order to avoid index shifting issues
+      const sortedLines = [...completedLines].sort((a, b) => b - a);
+      
+      // Remove completed lines from highest row index to lowest
+      for (const line of sortedLines) {
         newGrid.splice(line, 1);
         newGrid.unshift(Array(GRID_WIDTH).fill(null));
       }
@@ -464,9 +475,15 @@ export default function Tetris() {
       const newLines = lines + removedLines;
       const newLevel = Math.floor(newLines / 10) + 1;
       
+      console.log(`Cleared ${removedLines} lines, new score: ${newScore}, new level: ${newLevel}`);
+      
       setScore(newScore);
       setLines(newLines);
-      setLevel(newLevel);
+      
+      // Only update level if it changed
+      if (newLevel !== level) {
+        setLevel(newLevel);
+      }
       
       // Update high score if needed
       if (newScore > highScore) {
@@ -474,12 +491,18 @@ export default function Tetris() {
         localStorage.setItem('tetris-high-score', newScore.toString());
       }
       
-      // Adjust drop speed based on level
+      // Adjust drop speed based on level - this will be used by the next scheduled drop
       dropTimeRef.current = Math.max(100, 1000 - (newLevel - 1) * 100);
     }
     
+    // First update the grid
     setGrid(newGrid);
-    spawnTetromino();
+    
+    // Then spawn a new tetromino
+    // Separate this with setTimeout to ensure the grid is updated first
+    setTimeout(() => {
+      spawnTetromino();
+    }, 0);
   }, [currentTetromino, grid, score, lines, level, highScore, spawnTetromino]);
   
   // Drop tetromino by one cell
@@ -549,21 +572,11 @@ export default function Tetris() {
     setLines(0);
     setLevel(1);
     
-    // Create initial tetrominos using our helper function for proper deep copying
-    const initialTetromino = {
-      shape: [...TETROMINOES[0].shape.map(row => [...row])], // I-piece with deep copied shape
-      color: TETROMINOES[0].color,
-      position: { x: Math.floor(GRID_WIDTH / 2) - 2, y: 0 },
-      rotation: 0
-    };
+    // Create initial tetrominos using randomTetromino to ensure proper deep copying
+    const initialTetromino = randomTetromino();
+    initialTetromino.position.y = 0; // Start at the top
     
-    const randomIndex = Math.floor(Math.random() * TETROMINOES.length);
-    const initialNextTetromino = {
-      shape: [...TETROMINOES[randomIndex].shape.map(row => [...row])], // Deep copied shape
-      color: TETROMINOES[randomIndex].color,
-      position: { x: 0, y: 0 },
-      rotation: 0
-    };
+    const initialNextTetromino = randomTetromino();
     
     console.log("Created initial tetromino:", initialTetromino);
     console.log("Created initial next tetromino:", initialNextTetromino);
@@ -583,12 +596,14 @@ export default function Tetris() {
       dropIntervalRef.current = null;
     }
     
-    // Set the tetrominos and game state - must be done before setting up intervals
-    setCurrentTetromino(initialTetromino);
-    setNextTetromino(initialNextTetromino);
+    // Set the game state first
     setGameState(GameState.PLAYING);
     
-    // Start the render loop first to show the initial state
+    // Next, set the tetrominos in a sequence to ensure proper state updating
+    setCurrentTetromino(initialTetromino);
+    setNextTetromino(initialNextTetromino);
+    
+    // Start the rendering immediately
     const renderLoop = () => {
       drawBoard();
       drawPreview();
@@ -597,32 +612,50 @@ export default function Tetris() {
     
     gameLoopRef.current = requestAnimationFrame(renderLoop);
     
-    // Store the initial tetromino locally for the timeout to use
-    const activeTetromino = initialTetromino;
-    
-    // Add a delay before starting the drop interval to ensure state is updated
-    setTimeout(() => {
-      console.log("Setting up drop interval...");
-      
-      // Use the local variable instead of state which may not be updated yet
-      console.log("Initial tetromino for interval:", activeTetromino);
-      
-      // Set up auto-drop interval using direct function instead of dropTetromino
-      dropIntervalRef.current = window.setInterval(() => {
-        // This will use the latest state from closure, not the stale one
-        dropTetromino();
+    // Use a more reliable approach with setTimeout instead of setInterval
+    // This ensures that each drop operation completes before scheduling the next one
+    const scheduleDrop = () => {
+      dropIntervalRef.current = window.setTimeout(() => {
+        console.log("Auto drop scheduled");
+        // Only drop if the game is still playing
+        if (gameState === GameState.PLAYING) {
+          dropTetromino();
+          // Schedule the next drop after this one completes
+          scheduleDrop();
+        }
       }, dropTimeRef.current);
-    }, 500); // Longer delay to ensure React state updates
+    };
     
-  }, [drawBoard, drawPreview, dropTetromino]);
+    // Add a small delay before starting the first drop to ensure React state is updated
+    setTimeout(() => {
+      console.log("Starting game loop...");
+      scheduleDrop();
+    }, 300);
+    
+  }, [drawBoard, drawPreview, dropTetromino, gameState]);
   
+  // Create a recursive drop scheduler for reuse
+  const createScheduleDrop = useCallback(() => {
+    return function scheduleDrop() {
+      dropIntervalRef.current = window.setTimeout(() => {
+        console.log("Auto drop scheduled");
+        // Only drop if the game is still playing
+        if (gameState === GameState.PLAYING) {
+          dropTetromino();
+          // Schedule the next drop after this one completes
+          scheduleDrop();
+        }
+      }, dropTimeRef.current);
+    };
+  }, [gameState, dropTetromino]);
+
   // Pause the game
   const pauseGame = useCallback(() => {
     if (gameState === GameState.PLAYING) {
       setGameState(GameState.PAUSED);
       
       if (dropIntervalRef.current) {
-        clearInterval(dropIntervalRef.current);
+        clearTimeout(dropIntervalRef.current);
         dropIntervalRef.current = null;
       }
     }
@@ -634,25 +667,28 @@ export default function Tetris() {
       // First update the state
       setGameState(GameState.PLAYING);
       
-      // Restart the drop interval with just the function reference
+      // Restart the drop with our recursive scheduler
       if (!dropIntervalRef.current) {
-        dropIntervalRef.current = window.setInterval(dropTetromino, dropTimeRef.current);
+        const scheduleDrop = createScheduleDrop();
+        scheduleDrop();
       }
     }
-  }, [gameState, dropTetromino]);
+  }, [gameState, createScheduleDrop]);
   
   // Game over check
   const checkGameOver = useCallback(() => {
     if (currentTetromino && isColliding(currentTetromino)) {
+      console.log("GAME OVER: Tetromino is colliding at starting position");
       setGameState(GameState.GAME_OVER);
       
+      // Clean up all game loops
       if (gameLoopRef.current) {
         cancelAnimationFrame(gameLoopRef.current);
         gameLoopRef.current = null;
       }
       
       if (dropIntervalRef.current) {
-        clearInterval(dropIntervalRef.current);
+        clearTimeout(dropIntervalRef.current);
         dropIntervalRef.current = null;
       }
     }
@@ -756,31 +792,26 @@ export default function Tetris() {
     return () => {
       if (gameLoopRef.current) {
         cancelAnimationFrame(gameLoopRef.current);
+        gameLoopRef.current = null;
       }
       
       if (dropIntervalRef.current) {
-        clearInterval(dropIntervalRef.current);
+        clearTimeout(dropIntervalRef.current);
+        dropIntervalRef.current = null;
       }
     };
   }, []);
   
-  // Adjust drop interval when level changes
+  // Adjust drop speed when level changes
   useEffect(() => {
     if (gameState === GameState.PLAYING) {
-      if (dropIntervalRef.current) {
-        clearInterval(dropIntervalRef.current);
-      }
+      // Update drop time based on level
+      dropTimeRef.current = Math.max(100, 1000 - (level - 1) * 100);
       
-      // Use simple interval with just the function reference
-      dropIntervalRef.current = window.setInterval(dropTetromino, dropTimeRef.current);
+      // We don't need to restart the timeout here as it's handled by the recursive scheduleDrop function
+      console.log(`Level changed to ${level}, drop time adjusted to ${dropTimeRef.current}ms`);
     }
-    
-    return () => {
-      if (dropIntervalRef.current) {
-        clearInterval(dropIntervalRef.current);
-      }
-    };
-  }, [level, gameState, dropTetromino]);
+  }, [level, gameState]);
   
   return (
     <div className="min-h-screen flex flex-col">
