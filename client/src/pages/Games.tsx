@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { VideoBackground } from "@/components/VideoBackground";
 import { Gamepad2 } from "lucide-react";
 
 interface GameInfo {
@@ -46,16 +47,17 @@ export default function Games() {
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <Header />
       <main className="flex-grow">
-        <section className="py-20 px-6">
-          <Container maxWidth="6xl">
+        <VideoBackground opacity={0.15} className="bg-black">
+          <section className="py-20 px-6">
+            <Container maxWidth="6xl">
             <motion.div
               className="text-center mb-12"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">Games</h1>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
+              <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white">Games</h1>
+              <p className="text-gray-300 max-w-2xl mx-auto">
                 Fun and interactive browser games to test your skills and entertain
               </p>
             </motion.div>
@@ -107,6 +109,7 @@ export default function Games() {
             </motion.div>
           </Container>
         </section>
+        </VideoBackground>
       </main>
       <Footer />
     </div>

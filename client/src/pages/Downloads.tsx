@@ -5,6 +5,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { VideoBackground } from "@/components/VideoBackground";
 import { Download } from "lucide-react";
 
 interface DownloadItem {
@@ -31,16 +32,17 @@ export default function Downloads() {
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <Header />
       <main className="flex-grow">
-        <section className="py-20 px-6">
-          <Container maxWidth="6xl">
+        <VideoBackground opacity={0.15} className="bg-black">
+          <section className="py-20 px-6">
+            <Container maxWidth="6xl">
             <motion.div
               className="text-center mb-12"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">Downloads</h1>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
+              <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white">Downloads</h1>
+              <p className="text-gray-300 max-w-2xl mx-auto">
                 Free downloads, mods, and resources for various games and applications
               </p>
             </motion.div>
@@ -90,6 +92,7 @@ export default function Downloads() {
             </motion.div>
           </Container>
         </section>
+        </VideoBackground>
       </main>
       <Footer />
     </div>
