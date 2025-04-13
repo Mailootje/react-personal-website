@@ -202,7 +202,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           category: category,
           tags: Array.from(new Set(tags)).slice(0, 3), // Take up to 3 unique tags
           originalUrl: file.url,
-          downloadUrl: `/api/downloads/proxy?url=${encodeURIComponent(file.url)}`
+          downloadUrl: file.url
         };
       });
       

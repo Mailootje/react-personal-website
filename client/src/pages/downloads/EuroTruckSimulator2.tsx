@@ -416,7 +416,7 @@ function DownloadCard({ file }: { file: DownloadFile }) {
       </CardContent>
       <CardFooter className="flex justify-between items-center border-t pt-4">
         <Badge>{file.category}</Badge>
-        <a href={file.downloadUrl}>
+        <a href={file.originalUrl || file.downloadUrl} target="_blank" rel="noopener noreferrer">
           <Button className="gap-2">
             <Download className="h-4 w-4" />
             Download
