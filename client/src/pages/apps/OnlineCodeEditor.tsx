@@ -5,7 +5,7 @@ import {
   FaFolder, FaFile, FaFolderOpen, FaChevronDown, FaChevronRight, FaPlus, 
   FaUpload, FaSave, FaTrash, FaTimes, FaSearch, FaExchangeAlt, FaCode, 
   FaMinus, FaPlus as FaPlusIcon, FaList, FaMap, FaPlay, FaInfoCircle,
-  FaKeyboard, FaClock, FaCheck
+  FaKeyboard, FaClock, FaCheck, FaSun, FaMoon
 } from 'react-icons/fa';
 import { Button } from '@/components/ui/button';
 import { Tooltip } from '@/components/ui/tooltip';
@@ -1676,11 +1676,11 @@ console.log("Let's start coding!");`,
       <VideoBackground opacity={0.10} />
 
       <main className="flex-grow relative z-10 pt-24 pb-8">
-        <Container maxWidth="6xl" className="h-full">
+        <Container maxWidth="6xl" className="h-full max-w-[95vw]">
           <Card className="h-[80vh] overflow-hidden bg-gray-900/70 backdrop-blur border-gray-800">
             {/* Toolbar */}
-            <div className="flex items-center justify-between p-2 bg-gray-800 border-b border-gray-700">
-              <div className="flex items-center space-x-2">
+            <div className="flex items-center justify-between p-1 bg-gray-800 border-b border-gray-700">
+              <div className="flex items-center space-x-0.5">
                 {/* File Operations */}
                 <TooltipProvider>
                   <Tooltip>
@@ -1688,14 +1688,14 @@ console.log("Let's start coding!");`,
                       <Button 
                         variant="ghost" 
                         size="sm"
-                        className="h-8 px-2"
+                        className="h-7 px-1.5"
                         onClick={() => {
                           setNewItemParent(null);
                           setIsCreatingFile(true);
                         }}
                       >
-                        <FaPlus className="mr-2" size={14} />
-                        <span>New File</span>
+                        <FaPlus size={14} />
+                        <span className="ml-1">New</span>
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -1710,14 +1710,14 @@ console.log("Let's start coding!");`,
                       <Button 
                         variant="ghost" 
                         size="sm"
-                        className="h-8 px-2"
+                        className="h-7 px-1.5"
                         onClick={() => {
                           setNewItemParent(null);
                           setIsCreatingFolder(true);
                         }}
                       >
-                        <FaFolder className="mr-2" size={14} />
-                        <span>New Folder</span>
+                        <FaFolder size={14} />
+                        <span className="ml-1">Folder</span>
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -1733,11 +1733,11 @@ console.log("Let's start coding!");`,
                         <Button 
                           variant="ghost" 
                           size="sm"
-                          className="h-8 px-2"
+                          className="h-7 px-1.5"
                           onClick={() => fileInputRef.current?.click()}
                         >
-                          <FaUpload className="mr-2" size={14} />
-                          <span>Upload</span>
+                          <FaUpload size={14} />
+                          <span className="ml-1">Upload</span>
                         </Button>
                         <input 
                           type="file" 
@@ -1762,12 +1762,12 @@ console.log("Let's start coding!");`,
                       <Button 
                         variant="ghost" 
                         size="sm"
-                        className="h-8 px-2"
+                        className="h-7 px-1.5"
                         onClick={saveCurrentFile}
                         disabled={tabs.length === 0}
                       >
-                        <FaSave className="mr-2" size={14} />
-                        <span>Save</span>
+                        <FaSave size={14} />
+                        <span className="ml-1">Save</span>
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -1782,11 +1782,11 @@ console.log("Let's start coding!");`,
                       <Button 
                         variant="ghost" 
                         size="sm"
-                        className="h-8 px-2"
+                        className="h-7 px-1.5"
                         onClick={exportWorkspace}
                       >
-                        <FaUpload className="mr-2 transform rotate-180" size={14} />
-                        <span>Export</span>
+                        <FaUpload className="transform rotate-180" size={14} />
+                        <span className="ml-1">Export</span>
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -1796,7 +1796,7 @@ console.log("Let's start coding!");`,
                 </TooltipProvider>
               </div>
 
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-0.5">
                 {/* Editor features */}
                 <Separator orientation="vertical" className="h-6 bg-gray-700" />
                 
@@ -1806,11 +1806,11 @@ console.log("Let's start coding!");`,
                       <Button 
                         variant="ghost" 
                         size="sm"
-                        className="h-8 px-2"
+                        className="h-7 px-1.5"
                         onClick={() => setIsSearchOpen(true)}
                       >
-                        <FaSearch className="mr-2" size={14} />
-                        <span>Search</span>
+                        <FaSearch size={14} />
+                        <span className="ml-1">Find</span>
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -1825,12 +1825,12 @@ console.log("Let's start coding!");`,
                       <Button 
                         variant="ghost" 
                         size="sm"
-                        className="h-8 px-2"
+                        className="h-7 px-1.5"
                         onClick={formatCode}
                         disabled={tabs.length === 0}
                       >
-                        <FaCode className="mr-2" size={14} />
-                        <span>Format</span>
+                        <FaCode size={14} />
+                        <span className="ml-1">Format</span>
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -1845,12 +1845,12 @@ console.log("Let's start coding!");`,
                       <Button 
                         variant="ghost" 
                         size="sm"
-                        className="h-8 px-2"
+                        className="h-7 px-1.5"
                         onClick={executeCode}
                         disabled={tabs.length === 0 || !(currentLanguage === 'javascript' || currentLanguage === 'typescript')}
                       >
-                        <FaPlay className="mr-2" size={14} />
-                        <span>Execute</span>
+                        <FaPlay size={14} />
+                        <span className="ml-1">Run</span>
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -1867,11 +1867,11 @@ console.log("Let's start coding!");`,
                       <Button 
                         variant="ghost" 
                         size="sm"
-                        className="h-8 px-2"
+                        className="h-7 px-1.5"
                         onClick={() => setIsSnippetsOpen(true)}
                       >
-                        <FaCode className="mr-2" size={14} />
-                        <span>Snippets</span>
+                        <FaCode size={14} />
+                        <span className="ml-1">Snippets</span>
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -1889,11 +1889,11 @@ console.log("Let's start coding!");`,
                       <Button 
                         variant="ghost" 
                         size="sm"
-                        className="h-8 px-2"
+                        className="h-7 px-1.5"
                         onClick={() => setIsSettingsOpen(true)}
                       >
-                        <FaInfoCircle className="mr-2" size={14} />
-                        <span>Settings</span>
+                        <FaInfoCircle size={14} />
+                        <span className="ml-1">Settings</span>
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -1908,11 +1908,11 @@ console.log("Let's start coding!");`,
                       <Button 
                         variant="ghost" 
                         size="sm"
-                        className="h-8 px-2"
+                        className="h-7 px-1.5"
                         onClick={() => setIsKeyboardShortcutsOpen(true)}
                       >
-                        <FaKeyboard className="mr-2" size={14} />
-                        <span>Shortcuts</span>
+                        <FaKeyboard size={14} />
+                        <span className="ml-1">Keys</span>
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -1928,10 +1928,10 @@ console.log("Let's start coding!");`,
                       <Button 
                         variant="ghost" 
                         size="sm"
-                        className="h-8 px-2"
+                        className="h-7 px-1.5"
                         onClick={() => setEditorTheme(theme => theme === 'vs-dark' ? 'vs-light' : 'vs-dark')}
                       >
-                        {editorTheme === 'vs-dark' ? 'Light Mode' : 'Dark Mode'}
+                        {editorTheme === 'vs-dark' ? <FaSun size={14} /> : <FaMoon size={14} />}
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
