@@ -220,18 +220,24 @@ export default function SchoolPitch() {
 
       case "intro":
         return (
-          <div className="h-full flex flex-col justify-center py-16">
-            <div className="flex items-center mb-10">
-              {slide.icon && <slide.icon className="text-primary text-5xl mr-5" />}
-              <h2 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
-                {slide.title}
-              </h2>
+          <div className="h-full w-full flex flex-col md:flex-row md:items-center py-8 md:py-4">
+            <div className="md:w-1/3 mb-6 md:mb-0 md:pr-8">
+              <div className="flex items-center mb-6 md:mb-8">
+                {slide.icon && <slide.icon className="text-primary text-4xl mr-4" />}
+                <h2 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+                  {slide.title}
+                </h2>
+              </div>
+              {/* Empty div for spacing on mobile, image could go here */}
+              <div className="hidden md:block h-32 w-full bg-gradient-to-br from-primary/20 to-transparent rounded-lg border border-primary/30 flex items-center justify-center">
+                <FaGraduationCap className="text-primary/70 text-6xl" />
+              </div>
             </div>
             <motion.div 
               variants={containerVariants}
               initial="hidden"
               animate="visible"
-              className="space-y-6 text-xl text-gray-300"
+              className="md:w-2/3 space-y-4 text-base lg:text-lg text-gray-300"
             >
               {slide.content?.map((para, idx) => (
                 <motion.p key={idx} variants={itemVariants}>{para}</motion.p>
@@ -242,31 +248,35 @@ export default function SchoolPitch() {
 
       case "kwaliteiten":
         return (
-          <div className="h-full flex flex-col justify-center py-16">
-            <div className="flex items-center mb-10">
-              {slide.icon && <slide.icon className="text-primary text-5xl mr-5" />}
-              <h2 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
-                {slide.title}
-              </h2>
+          <div className="h-full w-full flex flex-col md:flex-row md:items-center py-8 md:py-4">
+            <div className="md:w-1/3 mb-6 md:mb-0 md:pr-8">
+              <div className="flex items-center mb-6 md:mb-8">
+                {slide.icon && <slide.icon className="text-primary text-4xl mr-4" />}
+                <h2 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+                  {slide.title}
+                </h2>
+              </div>
+              {/* Empty div for spacing on mobile, image could go here */}
+              <div className="hidden md:block h-32 w-full bg-gradient-to-br from-primary/20 to-transparent rounded-lg border border-primary/30 flex items-center justify-center">
+                <FaStar className="text-primary/70 text-6xl" />
+              </div>
             </div>
             <motion.ul 
               variants={containerVariants}
               initial="hidden"
               animate="visible"
-              className="space-y-5 text-xl"
+              className="md:w-2/3 space-y-3 text-base lg:text-lg"
             >
               {slide.listItems?.map((item, idx) => (
                 <motion.li key={idx} variants={itemVariants} className="flex items-start">
-                  <div className="text-primary text-2xl mr-4">•</div>
+                  <div className="text-primary text-xl mr-3">•</div>
                   <div>
-                    {'title' in item ? (
+                    {'title' in item && (
                       <>
                         <span className="font-bold text-white">{item.title}</span>
                         <span className="mx-2 text-gray-500">—</span>
                         <span className="text-gray-300">{item.desc}</span>
                       </>
-                    ) : (
-                      <span className="text-gray-300">{item}</span>
                     )}
                   </div>
                 </motion.li>
@@ -487,10 +497,10 @@ export default function SchoolPitch() {
       <Header />
       <VideoBackground opacity={0.15} />
       
-      <main className="flex-grow pt-24 pb-16 flex flex-col relative z-10">
-        <Container maxWidth="xl" className="flex-grow flex flex-col my-4">
+      <main className="flex-grow pt-16 pb-12 flex flex-col relative z-10">
+        <Container maxWidth="6xl" className="flex-grow flex flex-col my-2">
           {/* PowerPoint style controls for desktop - top position */}
-          <div className="hidden md:flex justify-between items-center mb-4 px-4">
+          <div className="hidden md:flex justify-between items-center mb-2 px-2">
             <div className="flex items-center space-x-3">
               <Button 
                 variant="outline" 
@@ -519,7 +529,7 @@ export default function SchoolPitch() {
               {slides.map((_, idx) => (
                 <div 
                   key={idx}
-                  className={`w-3 h-3 mx-1 rounded-full cursor-pointer ${
+                  className={`w-2.5 h-2.5 mx-1 rounded-full cursor-pointer ${
                     idx === currentSlide ? 'bg-primary' : 'bg-gray-600'
                   }`}
                   onClick={() => {
@@ -539,9 +549,9 @@ export default function SchoolPitch() {
                 size="lg"
                 onClick={handlePrev}
                 disabled={currentSlide === 0} 
-                className="h-12 w-12 rounded-full bg-black/70 border-gray-700 hover:bg-gray-800 text-white md:hidden shadow-lg"
+                className="h-10 w-10 rounded-full bg-black/70 border-gray-700 hover:bg-gray-800 text-white md:hidden shadow-lg"
               >
-                <FaChevronLeft className="h-5 w-5" />
+                <FaChevronLeft className="h-4 w-4" />
               </Button>
             </div>
             
@@ -551,9 +561,9 @@ export default function SchoolPitch() {
                 size="lg"
                 onClick={handleNext}
                 disabled={currentSlide === slides.length - 1} 
-                className="h-12 w-12 rounded-full bg-black/70 border-gray-700 hover:bg-gray-800 text-white md:hidden shadow-lg"
+                className="h-10 w-10 rounded-full bg-black/70 border-gray-700 hover:bg-gray-800 text-white md:hidden shadow-lg"
               >
-                <FaChevronRight className="h-5 w-5" />
+                <FaChevronRight className="h-4 w-4" />
               </Button>
             </div>
             
@@ -572,8 +582,8 @@ export default function SchoolPitch() {
                 }}
                 className="w-full h-full flex-grow"
               >
-                <Card className="w-full h-full bg-gray-900/60 backdrop-blur-sm border-gray-800 overflow-y-auto">
-                  <CardContent className="p-5 md:p-10 h-full flex flex-col justify-center">
+                <Card className="w-full h-full bg-gray-900/60 backdrop-blur-sm border-gray-800 overflow-auto">
+                  <CardContent className="p-4 md:p-6 h-full flex flex-col md:flex-row md:items-center">
                     {renderSlideContent(slides[currentSlide])}
                   </CardContent>
                 </Card>
@@ -581,12 +591,12 @@ export default function SchoolPitch() {
             </AnimatePresence>
 
             {/* Mobile navigation indicators (bottom) */}
-            <div className="md:hidden flex justify-center items-center mt-6 mb-2 px-4">
+            <div className="md:hidden flex justify-center items-center mt-4 mb-2 px-4">
               <div className="flex">
                 {slides.map((_, idx) => (
                   <div 
                     key={idx}
-                    className={`w-3 h-3 mx-1 rounded-full cursor-pointer ${
+                    className={`w-2.5 h-2.5 mx-1 rounded-full cursor-pointer ${
                       idx === currentSlide ? 'bg-primary' : 'bg-gray-600'
                     }`}
                     onClick={() => {
