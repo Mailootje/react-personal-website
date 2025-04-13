@@ -81,8 +81,8 @@ export default function VideoChat() {
       
       console.log(`Connecting to Socket.IO server at ${protocol}//${host}`);
       
-      // Connect to Socket.IO server with explicit URL
-      socketRef.current = io(`${protocol}//${host}`, {
+      // Connect to Socket.IO server with explicit URL - using same port as the app
+      socketRef.current = io({
         path: '/socket.io',
         reconnectionAttempts: 5,
         reconnectionDelay: 1000,
@@ -298,11 +298,12 @@ export default function VideoChat() {
   
   // Create a WebRTC peer connection
   const createPeer = (userToSignal: string, callerId: string, stream: MediaStream) => {
-    const peer = new SimplePeer({
+    // Use type assertion to avoid TypeScript error with SimplePeer constructor
+    const peer = new (SimplePeer as any)({
       initiator: true,
       trickle: false,
       stream
-    } as any);
+    });
     
     peer.on("signal", (signal: any) => {
       socketRef.current?.emit("signal", {
@@ -327,11 +328,12 @@ export default function VideoChat() {
   
   // Add a peer who is calling
   const addPeer = (incomingSignal: any, callerId: string, stream: MediaStream) => {
-    const peer = new SimplePeer({
+    // Use type assertion to avoid TypeScript error with SimplePeer constructor
+    const peer = new (SimplePeer as any)({
       initiator: false,
       trickle: false,
       stream
-    } as any);
+    });
     
     peer.on("signal", (signal: any) => {
       socketRef.current?.emit("signal", {

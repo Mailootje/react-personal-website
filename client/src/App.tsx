@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { DarkModeProvider } from "@/components/DarkModeProvider";
 import { VideoBackground } from "@/components/VideoBackground";
+import { TestComponent } from "@/components/TestComponent";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import Photography from "@/pages/Photography";
@@ -73,14 +74,21 @@ function Router() {
 }
 
 function App() {
-  return (
-    <DarkModeProvider>
-      <QueryClientProvider client={queryClient}>
-        <Router />
-        <Toaster />
-      </QueryClientProvider>
-    </DarkModeProvider>
-  );
+  try {
+    return (
+      <DarkModeProvider>
+        <QueryClientProvider client={queryClient}>
+          <div className="app-container">
+            <Router />
+            <Toaster />
+          </div>
+        </QueryClientProvider>
+      </DarkModeProvider>
+    );
+  } catch (error) {
+    console.error("App: Error rendering App:", error);
+    return <div style={{ color: "white" }}>Error rendering application: {String(error)}</div>;
+  }
 }
 
 export default App;

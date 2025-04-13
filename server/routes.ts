@@ -1202,7 +1202,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       origin: "*",
       methods: ["GET", "POST"]
     },
-    path: "/socket.io"
+    path: "/socket.io",
+    serveClient: false // Don't serve client files
+  });
+  
+  // Enable Socket.IO debugging
+  io.engine.on("connection_error", (err) => {
+    console.log("Socket.IO connection error:", err);
   });
   
   // Store active rooms with their access codes
