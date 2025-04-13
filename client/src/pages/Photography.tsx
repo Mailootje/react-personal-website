@@ -17,31 +17,25 @@ export default function Photography() {
   const [activeFilter, setActiveFilter] = useState("all");
   const [filteredPhotos, setFilteredPhotos] = useState<Photo[]>([]);
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
 
   // Categories for the filter
   const categories = ["all", "urban", "nature", "people"];
 
   // Fetch photos using React Query
-  const { data: photos, isError } = useQuery({
+  const { data: photos = [], isError, isLoading } = useQuery({
     queryKey: ['photos', activeFilter],
     queryFn: async () => {
       const endpoint = activeFilter === 'all' 
         ? '/api/photos' 
         : `/api/photos?category=${activeFilter}`;
         
-      const response = await apiRequest<Photo[]>(endpoint);
-      return response || [];
+      return apiRequest<Photo[]>(endpoint);
     }
   });
 
+  // Update filtered photos when photos data changes
   useEffect(() => {
-    if (photos) {
-      setFilteredPhotos(photos);
-    } else {
-      setFilteredPhotos([]);
-    }
-    setIsLoading(false);
+    setFilteredPhotos(photos);
   }, [photos]);
 
   const openPhotoModal = (photo: Photo) => {
