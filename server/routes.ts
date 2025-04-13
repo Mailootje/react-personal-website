@@ -52,6 +52,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Download files API
   app.get("/api/downloads/ets2", async (req, res) => {
     try {
+      // Get version from query parameter, default to 'v1.53.x'
+      const version = req.query.version as string || 'v1.53.x';
+      
       // Fetch the ETS2 mods from mailobedo.nl
       const response = await fetch('https://mailobedo.nl/files/');
       
@@ -66,8 +69,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         throw new Error('Invalid data format received from API');
       }
       
+      // Extract available versions from the URLs
+      const availableVersions = new Set<string>();
+      data.Euro_Truck_Simulator_2.forEach((file: any) => {
+        if (file.url) {
+          const urlParts = file.url.split('/');
+          // Look for version pattern in the URL (e.g., v1.53.x)
+          for (let i = 0; i < urlParts.length; i++) {
+            if (/^v\d+\.\d+\.x$/i.test(urlParts[i])) {
+              availableVersions.add(urlParts[i].toLowerCase());
+              break;
+            }
+          }
+        }
+      });
+      
+      // Filter files by selected version
+      const filteredFiles = data.Euro_Truck_Simulator_2.filter((file: any) => {
+        return file.url && file.url.toLowerCase().includes(version.toLowerCase());
+      });
+      
       // Process the files to create a proper response
-      const processedFiles = data.Euro_Truck_Simulator_2.map((file: any, index: number) => {
+      const processedFiles = filteredFiles.map((file: any, index: number) => {
         // Extract filename from file object
         const filename = file.name || '';
         const cleanFilename = filename.replace('.scs', '').replace('.zip', '');
@@ -75,7 +98,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Create a more user-friendly name from the filename
         const name = cleanFilename
           .split('-')
-          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
           .join(' ')
           .replace(/_/g, ' ');
         
@@ -91,7 +114,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         else if (filename.includes('media')) category = 'Media';
         
         // Create tags from the filename components
-        const tags = cleanFilename.split(/[-_]/).filter(tag => 
+        const tags = cleanFilename.split(/[-_]/).filter((tag: string) => 
           tag.length > 2 && 
           !['and', 'the', 'for', 'with', 'v1', 'v2', 'v3'].includes(tag.toLowerCase())
         );
@@ -105,7 +128,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return {
           id: `ets2-${index}`,
           name: name,
-          description: `${fileType} for Euro Truck Simulator 2 v1.53.x`,
+          description: `${fileType} for Euro Truck Simulator 2 ${version}`,
           fileSize: fileSize,
           version: filename.match(/v[0-9.]+/)?.[0] || 'Latest',
           uploadDate: "2025-03-01", // Placeholder date
@@ -117,7 +140,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         };
       });
       
-      res.json(processedFiles);
+      // Return versions along with the files
+      res.json({
+        versions: Array.from(availableVersions).sort().reverse(),
+        currentVersion: version,
+        files: processedFiles
+      });
     } catch (error) {
       console.error("Error fetching ETS2 mods:", error);
       res.status(500).json({ message: "Failed to fetch ETS2 mods from source" });

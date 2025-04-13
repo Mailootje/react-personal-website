@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { Link } from "wouter";
-import { ArrowLeft, Download, FileText, Info, Clock, Tag, Loader2, AlertCircle } from "lucide-react";
+import { Link, useLocation } from "wouter";
+import { ArrowLeft, Download, FileText, Info, Clock, Tag, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface DownloadFile {
   id: string;
@@ -27,25 +28,52 @@ interface DownloadFile {
   originalUrl?: string;
 }
 
+interface DownloadsResponse {
+  versions: string[];
+  currentVersion: string;
+  files: DownloadFile[];
+}
+
 export default function EuroTruckSimulator2() {
+  const [location, setLocation] = useLocation();
+  const [downloadData, setDownloadData] = useState<DownloadsResponse | null>(null);
   const [downloadFiles, setDownloadFiles] = useState<DownloadFile[]>([]);
+  const [selectedVersion, setSelectedVersion] = useState<string>('v1.53.x');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
+  // Get version from URL query params if present
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const version = params.get('version');
+    if (version) {
+      setSelectedVersion(version);
+    }
+  }, []);
+  
+  // Fetch downloads based on selected version
   useEffect(() => {
     const fetchDownloads = async () => {
       setIsLoading(true);
       setError(null);
       
       try {
-        const response = await fetch('/api/downloads/ets2');
+        const response = await fetch(`/api/downloads/ets2?version=${selectedVersion}`);
         
         if (!response.ok) {
           throw new Error(`Failed to fetch downloads: ${response.status}`);
         }
         
         const data = await response.json();
-        setDownloadFiles(data);
+        setDownloadData(data);
+        setDownloadFiles(data.files || []);
+        
+        // Update URL with the selected version
+        const params = new URLSearchParams(window.location.search);
+        params.set('version', data.currentVersion);
+        const newUrl = `${window.location.pathname}?${params.toString()}`;
+        window.history.replaceState({}, '', newUrl);
+        
       } catch (err) {
         console.error('Error fetching downloads:', err);
         setError('Failed to load downloads. Please try again later.');
@@ -60,7 +88,7 @@ export default function EuroTruckSimulator2() {
     };
     
     fetchDownloads();
-  }, []);
+  }, [selectedVersion]);
 
   const categories = Array.from(new Set(downloadFiles.map(file => file.category)));
   
@@ -99,6 +127,41 @@ export default function EuroTruckSimulator2() {
               </div>
               
               <Separator className="my-8" />
+              
+              {/* Version Selector */}
+              {downloadData?.versions && downloadData.versions.length > 0 && (
+                <div className="mb-8">
+                  <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                    <div className="flex items-center">
+                      <h3 className="text-lg font-semibold mr-3">Game Version:</h3>
+                      <Select
+                        value={selectedVersion}
+                        onValueChange={(value) => setSelectedVersion(value)}
+                      >
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Select version" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {downloadData.versions.map((version) => (
+                            <SelectItem key={version} value={version}>
+                              <div className="flex items-center">
+                                {version}
+                                {version === selectedVersion && (
+                                  <CheckCircle2 className="ml-2 h-4 w-4 text-primary" />
+                                )}
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <p className="text-sm text-muted-foreground">
+                      Showing {downloadFiles.length} mods compatible with Euro Truck Simulator 2 {selectedVersion}
+                    </p>
+                  </div>
+                </div>
+              )}
               
               {isLoading ? (
                 <div className="space-y-6">
