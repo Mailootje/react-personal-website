@@ -141,6 +141,11 @@ const OnlineCodeEditor: React.FC = () => {
     itemId: null
   });
   
+  // Rename state
+  const [isRenaming, setIsRenaming] = useState<boolean>(false);
+  const [itemToRename, setItemToRename] = useState<string | null>(null);
+  const [newItemRename, setNewItemRename] = useState<string>('');
+  
   const [editorOptions, setEditorOptions] = useState({
     minimap: { enabled: true },
     fontSize: 14,
@@ -648,7 +653,57 @@ console.log("Let's start coding!");`,
     const hasChildren = isFolder && item.children && item.children.length > 0;
     const isBeingDragged = draggedItem === itemId;
     const isDropTarget = dropTarget === itemId;
+    const isCurrentlyRenaming = isRenaming && itemToRename === item.id;
     
+    // Render rename input if this item is being renamed
+    if (isCurrentlyRenaming) {
+      return (
+        <div key={item.id} className="fileSystemItem" style={{ paddingLeft: `${depth * 12}px` }}>
+          <div className="flex items-center py-1 px-2 bg-gray-800 rounded">
+            {isFolder ? 
+              <FaFolder className="mr-2 text-yellow-400" /> : 
+              <FaFile className="mr-2 text-blue-400" />
+            }
+            <Input 
+              value={newItemRename}
+              onChange={(e) => setNewItemRename(e.target.value)}
+              className="h-6 py-0 text-sm bg-gray-700 border-gray-600"
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') completeRenameItem();
+                if (e.key === 'Escape') cancelRenameItem();
+                e.stopPropagation();
+              }}
+              onClick={(e) => e.stopPropagation()}
+            />
+            <Button
+              variant="ghost" 
+              size="sm"
+              className="p-0 ml-1 h-6 w-6"
+              onClick={(e) => {
+                e.stopPropagation();
+                completeRenameItem();
+              }}
+            >
+              <FaCheck size={12} />
+            </Button>
+            <Button
+              variant="ghost" 
+              size="sm"
+              className="p-0 ml-1 h-6 w-6"
+              onClick={(e) => {
+                e.stopPropagation();
+                cancelRenameItem();
+              }}
+            >
+              <FaTimes size={12} />
+            </Button>
+          </div>
+        </div>
+      );
+    }
+    
+    // Regular item display
     return (
       <div key={item.id} className="fileSystemItem" style={{ paddingLeft: `${depth * 12}px` }}>
         <div 
@@ -2451,12 +2506,22 @@ console.log("Starting fresh!");`,
     }
   };
 
-  // Add document click handler for context menu
+  // Add document click handler for context menu and rename
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       // Close context menu on any click outside
       if (contextMenu.isOpen) {
         setContextMenu(prev => ({ ...prev, isOpen: false }));
+      }
+      
+      // Close rename input on any click outside (after a small delay to allow the confirm button to work)
+      if (isRenaming) {
+        // Use setTimeout to ensure click handlers on the rename UI have time to fire
+        setTimeout(() => {
+          if (isRenaming) {
+            cancelRenameItem();
+          }
+        }, 100);
       }
     };
     
@@ -2465,7 +2530,7 @@ console.log("Starting fresh!");`,
     return () => {
       document.removeEventListener('click', handleClickOutside);
     };
-  }, [contextMenu.isOpen]);
+  }, [contextMenu.isOpen, isRenaming]);
   
   // Function to download a file
   const downloadFile = (fileId: string) => {
@@ -2519,6 +2584,91 @@ console.log("Starting fresh!");`,
     });
   };
 
+  // Function to start renaming an item
+  const startRenameItem = (itemId: string) => {
+    const item = fileSystem.items[itemId];
+    if (!item) return;
+    
+    setItemToRename(itemId);
+    setNewItemRename(item.name);
+    setIsRenaming(true);
+  };
+  
+  // Function to cancel renaming
+  const cancelRenameItem = () => {
+    setItemToRename(null);
+    setNewItemRename('');
+    setIsRenaming(false);
+  };
+  
+  // Function to complete renaming
+  const completeRenameItem = () => {
+    if (!itemToRename || !newItemRename.trim()) {
+      cancelRenameItem();
+      return;
+    }
+    
+    const item = fileSystem.items[itemToRename];
+    if (!item) {
+      cancelRenameItem();
+      return;
+    }
+    
+    // Check if name already exists in the same folder
+    const siblings = Object.values(fileSystem.items).filter(
+      i => i.parent === item.parent && i.id !== item.id
+    );
+    
+    if (siblings.some(s => s.name === newItemRename)) {
+      toast({
+        title: "Error",
+        description: `An item named "${newItemRename}" already exists in this location.`,
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Update file system
+    setFileSystem(prev => {
+      const updatedItems = { ...prev.items };
+      
+      // If this is a file, update the language based on the new filename
+      if (item.type === 'file') {
+        const newLanguage = getLanguageByFilename(newItemRename);
+        
+        updatedItems[itemToRename] = {
+          ...updatedItems[itemToRename],
+          name: newItemRename,
+          language: newLanguage
+        };
+        
+        // If this file is currently open, update the editor language
+        const activeTab = tabs.find(tab => tab.fileId === itemToRename && tab.isActive);
+        if (activeTab) {
+          setCurrentLanguage(newLanguage);
+        }
+      } else {
+        // Just update the name for folders
+        updatedItems[itemToRename] = {
+          ...updatedItems[itemToRename],
+          name: newItemRename
+        };
+      }
+      
+      return {
+        ...prev,
+        items: updatedItems
+      };
+    });
+    
+    toast({
+      title: "Success",
+      description: `Renamed to "${newItemRename}".`
+    });
+    
+    cancelRenameItem();
+  };
+
   // Function to handle context menu actions
   const handleContextMenuAction = (action: string) => {
     if (!contextMenu.itemId) return;
@@ -2535,11 +2685,7 @@ console.log("Starting fresh!");`,
         }
         break;
       case 'rename':
-        // Implement rename functionality here
-        toast({
-          title: "Coming Soon",
-          description: "Rename functionality will be added soon.",
-        });
+        startRenameItem(item.id);
         break;
       case 'delete':
         deleteItem(item.id);
