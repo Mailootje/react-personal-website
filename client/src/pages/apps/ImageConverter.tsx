@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { FaUpload, FaDownload, FaFileArchive, FaTrash, FaSyncAlt, FaMicrochip } from 'react-icons/fa';
 import JSZip from 'jszip';
+import jsPDF from 'jspdf';
 
 // Ensure WebGL context type is available
 declare global {
@@ -513,6 +514,73 @@ export default function ImageConverter() {
   // Convert image to the selected format - main conversion function
   const convertImage = async (imgItem: ImageItem, options: ImageOptions): Promise<Blob | null> => {
     try {
+      // Special handling for PDF conversion
+      if (options.format === 'pdf') {
+        try {
+          // Load the image
+          const img = new Image();
+          await new Promise((resolve, reject) => {
+            img.onload = resolve;
+            img.onerror = reject;
+            img.src = imgItem.originalUrl;
+          });
+          
+          // Determine dimensions
+          let width = img.width;
+          let height = img.height;
+          
+          if (options.resize) {
+            if (options.maintainAspectRatio) {
+              // Calculate new dimensions while maintaining aspect ratio
+              const aspectRatio = img.width / img.height;
+              if (options.width / options.height > aspectRatio) {
+                height = options.height;
+                width = height * aspectRatio;
+              } else {
+                width = options.width;
+                height = width / aspectRatio;
+              }
+            } else {
+              width = options.width;
+              height = options.height;
+            }
+          }
+          
+          // Create PDF with jsPDF
+          // Use PDF orientation based on image dimensions
+          const orientation = width > height ? 'landscape' : 'portrait';
+          const pdf = new jsPDF({
+            orientation: orientation,
+            unit: 'px',
+            format: [width, height]
+          });
+          
+          // Add the image to PDF
+          pdf.addImage(
+            img, 
+            'JPEG', // format for the image inside PDF
+            0, // x position
+            0, // y position
+            width, // width
+            height, // height
+            undefined, // alias
+            'FAST' // compression option
+          );
+          
+          // Convert to blob
+          const pdfBlob = await pdf.output('blob');
+          return new Blob([pdfBlob], { type: 'application/pdf' });
+        } catch (err) {
+          console.error('Error generating PDF:', err);
+          toast({
+            title: "PDF Generation Failed",
+            description: "Failed to create PDF from image.",
+            variant: "destructive"
+          });
+          return null;
+        }
+      }
+      
       // Handle SVG format specially, as it requires different processing
       if (options.format === 'svg+xml') {
         // For SVG output, we would need server-side processing or a specialized library
@@ -689,6 +757,7 @@ export default function ImageConverter() {
     if (options.format === 'ico') fileExtension = 'ico';
     if (options.format === 'heic') fileExtension = 'heic';
     if (options.format === 'tiff') fileExtension = 'tiff';
+    if (options.format === 'pdf') fileExtension = 'pdf';
     
     const newFilename = imgItem.file.name.replace(
       new RegExp(`\\.${originalExt}$`), 
@@ -738,6 +807,7 @@ export default function ImageConverter() {
           if (options.format === 'ico') fileExtension = 'ico';
           if (options.format === 'heic') fileExtension = 'heic';
           if (options.format === 'tiff') fileExtension = 'tiff';
+          if (options.format === 'pdf') fileExtension = 'pdf';
           
           const newFilename = img.file.name.replace(
             new RegExp(`\\.${originalExt}$`), 
