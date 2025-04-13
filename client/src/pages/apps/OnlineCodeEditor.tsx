@@ -1318,59 +1318,10 @@ console.log("Let's start coding!");`,
     console.log("FileSystem rootItems:", fileSystem.rootItems);
     console.log("FileSystem items count:", Object.keys(fileSystem.items).length);
     
-    // If there are no tabs but we have content, create a new file and tab
+    // If there are no tabs but we have content, use our more reliable dedicated function
     if (tabs.length === 0 && currentContent) {
-      console.log("No tabs exist but we have content - creating new file");
-      
-      // Create a new file
-      const newFileId = generateId();
-      const newFileName = "untitled.txt";
-      const language = "plaintext";
-      
-      // Create the file in the file system
-      setFileSystem(prev => {
-        const newFileSystem = { ...prev };
-        
-        newFileSystem.items = {
-          ...newFileSystem.items,
-          [newFileId]: {
-            id: newFileId,
-            name: newFileName,
-            type: 'file',
-            content: currentContent,
-            language: language,
-            parent: null
-          }
-        };
-        
-        newFileSystem.rootItems = [...newFileSystem.rootItems, newFileId];
-        
-        return newFileSystem;
-      });
-      
-      // Create a new tab for this file
-      const newTab: EditorTab = {
-        id: generateId(),
-        fileId: newFileId,
-        isActive: true
-      };
-      
-      setTabs([newTab]);
-      setCurrentLanguage(language);
-      
-      // Save to current workspace's localStorage
-      setTimeout(() => {
-        console.log("Saving newly created file to localStorage");
-        saveToLocalStorage(workspaceName, true);
-        setLastSaveTime(new Date());
-      }, 100);
-      
-      toast({
-        title: "File Created and Saved",
-        description: `New file "${newFileName}" has been created and saved`,
-      });
-      
-      return;
+      console.log("No tabs exist but we have content - using createNewFileWithContent");
+      return createNewFileWithContent();
     }
     
     // Find active tab
@@ -1381,7 +1332,6 @@ console.log("Let's start coding!");`,
       // If we have tabs, but none are active, activate the first one
       if (tabs.length > 0) {
         console.log("We have tabs but none are active - activating first tab");
-        const firstTab = tabs[0];
         
         setTabs(prev => 
           prev.map((tab, index) => ({
@@ -1395,10 +1345,16 @@ console.log("Let's start coding!");`,
         return;
       }
       
-      console.log("No tabs found at all, returning without saving");
+      // If we have content but no tabs, create a new file
+      if (currentContent && currentContent.trim() !== '') {
+        console.log("No tabs but have content - creating new file with createNewFileWithContent");
+        return createNewFileWithContent();
+      }
+      
+      console.log("No tabs found and no content, returning without saving");
       toast({
-        title: "Save Failed",
-        description: "No active file to save",
+        title: "Nothing to Save",
+        description: "There is no content to save",
         variant: "destructive"
       });
       return;
@@ -1449,102 +1405,113 @@ console.log("Let's start coding!");`,
     setCurrentContent(value || '');
   };
 
-  // Direct Save function that doesn't rely on closure values
+  // Create and save a new file with current content
+  const createNewFileWithContent = useCallback(() => {
+    console.log("Creating new file with current content");
+    if (!currentContent) {
+      console.log("No content to save");
+      toast({
+        title: "Nothing to Save",
+        description: "There is no content to save",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Generate new IDs for file and tab
+    const newFileId = generateId();
+    const newTabId = generateId();
+    const newFileName = "untitled.txt";
+    const language = "plaintext";
+    
+    // Create file object
+    const newFile = {
+      id: newFileId,
+      name: newFileName,
+      type: 'file' as const,
+      content: currentContent,
+      language: language,
+      parent: null
+    };
+    
+    // Create tab object
+    const newTab: EditorTab = {
+      id: newTabId,
+      fileId: newFileId,
+      isActive: true
+    };
+    
+    console.log("New file:", newFile);
+    console.log("New tab:", newTab);
+    
+    // Update file system
+    const updatedFileSystem = {
+      ...fileSystem,
+      items: {
+        ...fileSystem.items,
+        [newFileId]: newFile
+      },
+      rootItems: [...fileSystem.rootItems, newFileId]
+    };
+    
+    // Update tabs - set all existing tabs to inactive
+    const updatedTabs = [
+      ...tabs.map(tab => ({ ...tab, isActive: false })),
+      newTab
+    ];
+    
+    // Save directly to localStorage
+    try {
+      const fileSystemString = JSON.stringify(updatedFileSystem);
+      const tabsString = JSON.stringify(updatedTabs);
+      
+      console.log("Saving file system to localStorage:", fileSystemString.length, "bytes");
+      console.log("Saving tabs to localStorage:", tabsString.length, "bytes");
+      
+      localStorage.setItem(`codeEditor_fileSystem_${workspaceName}`, fileSystemString);
+      localStorage.setItem(`codeEditor_tabs_${workspaceName}`, tabsString);
+      localStorage.setItem(`codeEditor_options_${workspaceName}`, JSON.stringify(editorOptions));
+      
+      // Update state
+      setFileSystem(updatedFileSystem);
+      setTabs(updatedTabs);
+      setCurrentLanguage(language);
+      setLastSaveTime(new Date());
+      
+      toast({
+        title: "File Created and Saved",
+        description: `New file "${newFileName}" has been created and saved`,
+      });
+      
+      return true;
+    } catch (error) {
+      console.error("Error saving new file:", error);
+      toast({
+        title: "Save Failed",
+        description: "Error creating and saving new file",
+        variant: "destructive"
+      });
+      return false;
+    }
+  }, [currentContent, fileSystem, tabs, workspaceName, editorOptions]);
+
+  // Generic save handler that works in all contexts
   const directSaveHandler = useCallback(() => {
     console.log("Direct save handler called");
     console.log("Current content length:", currentContent?.length || 0);
     console.log("Current tabs:", tabs);
     
-    // If there are no tabs but we have content, create a new file and tab
+    // If no tabs but we have content, create a new file
     if (tabs.length === 0 && currentContent) {
-      console.log("No tabs exist but we have content - creating new file in direct save");
-      
-      // Create a new file
-      const newFileId = generateId();
-      const newFileName = "untitled.txt";
-      const language = "plaintext";
-      
-      // Create the file in the file system
-      setFileSystem(prev => {
-        const newFileSystem = { ...prev };
-        
-        newFileSystem.items = {
-          ...newFileSystem.items,
-          [newFileId]: {
-            id: newFileId,
-            name: newFileName,
-            type: 'file',
-            content: currentContent,
-            language: language,
-            parent: null
-          }
-        };
-        
-        newFileSystem.rootItems = [...newFileSystem.rootItems, newFileId];
-        
-        return newFileSystem;
-      });
-      
-      // Create a new tab for this file
-      const newTab: EditorTab = {
-        id: generateId(),
-        fileId: newFileId,
-        isActive: true
-      };
-      
-      setTabs([newTab]);
-      setCurrentLanguage(language);
-      
-      // Save to current workspace's localStorage
-      setTimeout(() => {
-        console.log("Saving newly created file to localStorage from direct save");
-        try {
-          // Save current workspace state directly without relying on state closure
-          const updatedFileSystem = {
-            ...fileSystem,
-            items: {
-              ...fileSystem.items,
-              [newFileId]: {
-                id: newFileId,
-                name: newFileName,
-                type: 'file',
-                content: currentContent,
-                language: language,
-                parent: null
-              }
-            },
-            rootItems: [...fileSystem.rootItems, newFileId]
-          };
-          
-          // Directly save without using saveToLocalStorage which depends on state closures
-          const fileSystemString = JSON.stringify(updatedFileSystem);
-          const tabsString = JSON.stringify([newTab]);
-          localStorage.setItem(`codeEditor_fileSystem_${workspaceName}`, fileSystemString);
-          localStorage.setItem(`codeEditor_tabs_${workspaceName}`, tabsString);
-          localStorage.setItem(`codeEditor_options_${workspaceName}`, JSON.stringify(editorOptions));
-          
-          setLastSaveTime(new Date());
-          
-          toast({
-            title: "File Created and Saved",
-            description: `New file "${newFileName}" has been created and saved`,
-          });
-        } catch (error) {
-          console.error("Error saving:", error);
-          toast({
-            title: "Save Failed",
-            description: "Error saving new file",
-            variant: "destructive"
-          });
-        }
-      }, 100);
-      
-      return;
+      console.log("No tabs but have content - creating new file");
+      return createNewFileWithContent();
     }
     
-    // Use the regular save function if we have tabs
+    // If we have tabs, use the normal save function
+    console.log("Have tabs - using normal save function");
     saveCurrentFile();
-  }, [currentContent, tabs, workspaceName, fileSystem, editorOptions]);
+    return true;
+  }, [tabs, currentContent, createNewFileWithContent, saveCurrentFile]);
 
   // Prevent default browser shortcuts that conflict with editor
   const preventDefaultHandler = useCallback((e: KeyboardEvent) => {
