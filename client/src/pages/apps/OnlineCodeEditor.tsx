@@ -988,7 +988,8 @@ console.log("Let's start coding with more storage!");`,
     }
     
     // Set the editor content and language
-    setCurrentContent(file.content || '');
+    // Don't try to parse content for image files - the image viewer will handle displaying them
+    setCurrentContent(file.isImage ? '' : (file.content || ''));
     setCurrentLanguage(file.language || 'plaintext');
   };
 
@@ -1009,7 +1010,7 @@ console.log("Let's start coding with more storage!");`,
       
       // Set content and language to the new active tab
       const activeFile = fileSystem.items[newTabs[newActiveIndex].fileId];
-      setCurrentContent(activeFile.content || '');
+      setCurrentContent(activeFile.isImage ? '' : (activeFile.content || ''));
       setCurrentLanguage(activeFile.language || 'plaintext');
     }
     
@@ -1035,7 +1036,7 @@ console.log("Let's start coding with more storage!");`,
     const activeTab = newTabs.find(tab => tab.isActive);
     if (activeTab) {
       const activeFile = fileSystem.items[activeTab.fileId];
-      setCurrentContent(activeFile.content || '');
+      setCurrentContent(activeFile.isImage ? '' : (activeFile.content || ''));
       setCurrentLanguage(activeFile.language || 'plaintext');
     }
   };
@@ -1344,7 +1345,12 @@ console.log("Let's start coding with more storage!");`,
         newTab
       ]);
       
-      setCurrentContent(content);
+      // Don't try to set image content as text in the editor
+      if (!isImage) {
+        setCurrentContent(content);
+      } else {
+        setCurrentContent('');  // Empty string for images
+      }
       setCurrentLanguage(language);
       
       toast({
