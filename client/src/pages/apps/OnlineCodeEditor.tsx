@@ -1259,21 +1259,16 @@ console.log("Let's start coding!");`,
         }
       };
       
-      // Save to localStorage after updating state
-      try {
-        localStorage.setItem('codeEditor_fileSystem', JSON.stringify(newFileSystem));
-        localStorage.setItem('codeEditor_tabs', JSON.stringify(tabs));
-        setLastSaveTime(new Date());
-      } catch (err) {
-        console.error('Failed to auto-save to localStorage:', err);
-      }
-      
       return newFileSystem;
     });
     
+    // Save to current workspace's localStorage
+    saveToLocalStorage(workspaceName);
+    setLastSaveTime(new Date());
+    
     toast({
-      title: "File saved",
-      description: `Changes have been saved to memory`,
+      title: "File Saved",
+      description: `File saved to "${workspaceName}" workspace`,
     });
   };
 
@@ -1734,13 +1729,34 @@ console.log("Let's start coding in workspace ${name}!");`,
     
     const interval = setInterval(() => {
       if (tabs.length > 0) {
-        saveCurrentFile();
-        setLastSaveTime(new Date());
+        // Only update the file system
+        const activeTab = tabs.find(tab => tab.isActive);
+        if (activeTab) {
+          setFileSystem(prev => {
+            const fileId = activeTab.fileId;
+            const file = prev.items[fileId];
+            
+            return {
+              ...prev,
+              items: {
+                ...prev.items,
+                [fileId]: {
+                  ...file,
+                  content: currentContent
+                }
+              }
+            };
+          });
+          
+          // Save to current workspace's localStorage
+          saveToLocalStorage(workspaceName);
+          setLastSaveTime(new Date());
+        }
       }
     }, autoSaveInterval * 1000);
     
     return () => clearInterval(interval);
-  }, [autoSaveEnabled, autoSaveInterval, tabs]);
+  }, [autoSaveEnabled, autoSaveInterval, tabs, currentContent, workspaceName]);
 
   // Check for localStorage data on first load
   useEffect(() => {
@@ -2439,14 +2455,14 @@ console.log("Let's start coding in workspace ${name}!");`,
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  onClick={saveToLocalStorage}
+                  onClick={() => saveToLocalStorage()}
                 >
                   Save
                 </Button>
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  onClick={loadFromLocalStorage}
+                  onClick={() => loadFromLocalStorage()}
                 >
                   Load
                 </Button>
