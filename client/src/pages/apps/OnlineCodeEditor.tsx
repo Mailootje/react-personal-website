@@ -1449,14 +1449,111 @@ console.log("Let's start coding!");`,
     setCurrentContent(value || '');
   };
 
+  // Direct Save function that doesn't rely on closure values
+  const directSaveHandler = useCallback(() => {
+    console.log("Direct save handler called");
+    console.log("Current content length:", currentContent?.length || 0);
+    console.log("Current tabs:", tabs);
+    
+    // If there are no tabs but we have content, create a new file and tab
+    if (tabs.length === 0 && currentContent) {
+      console.log("No tabs exist but we have content - creating new file in direct save");
+      
+      // Create a new file
+      const newFileId = generateId();
+      const newFileName = "untitled.txt";
+      const language = "plaintext";
+      
+      // Create the file in the file system
+      setFileSystem(prev => {
+        const newFileSystem = { ...prev };
+        
+        newFileSystem.items = {
+          ...newFileSystem.items,
+          [newFileId]: {
+            id: newFileId,
+            name: newFileName,
+            type: 'file',
+            content: currentContent,
+            language: language,
+            parent: null
+          }
+        };
+        
+        newFileSystem.rootItems = [...newFileSystem.rootItems, newFileId];
+        
+        return newFileSystem;
+      });
+      
+      // Create a new tab for this file
+      const newTab: EditorTab = {
+        id: generateId(),
+        fileId: newFileId,
+        isActive: true
+      };
+      
+      setTabs([newTab]);
+      setCurrentLanguage(language);
+      
+      // Save to current workspace's localStorage
+      setTimeout(() => {
+        console.log("Saving newly created file to localStorage from direct save");
+        try {
+          // Save current workspace state directly without relying on state closure
+          const updatedFileSystem = {
+            ...fileSystem,
+            items: {
+              ...fileSystem.items,
+              [newFileId]: {
+                id: newFileId,
+                name: newFileName,
+                type: 'file',
+                content: currentContent,
+                language: language,
+                parent: null
+              }
+            },
+            rootItems: [...fileSystem.rootItems, newFileId]
+          };
+          
+          // Directly save without using saveToLocalStorage which depends on state closures
+          const fileSystemString = JSON.stringify(updatedFileSystem);
+          const tabsString = JSON.stringify([newTab]);
+          localStorage.setItem(`codeEditor_fileSystem_${workspaceName}`, fileSystemString);
+          localStorage.setItem(`codeEditor_tabs_${workspaceName}`, tabsString);
+          localStorage.setItem(`codeEditor_options_${workspaceName}`, JSON.stringify(editorOptions));
+          
+          setLastSaveTime(new Date());
+          
+          toast({
+            title: "File Created and Saved",
+            description: `New file "${newFileName}" has been created and saved`,
+          });
+        } catch (error) {
+          console.error("Error saving:", error);
+          toast({
+            title: "Save Failed",
+            description: "Error saving new file",
+            variant: "destructive"
+          });
+        }
+      }, 100);
+      
+      return;
+    }
+    
+    // Use the regular save function if we have tabs
+    saveCurrentFile();
+  }, [currentContent, tabs, workspaceName, fileSystem, editorOptions]);
+
   // Prevent default browser shortcuts that conflict with editor
   const preventDefaultHandler = useCallback((e: KeyboardEvent) => {
     // Prevent browser's save dialog when Ctrl+S is pressed 
-    // and trigger save function explicitly
+    // and trigger direct save function explicitly
     if ((e.ctrlKey || e.metaKey) && e.key === 's') {
       e.preventDefault();
-      saveCurrentFile();
-      console.log("Ctrl+S prevented and save triggered");
+      directSaveHandler();
+      console.log("Ctrl+S prevented and direct save triggered");
     }
     // Prevent browser's find dialog when Ctrl+F is pressed
     // and open the search dialog
@@ -1465,7 +1562,7 @@ console.log("Let's start coding!");`,
       setIsSearchOpen(true);
       console.log("Ctrl+F prevented and search dialog opened");
     }
-  }, [saveCurrentFile, setIsSearchOpen]);
+  }, [directSaveHandler, setIsSearchOpen]);
 
   // Add event listener when editor is mounted and remove when unmounted
   useEffect(() => {
@@ -1478,8 +1575,8 @@ console.log("Let's start coding!");`,
   // Handle editor mount
   const handleEditorDidMount = (editor: any, monaco: any) => {
     editorRef.current = editor;
-    // Setup editor keybindings
-    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, saveCurrentFile);
+    // Setup editor keybindings with our direct save handler
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, directSaveHandler);
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyF, () => setIsSearchOpen(true));
     
     // Focus the editor
@@ -2292,8 +2389,8 @@ console.log("Starting fresh!");`,
                         variant="ghost" 
                         size="sm"
                         className="h-7 px-1.5"
-                        onClick={saveCurrentFile}
-                        disabled={tabs.length === 0}
+                        onClick={directSaveHandler}
+                        disabled={!currentContent}
                       >
                         <FaSave size={14} />
                         <span className="ml-1">Save</span>
