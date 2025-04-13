@@ -25,6 +25,13 @@ export default function Apps() {
       icon: "🔐",
       tags: ["Security", "Utility"]
     },
+    {
+      id: "link-shortener",
+      title: "Link Shortener",
+      description: "Shorten long URLs into compact, easy-to-share links",
+      icon: "🔗",
+      tags: ["Utility", "Sharing"]
+    },
     // Add more apps as needed
   ]);
 

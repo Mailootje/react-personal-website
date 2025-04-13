@@ -7,6 +7,7 @@ import Home from "@/pages/Home";
 import Photography from "@/pages/Photography";
 import Apps from "@/pages/Apps";
 import PasswordGenerator from "@/pages/apps/PasswordGenerator";
+import LinkShortener from "@/pages/apps/LinkShortener";
 
 function Router() {
   return (
@@ -15,6 +16,7 @@ function Router() {
       <Route path="/photography" component={Photography}/>
       <Route path="/apps" component={Apps}/>
       <Route path="/apps/password-generator" component={PasswordGenerator}/>
+      <Route path="/apps/link-shortener" component={LinkShortener}/>
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
