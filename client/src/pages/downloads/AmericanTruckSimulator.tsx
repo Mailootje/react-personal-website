@@ -38,7 +38,7 @@ export default function AmericanTruckSimulator() {
   const [location, setLocation] = useLocation();
   const [downloadData, setDownloadData] = useState<DownloadsResponse | null>(null);
   const [downloadFiles, setDownloadFiles] = useState<DownloadFile[]>([]);
-  const [selectedVersion, setSelectedVersion] = useState<string>('v1.53.x');
+  const [selectedVersion, setSelectedVersion] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showLoadOrder, setShowLoadOrder] = useState(false);
