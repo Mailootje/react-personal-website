@@ -154,18 +154,18 @@ export const experiences: Experience[] = [
 
 export const educations: Education[] = [
   {
-    degree: "Bachelor's in Computer Science",
-    institution: "University of Amsterdam",
-    period: "2012 - 2016",
+    degree: "Software Developer",
+    institution: "ROC A12",
+    period: "2020 - 2025",
     description:
-      "Focused on software development and web technologies. Participated in various coding competitions and hackathons. Completed coursework in algorithms, data structures, and web development.",
+      "Focused on software development and web technologies. Completed coursework in algorithms, data structures, and web development.",
   },
   {
-    degree: "IT Support",
+    degree: "Software Developer",
     institution: "ROC A12",
     period: "2018 - 2019",
     description:
-      "Specialized training in system administration, network troubleshooting, and technical support. Gained practical experience in hardware diagnostics, software installation, and customer service. Developed skills in resolving complex IT issues and maintaining system security.",
+      "Intensive program focusing on modern software development practices and programming languages. Gained strong foundation in full-stack development, database design, and application architecture. Created multiple real-world projects using JavaScript, React, and Node.js while implementing industry best practices for code quality and efficiency.",
   },
 ];
 
