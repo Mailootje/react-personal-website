@@ -238,15 +238,8 @@ export default function EuroTruckSimulator2() {
                   </div>
                   
                   <TabsContent value="all" className="mt-0">
-                    <div className="grid grid-cols-1 lg:grid-cols-7 gap-6">
-                      <div className="lg:col-span-3">
-                        <div className="grid grid-cols-1 gap-6">
-                          {downloadFiles.map(file => (
-                            <DownloadCard key={file.id} file={file} />
-                          ))}
-                        </div>
-                      </div>
-                      <div className={`lg:col-span-4 ${!showLoadOrder ? 'hidden lg:block' : ''}`}>
+                    <div className="grid grid-cols-1 gap-6">
+                      <div className={`${!showLoadOrder ? 'hidden lg:block' : ''}`}>
                         <Card className="shadow-sm mb-6">
                           <CardHeader>
                             <CardTitle className="text-xl">Recommended Load Order</CardTitle>
@@ -295,23 +288,20 @@ export default function EuroTruckSimulator2() {
                           </CardContent>
                         </Card>
                       </div>
+                      <div>
+                        <div className="grid grid-cols-1 gap-6">
+                          {downloadFiles.map(file => (
+                            <DownloadCard key={file.id} file={file} />
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   </TabsContent>
                   
                   {categories.map(category => (
                     <TabsContent key={category} value={category} className="mt-0">
-                      <div className="grid grid-cols-1 lg:grid-cols-7 gap-6">
-                        <div className="lg:col-span-3">
-                          <div className="grid grid-cols-1 gap-6">
-                            {downloadFiles
-                              .filter(file => file.category === category)
-                              .map(file => (
-                                <DownloadCard key={file.id} file={file} />
-                              ))
-                            }
-                          </div>
-                        </div>
-                        <div className={`lg:col-span-4 ${!showLoadOrder ? 'hidden lg:block' : ''}`}>
+                      <div className="grid grid-cols-1 gap-6">
+                        <div className={`${!showLoadOrder ? 'hidden lg:block' : ''}`}>
                           <Card className="shadow-sm mb-6">
                             <CardHeader>
                               <CardTitle className="text-xl">Recommended Load Order</CardTitle>
@@ -359,6 +349,16 @@ export default function EuroTruckSimulator2() {
                               </div>
                             </CardContent>
                           </Card>
+                        </div>
+                        <div>
+                          <div className="grid grid-cols-1 gap-6">
+                            {downloadFiles
+                              .filter(file => file.category === category)
+                              .map(file => (
+                                <DownloadCard key={file.id} file={file} />
+                              ))
+                            }
+                          </div>
                         </div>
                       </div>
                     </TabsContent>
