@@ -10,6 +10,8 @@ import QRCode from 'qrcode';
 import https from 'https';
 import crypto from 'crypto';
 import fetch from 'node-fetch';
+import { Server as SocketIOServer } from "socket.io";
+import { WebSocketServer } from "ws";
 
 interface PhotoItem {
   id: string;
@@ -1193,6 +1195,191 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   const httpServer = createServer(app);
+  
+  // Setup Socket.IO for video/voice streaming with room code functionality
+  const io = new SocketIOServer(httpServer, {
+    cors: {
+      origin: "*",
+      methods: ["GET", "POST"]
+    }
+  });
+  
+  // Store active rooms with their access codes
+  const rooms: Record<string, {
+    roomCode: string,
+    participants: Map<string, { id: string, name: string }>
+  }> = {};
+  
+  // Generate a random room code
+  const generateRoomCode = () => {
+    return Math.random().toString(36).substring(2, 8).toUpperCase();
+  };
+  
+  // Handle Socket.IO connections
+  io.on('connection', (socket) => {
+    console.log(`User connected: ${socket.id}`);
+    
+    // Create a new room
+    socket.on('create-room', (userData: { name: string }, callback) => {
+      try {
+        const roomId = crypto.randomBytes(8).toString('hex');
+        const roomCode = generateRoomCode();
+        
+        rooms[roomId] = {
+          roomCode,
+          participants: new Map()
+        };
+        
+        console.log(`Room created: ${roomId} with code: ${roomCode}`);
+        callback({ success: true, roomId, roomCode });
+      } catch (error) {
+        console.error('Error creating room:', error);
+        callback({ success: false, error: 'Failed to create room' });
+      }
+    });
+    
+    // Join a room with room code
+    socket.on('join-room', (data: { roomId: string, roomCode: string, name: string }, callback) => {
+      try {
+        const { roomId, roomCode, name } = data;
+        const room = rooms[roomId];
+        
+        if (!room) {
+          return callback({ 
+            success: false, 
+            error: 'Room not found' 
+          });
+        }
+        
+        if (room.roomCode !== roomCode) {
+          return callback({ 
+            success: false, 
+            error: 'Invalid room code' 
+          });
+        }
+        
+        // Add user to the room
+        socket.join(roomId);
+        room.participants.set(socket.id, { id: socket.id, name });
+        
+        // Notify other participants that a new user joined
+        socket.to(roomId).emit('user-joined', { id: socket.id, name });
+        
+        // Send list of existing participants to the new user
+        const participants = Array.from(room.participants.values());
+        
+        callback({ 
+          success: true, 
+          participants 
+        });
+        
+        console.log(`User ${socket.id} (${name}) joined room ${roomId}`);
+      } catch (error) {
+        console.error('Error joining room:', error);
+        callback({ success: false, error: 'Failed to join room' });
+      }
+    });
+    
+    // Handle WebRTC signaling
+    socket.on('signal', (data: { roomId: string, to: string, signal: any }) => {
+      const { roomId, to, signal } = data;
+      
+      if (rooms[roomId]?.participants.has(socket.id)) {
+        io.to(to).emit('signal', {
+          from: socket.id,
+          signal
+        });
+      }
+    });
+    
+    // Handle chat messages
+    socket.on('chat-message', (data: { roomId: string, message: string }) => {
+      const { roomId, message } = data;
+      const room = rooms[roomId];
+      
+      if (room?.participants.has(socket.id)) {
+        const sender = room.participants.get(socket.id);
+        io.to(roomId).emit('chat-message', {
+          sender: sender?.name || 'Unknown',
+          message,
+          timestamp: new Date().toISOString()
+        });
+      }
+    });
+    
+    // Handle user disconnect
+    socket.on('disconnect', () => {
+      console.log(`User disconnected: ${socket.id}`);
+      
+      // Find which room this user was in
+      for (const roomId in rooms) {
+        const room = rooms[roomId];
+        if (room.participants.has(socket.id)) {
+          // Remove user from the room
+          const userData = room.participants.get(socket.id);
+          room.participants.delete(socket.id);
+          
+          // Notify others that user left
+          socket.to(roomId).emit('user-left', { id: socket.id });
+          
+          // Clean up empty rooms
+          if (room.participants.size === 0) {
+            delete rooms[roomId];
+            console.log(`Room ${roomId} deleted (no participants left)`);
+          }
+          
+          break;
+        }
+      }
+    });
+    
+    // Handle user leaving a room
+    socket.on('leave-room', (data: { roomId: string }) => {
+      const { roomId } = data;
+      const room = rooms[roomId];
+      
+      if (room?.participants.has(socket.id)) {
+        // Remove user from the room
+        room.participants.delete(socket.id);
+        socket.leave(roomId);
+        
+        // Notify others that user left
+        socket.to(roomId).emit('user-left', { id: socket.id });
+        
+        // Clean up empty rooms
+        if (room.participants.size === 0) {
+          delete rooms[roomId];
+          console.log(`Room ${roomId} deleted (no participants left)`);
+        }
+      }
+    });
+  });
+  
+  // Also setup a WebSocket server for signaling on a distinct path
+  const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
+  
+  wss.on('connection', (ws) => {
+    console.log('WebSocket client connected');
+    
+    ws.on('message', (message) => {
+      try {
+        const data = JSON.parse(message.toString());
+        
+        // Broadcast to all clients except sender
+        wss.clients.forEach((client) => {
+          if (client !== ws && client.readyState === ws.OPEN) {
+            client.send(JSON.stringify(data));
+          }
+        });
+      } catch (error) {
+        console.error('Error handling WebSocket message:', error);
+      }
+    });
+    
+    ws.on('close', () => {
+      console.log('WebSocket client disconnected');
+    });
+  });
 
   return httpServer;
 }
