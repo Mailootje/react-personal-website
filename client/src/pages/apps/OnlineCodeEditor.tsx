@@ -1451,15 +1451,21 @@ console.log("Let's start coding!");`,
 
   // Prevent default browser shortcuts that conflict with editor
   const preventDefaultHandler = useCallback((e: KeyboardEvent) => {
-    // Prevent browser's save dialog when Ctrl+S is pressed
+    // Prevent browser's save dialog when Ctrl+S is pressed 
+    // and trigger save function explicitly
     if ((e.ctrlKey || e.metaKey) && e.key === 's') {
       e.preventDefault();
+      saveCurrentFile();
+      console.log("Ctrl+S prevented and save triggered");
     }
     // Prevent browser's find dialog when Ctrl+F is pressed
+    // and open the search dialog
     if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
       e.preventDefault();
+      setIsSearchOpen(true);
+      console.log("Ctrl+F prevented and search dialog opened");
     }
-  }, []);
+  }, [saveCurrentFile, setIsSearchOpen]);
 
   // Add event listener when editor is mounted and remove when unmounted
   useEffect(() => {
