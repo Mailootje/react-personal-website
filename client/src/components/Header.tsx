@@ -1,95 +1,72 @@
 import { useEffect, useState } from "react";
+import { Link } from "wouter";
 import { navigationItems } from "@/lib/data";
+import { MobileMenu } from "./MobileMenu";
 import { scrollToElement } from "@/lib/utils";
 
 export function Header() {
-  const [darkMode, setDarkMode] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    // Check if user previously set dark mode
-    const storedDarkMode = localStorage.getItem('darkMode') === 'true';
-    setDarkMode(storedDarkMode);
-    
-    if (storedDarkMode) {
-      document.body.classList.add('dark-mode');
-    }
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const toggleDarkMode = () => {
-    const newDarkMode = !darkMode;
-    setDarkMode(newDarkMode);
-    localStorage.setItem('darkMode', String(newDarkMode));
-    
-    if (newDarkMode) {
-      document.body.classList.add('dark-mode');
-    } else {
-      document.body.classList.remove('dark-mode');
-    }
-  };
-
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    if (href.startsWith('#')) {
-      e.preventDefault();
-      const elementId = href.replace("#", "");
-      scrollToElement(elementId);
-    }
-  };
-
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
-    
-    // Toggle hamburger menu animation class
-    const navToggle = document.getElementById('nav-toggle');
-    if (navToggle) {
-      navToggle.classList.toggle('is-active');
-    }
+    e.preventDefault();
+    const elementId = href.replace("#", "");
+    scrollToElement(elementId);
   };
 
   return (
-    <nav className="custom-navbar" data-spy="affix" data-offset-top="20">
-      <div className="container">
-        <a className="logo" href="#"></a>
-        <ul className={`nav ${mobileMenuOpen ? 'show' : ''}`}>
-          {navigationItems.map((item) => (
-            <li key={item.name} className="item">
-              <a 
-                className="link" 
-                href={item.href}
-                onClick={(e) => handleNavClick(e, item.href)}
-              >
-                {item.name}
-              </a>
-            </li>
-          ))}
-          <li className="item dark-mode-slider">
-            <div 
-              className="slider" 
-              id="dark-mode-slider"
-              onClick={toggleDarkMode}
-              style={{ backgroundColor: darkMode ? '#333' : '#ddd' }}
-            >
-              <div 
-                className="slider-button" 
-                style={{ 
-                  transform: darkMode ? 'translateX(20px)' : 'translateX(0)',
-                  backgroundColor: darkMode ? '#fff' : '#888'
-                }}
-              ></div>
-            </div>
-          </li>
-        </ul>
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      isScrolled ? "bg-white/90 backdrop-blur-sm shadow-sm" : "bg-transparent"
+    }`}>
+      <div className="container mx-auto px-6 py-4 flex justify-between items-center">
         <a 
-          href="javascript:void(0)" 
-          id="nav-toggle" 
-          className={`hamburger hamburger--elastic ${mobileMenuOpen ? 'is-active' : ''}`}
-          onClick={toggleMobileMenu}
+          href="#hero" 
+          className="text-xl font-bold text-primary flex items-center space-x-2"
+          onClick={(e) => handleNavClick(e, "#hero")}
         >
-          <div className="hamburger-box">
-            <div className="hamburger-inner"></div>
-          </div>
+          <span className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white">JD</span>
+          <span>John Doe</span>
         </a>
+        
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex space-x-8">
+          {navigationItems.map((item) => (
+            <a
+              key={item.name}
+              href={item.href}
+              className="text-text hover:text-primary transition-colors font-medium"
+              onClick={(e) => handleNavClick(e, item.href)}
+            >
+              {item.name}
+            </a>
+          ))}
+        </nav>
+        
+        {/* Mobile Navigation Toggle */}
+        <button 
+          className="md:hidden text-text hover:text-primary transition-colors focus:outline-none"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label="Toggle mobile menu"
+        >
+          <i className={`${mobileMenuOpen ? "ri-close-line" : "ri-menu-line"} text-2xl`}></i>
+        </button>
       </div>
-    </nav>
+      
+      {/* Mobile Navigation Menu */}
+      <MobileMenu 
+        isOpen={mobileMenuOpen} 
+        onClose={() => setMobileMenuOpen(false)} 
+        items={navigationItems}
+      />
+    </header>
   );
 }
