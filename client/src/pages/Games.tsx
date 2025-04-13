@@ -32,6 +32,13 @@ export default function Games() {
       icon: "🧩",
       tags: ["Game", "Puzzle", "Classic"],
     },
+    {
+      id: "pacman",
+      title: "Pac-Man",
+      description: "The classic arcade game. Navigate the maze, eat all the dots, and avoid the ghosts!",
+      icon: "👾",
+      tags: ["Game", "Arcade", "Classic"],
+    },
     // You can add more games here in the future
   ]);
 

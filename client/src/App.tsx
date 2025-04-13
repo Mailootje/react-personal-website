@@ -14,6 +14,7 @@ import QRCodeGenerator from "@/pages/apps/QRCodeGenerator";
 import WeatherDashboard from "@/pages/apps/WeatherDashboard";
 import Snake from "@/pages/games/Snake";
 import Tetris from "@/pages/games/Tetris";
+import Pacman from "@/pages/games/Pacman";
 import EuroTruckSimulator2 from "@/pages/downloads/EuroTruckSimulator2";
 
 function Router() {
@@ -31,6 +32,7 @@ function Router() {
       <Route path="/games" component={Games}/>
       <Route path="/games/snake" component={Snake}/>
       <Route path="/games/tetris" component={Tetris}/>
+      <Route path="/games/pacman" component={Pacman}/>
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
