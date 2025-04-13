@@ -7,9 +7,9 @@ import { staggerContainer } from "@/lib/utils";
 
 export function Resume() {
   return (
-    <section id="resume" className="py-20 px-6">
+    <section id="resume" className="py-20 px-6 bg-black/70">
       <Container maxWidth="5xl">
-        <SectionHeading subtitle="My Resume" title="Experience & Education" />
+        <SectionHeading subtitle="My Resume" title="Experience & Education" isDark={true} />
         
         <div className="grid md:grid-cols-2 gap-12">
           <div>
@@ -17,7 +17,7 @@ export function Resume() {
               <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary mr-4">
                 <i className="ri-briefcase-4-fill text-xl"></i>
               </div>
-              <h3 className="text-2xl font-bold">Work Experience</h3>
+              <h3 className="text-2xl font-bold text-white">Work Experience</h3>
             </div>
             
             <motion.div
@@ -29,7 +29,7 @@ export function Resume() {
               {experiences.map((experience, index) => (
                 <motion.div 
                   key={experience.title + experience.company}
-                  className="relative pl-8 pb-8 border-l-2 border-gray-200 last:border-0"
+                  className="relative pl-8 pb-8 border-l-2 border-gray-700 last:border-0"
                   variants={{
                     hidden: { opacity: 0, y: 20 },
                     visible: { 
@@ -43,13 +43,13 @@ export function Resume() {
                   }}
                 >
                   <div className="absolute left-[-8px] top-0 w-4 h-4 rounded-full bg-primary"></div>
-                  <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                  <div className="bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-800">
                     <div className="flex justify-between flex-wrap mb-2">
-                      <h4 className="font-bold">{experience.title}</h4>
+                      <h4 className="font-bold text-gray-100">{experience.title}</h4>
                       <span className="text-xs py-1 px-2 bg-primary/10 text-primary rounded-full">{experience.period}</span>
                     </div>
-                    <h5 className="text-muted-foreground mb-4">{experience.company}</h5>
-                    <p className="text-sm text-muted-foreground">
+                    <h5 className="text-gray-300 mb-4">{experience.company}</h5>
+                    <p className="text-sm text-gray-400">
                       {experience.description}
                     </p>
                   </div>
@@ -63,7 +63,7 @@ export function Resume() {
               <div className="h-10 w-10 rounded-full bg-green-500/10 flex items-center justify-center text-green-500 mr-4">
                 <i className="ri-graduation-cap-fill text-xl"></i>
               </div>
-              <h3 className="text-2xl font-bold">Education</h3>
+              <h3 className="text-2xl font-bold text-white">Education</h3>
             </div>
             
             <motion.div
@@ -75,7 +75,7 @@ export function Resume() {
               {educations.map((education) => (
                 <motion.div 
                   key={education.degree + education.institution}
-                  className="relative pl-8 pb-8 border-l-2 border-gray-200"
+                  className="relative pl-8 pb-8 border-l-2 border-gray-700"
                   variants={{
                     hidden: { opacity: 0, y: 20 },
                     visible: { 
@@ -89,13 +89,13 @@ export function Resume() {
                   }}
                 >
                   <div className="absolute left-[-8px] top-0 w-4 h-4 rounded-full bg-green-500"></div>
-                  <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                  <div className="bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-800">
                     <div className="flex justify-between flex-wrap mb-2">
-                      <h4 className="font-bold">{education.degree}</h4>
+                      <h4 className="font-bold text-gray-100">{education.degree}</h4>
                       <span className="text-xs py-1 px-2 bg-green-500/10 text-green-500 rounded-full">{education.period}</span>
                     </div>
-                    <h5 className="text-muted-foreground mb-4">{education.institution}</h5>
-                    <p className="text-sm text-muted-foreground">
+                    <h5 className="text-gray-300 mb-4">{education.institution}</h5>
+                    <p className="text-sm text-gray-400">
                       {education.description}
                     </p>
                   </div>
@@ -108,23 +108,23 @@ export function Resume() {
                 <div className="h-10 w-10 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-500 mr-4">
                   <i className="ri-award-fill text-xl"></i>
                 </div>
-                <h3 className="text-2xl font-bold">Certifications</h3>
+                <h3 className="text-2xl font-bold text-white">Certifications</h3>
               </div>
               
               <motion.div 
-                className="relative pl-8 pb-8 border-l-2 border-gray-200"
+                className="relative pl-8 pb-8 border-l-2 border-gray-700"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
                 viewport={{ once: true }}
               >
                 <div className="absolute left-[-8px] top-0 w-4 h-4 rounded-full bg-purple-500"></div>
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <div className="bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-800">
                   <ul className="space-y-3">
                     {certifications.map((cert) => (
                       <li key={cert.name} className="flex items-center">
                         <i className="ri-check-line text-purple-500 mr-2"></i>
-                        <span className="text-sm">{cert.name}</span>
+                        <span className="text-sm text-gray-300">{cert.name}</span>
                       </li>
                     ))}
                   </ul>
