@@ -1265,58 +1265,129 @@ console.log("Let's start coding with more storage!");`,
 
   // Process a single file upload
   const processSingleFile = (file: File) => {
-    const reader = new FileReader();
+    // Determine if this is a text file or binary file
+    const extension = file.name.split('.').pop()?.toLowerCase() || '';
+    const isLikelyText = !['zip', 'png', 'jpg', 'jpeg', 'gif', 'pdf', 'exe', 'dll', 
+                         'so', 'a', 'o', 'class', 'jar', 'war', 'ear', 'mp3', 
+                         'mp4', 'avi', 'mov', 'mpg', 'mpeg', 'webm', 'woff', 
+                         'woff2', 'eot', 'ttf', 'otf', 'ico', 'gz', 'tar', 
+                         'rar', '7z', 'dat', 'bin', 'iso', 'dmg'].includes(extension);
     
-    reader.onload = (e) => {
-      const content = e.target?.result as string;
-      
-      // Create a new file in the root
-      const newFileId = generateId();
-      const language = getLanguageByFilename(file.name);
-      
-      // Update the file system
-      setFileSystem(prev => {
-        const newFileSystem = { ...prev };
-        
-        newFileSystem.items = {
-          ...newFileSystem.items,
-          [newFileId]: {
-            id: newFileId,
-            name: file.name,
-            type: 'file',
-            content: content,
-            language: language,
-            parent: null
-          }
-        };
-        
-        newFileSystem.rootItems = [...newFileSystem.rootItems, newFileId];
-        
-        return newFileSystem;
-      });
-      
-      // Open the file
-      const newTab: EditorTab = {
-        id: generateId(),
-        fileId: newFileId,
-        isActive: true
-      };
-      
-      setTabs(prev => [
-        ...prev.map(tab => ({ ...tab, isActive: false })),
-        newTab
-      ]);
-      
-      setCurrentContent(content);
-      setCurrentLanguage(language);
-      
-      toast({
-        title: "File uploaded",
-        description: `${file.name} has been added to your workspace`,
-      });
+    const newFileId = generateId();
+    const language = getLanguageByFilename(file.name);
+    const newTab: EditorTab = {
+      id: generateId(),
+      fileId: newFileId,
+      isActive: true
     };
     
-    reader.readAsText(file);
+    if (isLikelyText) {
+      // For text files, use text reading
+      const reader = new FileReader();
+      
+      reader.onload = (e) => {
+        const content = e.target?.result as string;
+        
+        // Update the file system
+        setFileSystem(prev => {
+          const newFileSystem = { ...prev };
+          
+          newFileSystem.items = {
+            ...newFileSystem.items,
+            [newFileId]: {
+              id: newFileId,
+              name: file.name,
+              type: 'file',
+              content: content,
+              language: language,
+              parent: null
+            }
+          };
+          
+          newFileSystem.rootItems = [...newFileSystem.rootItems, newFileId];
+          
+          return newFileSystem;
+        });
+        
+        // Open the file
+        setTabs(prev => [
+          ...prev.map(tab => ({ ...tab, isActive: false })),
+          newTab
+        ]);
+        
+        setCurrentContent(content);
+        setCurrentLanguage(language);
+        
+        toast({
+          title: "File uploaded",
+          description: `${file.name} has been added to your workspace`,
+        });
+      };
+      
+      reader.readAsText(file);
+    } else {
+      // For binary files, use binary reading and base64 encoding
+      const reader = new FileReader();
+      
+      reader.onload = (e) => {
+        const arrayBuffer = e.target?.result as ArrayBuffer;
+        const bytes = new Uint8Array(arrayBuffer);
+        
+        // Convert to base64
+        let binary = '';
+        for (let i = 0; i < bytes.byteLength; i++) {
+          binary += String.fromCharCode(bytes[i]);
+        }
+        const content = btoa(binary);
+        
+        // Update the file system
+        setFileSystem(prev => {
+          const newFileSystem = { ...prev };
+          
+          newFileSystem.items = {
+            ...newFileSystem.items,
+            [newFileId]: {
+              id: newFileId,
+              name: file.name,
+              type: 'file',
+              content: content,
+              language: language,
+              parent: null
+            }
+          };
+          
+          newFileSystem.rootItems = [...newFileSystem.rootItems, newFileId];
+          
+          return newFileSystem;
+        });
+        
+        // Open the file (only if it's a known editable format)
+        if (['json', 'txt', 'md', 'xml', 'svg'].includes(extension)) {
+          setTabs(prev => [
+            ...prev.map(tab => ({ ...tab, isActive: false })),
+            newTab
+          ]);
+          
+          try {
+            // Attempt to decode base64 for display
+            const decoded = atob(content);
+            setCurrentContent(decoded);
+          } catch (e) {
+            // If decoding fails, just display the raw content
+            setCurrentContent(content);
+          }
+          
+          setCurrentLanguage(language);
+        }
+        
+        toast({
+          title: "File uploaded",
+          description: `${file.name} has been added to your workspace`,
+        });
+      };
+      
+      reader.readAsArrayBuffer(file);
+    }
   };
 
   // Process a ZIP file upload
@@ -1370,27 +1441,29 @@ console.log("Let's start coding with more storage!");`,
       // Map to store folders by path for quick lookup
       const folderMap: Record<string, string> = { '': extractFolderId || '' }; // Empty string is the root or parent
 
-      // First create all folders
-      for (const relativePath in loaded.files) {
-        const entry = loaded.files[relativePath];
+      // Helper function to ensure a folder exists and get its ID
+      const ensureFolderExists = async (folderPath: string, parentId: string | null): Promise<string> => {
+        // If folder already exists in our map, return its ID
+        if (folderMap[folderPath]) {
+          return folderMap[folderPath];
+        }
         
-        // Skip directories and empty files that are automatically added by JSZip
-        if (entry.dir || relativePath.endsWith('/')) {
-          // Create folder hierarchy
-          const pathParts = relativePath.split('/').filter(Boolean);
-          let currentPath = '';
-          let parentId: string | null = extractFolderId;
+        // Need to create the folder hierarchy
+        const pathParts = folderPath.split('/').filter(Boolean);
+        let currentPath = '';
+        let currentParentId = parentId;
+        
+        for (let i = 0; i < pathParts.length; i++) {
+          const folderName = pathParts[i];
+          const newPath = currentPath ? `${currentPath}/${folderName}` : folderName;
           
-          for (let i = 0; i < pathParts.length; i++) {
-            const folderName = pathParts[i];
-            const newPath = currentPath ? `${currentPath}/${folderName}` : folderName;
+          // If this folder segment doesn't exist yet, create it
+          if (!folderMap[newPath]) {
+            const folderId = generateId();
+            folderMap[newPath] = folderId;
             
-            // Check if this folder already exists
-            if (!folderMap[newPath]) {
-              const folderId = generateId();
-              folderMap[newPath] = folderId;
-              
-              // Create the folder in our file system
+            // Create the folder in our file system (wrapped in a promise to ensure sequential execution)
+            await new Promise<void>(resolve => {
               setFileSystem(prev => {
                 const newFileSystem = { ...prev };
                 
@@ -1400,54 +1473,112 @@ console.log("Let's start coding with more storage!");`,
                     id: folderId,
                     name: folderName,
                     type: 'folder',
-                    parent: parentId,
+                    parent: currentParentId,
                     children: [],
                     isOpen: true
                   }
                 };
                 
                 // Add to parent's children or root
-                if (parentId) {
-                  const parent = { ...newFileSystem.items[parentId] };
+                if (currentParentId) {
+                  const parent = { ...newFileSystem.items[currentParentId] };
                   if (parent.children) {
                     parent.children = [...parent.children, folderId];
                   } else {
                     parent.children = [folderId];
                   }
-                  newFileSystem.items[parentId] = parent;
+                  newFileSystem.items[currentParentId] = parent;
                 } else {
                   newFileSystem.rootItems = [...newFileSystem.rootItems, folderId];
                 }
                 
+                resolve();
                 return newFileSystem;
               });
-            }
-            
-            // Update parent for next iteration
-            parentId = folderMap[newPath];
-            currentPath = newPath;
+            });
           }
+          
+          // Update parent for next iteration
+          currentParentId = folderMap[newPath];
+          currentPath = newPath;
         }
-      }
-      
-      // Then create files
-      for (const relativePath in loaded.files) {
-        const entry = loaded.files[relativePath];
         
-        // Skip directories
-        if (!entry.dir && !relativePath.endsWith('/')) {
+        return currentParentId || '';
+      };
+
+      // Process all files, creating folders as needed
+      const fileEntries: { path: string, entry: JSZip.JSZipObject }[] = [];
+      
+      // Collect all file entries first
+      Object.keys(loaded.files).forEach(path => {
+        const entry = loaded.files[path];
+        if (!entry.dir && !path.endsWith('/')) {
+          fileEntries.push({ path, entry });
+        }
+      });
+      
+      // Sort files by path depth to ensure parent folders are created first
+      fileEntries.sort((a, b) => {
+        const aDepth = a.path.split('/').length;
+        const bDepth = b.path.split('/').length;
+        return aDepth - bDepth;
+      });
+      
+      // Process each file
+      let filesProcessed = 0;
+      let filesSkipped = 0;
+      
+      for (const { path, entry } of fileEntries) {
+        try {
+          // Determine if this is a text file or binary file
+          const extension = path.split('.').pop()?.toLowerCase() || '';
+          const isLikelyText = !['zip', 'png', 'jpg', 'jpeg', 'gif', 'pdf', 'exe', 'dll', 
+                               'so', 'a', 'o', 'class', 'jar', 'war', 'ear', 'mp3', 
+                               'mp4', 'avi', 'mov', 'mpg', 'mpeg', 'webm', 'woff', 
+                               'woff2', 'eot', 'ttf', 'otf', 'ico', 'gz', 'tar', 
+                               'rar', '7z', 'dat', 'bin', 'iso', 'dmg'].includes(extension);
+          
+          // Get file content - try as text first for most files
+          let content: string;
           try {
-            // Get file content
-            const content = await entry.async('text');
+            if (isLikelyText) {
+              content = await entry.async('text');
+            } else {
+              // For binary files, use base64 encoding
+              const buffer = await entry.async('arraybuffer');
+              const bytes = new Uint8Array(buffer);
+              
+              // Convert to base64
+              let binary = '';
+              for (let i = 0; i < bytes.byteLength; i++) {
+                binary += String.fromCharCode(bytes[i]);
+              }
+              content = btoa(binary);
+            }
+          } catch (e) {
+            // If text fails, fallback to base64
+            const buffer = await entry.async('arraybuffer');
+            const bytes = new Uint8Array(buffer);
             
-            // Get file parent folder
-            const pathParts = relativePath.split('/');
-            const fileName = pathParts.pop() || '';
-            const parentPath = pathParts.join('/');
-            const parentId = folderMap[parentPath] || extractFolderId;
-            
-            // Create file
-            const fileId = generateId();
+            // Convert to base64
+            let binary = '';
+            for (let i = 0; i < bytes.byteLength; i++) {
+              binary += String.fromCharCode(bytes[i]);
+            }
+            content = btoa(binary);
+          }
+          
+          // Get parent directory path
+          const pathParts = path.split('/');
+          const fileName = pathParts.pop() || '';
+          const parentPath = pathParts.join('/');
+          
+          // Ensure parent directory exists
+          const parentId = await ensureFolderExists(parentPath, extractFolderId);
+          
+          // Create file
+          const fileId = generateId();
+          await new Promise<void>(resolve => {
             setFileSystem(prev => {
               const newFileSystem = { ...prev };
               
@@ -1458,35 +1589,36 @@ console.log("Let's start coding with more storage!");`,
                   name: fileName,
                   type: 'file',
                   parent: parentId,
-                  content: btoa(content),
+                  content: content,
                   language: getLanguageByFilename(fileName)
                 }
               };
               
-              // Add to parent's children or root
-              if (parentId) {
-                const parent = { ...newFileSystem.items[parentId] };
-                if (parent.children) {
-                  parent.children = [...parent.children, fileId];
-                } else {
-                  parent.children = [fileId];
-                }
-                newFileSystem.items[parentId] = parent;
+              // Add to parent's children
+              const parent = { ...newFileSystem.items[parentId] };
+              if (parent.children) {
+                parent.children = [...parent.children, fileId];
               } else {
-                newFileSystem.rootItems = [...newFileSystem.rootItems, fileId];
+                parent.children = [fileId];
               }
+              newFileSystem.items[parentId] = parent;
               
+              resolve();
               return newFileSystem;
             });
-          } catch (error) {
-            console.error(`Failed to extract file: ${relativePath}`, error);
-          }
+          });
+          
+          filesProcessed++;
+        } catch (error) {
+          console.error(`Failed to extract file: ${path}`, error);
+          filesSkipped++;
         }
       }
       
+      // Update toast message with statistics
       toast({
         title: "ZIP Extracted",
-        description: `${Object.keys(loaded.files).length} files extracted successfully.`,
+        description: `${filesProcessed} files extracted successfully${filesSkipped > 0 ? `, ${filesSkipped} files skipped` : ''}.`,
         duration: 3000
       });
     } catch (error) {
@@ -1508,123 +1640,12 @@ console.log("Let's start coding with more storage!");`,
         const content = e.target?.result;
         if (!content) throw new Error("Could not read ZIP file");
         
-        const zip = new JSZip();
-        const loaded = await zip.loadAsync(content);
+        // Create a blob for the processZipFileContent function to use
+        const blob = new Blob([content as ArrayBuffer], { type: 'application/zip' });
         
-        // Map to store folders by path for quick lookup
-        const folderMap: Record<string, string> = { '': '' }; // Empty string is the root
+        // Use the improved ZIP extraction function
+        processZipFileContent(blob, null, file.name.replace(/\.zip$/i, ''));
         
-        // First create all folders
-        for (const relativePath in loaded.files) {
-          const entry = loaded.files[relativePath];
-          
-          // Skip directories and empty files that are automatically added by JSZip
-          if (entry.dir || relativePath.endsWith('/')) {
-            // Create folder hierarchy
-            const pathParts = relativePath.split('/').filter(Boolean);
-            let currentPath = '';
-            let parentId: string | null = null;
-            
-            for (let i = 0; i < pathParts.length; i++) {
-              const folderName = pathParts[i];
-              const newPath = currentPath ? `${currentPath}/${folderName}` : folderName;
-              
-              // Check if this folder already exists
-              if (!folderMap[newPath]) {
-                const folderId = generateId();
-                folderMap[newPath] = folderId;
-                
-                // Create the folder in our file system
-                setFileSystem(prev => {
-                  const newFileSystem = { ...prev };
-                  
-                  newFileSystem.items = {
-                    ...newFileSystem.items,
-                    [folderId]: {
-                      id: folderId,
-                      name: folderName,
-                      type: 'folder',
-                      parent: parentId,
-                      children: [],
-                      isOpen: true
-                    }
-                  };
-                  
-                  // Add to parent's children or root
-                  if (parentId) {
-                    const parent = newFileSystem.items[parentId];
-                    newFileSystem.items[parentId] = {
-                      ...parent,
-                      children: [...(parent.children || []), folderId]
-                    };
-                  } else {
-                    newFileSystem.rootItems = [...newFileSystem.rootItems, folderId];
-                  }
-                  
-                  return newFileSystem;
-                });
-              }
-              
-              parentId = folderMap[newPath];
-              currentPath = newPath;
-            }
-          }
-        }
-        
-        // Then add all files
-        for (const relativePath in loaded.files) {
-          const entry = loaded.files[relativePath];
-          
-          // Skip directories or empty files
-          if (!entry.dir && !relativePath.endsWith('/')) {
-            const pathParts = relativePath.split('/');
-            const fileName = pathParts.pop() || '';
-            const folderPath = pathParts.join('/');
-            
-            // Get the parent folder ID (or null for root)
-            const parentId = folderMap[folderPath] || null;
-            
-            // Get file content
-            const content = await entry.async('text');
-            const fileId = generateId();
-            const language = getLanguageByFilename(fileName);
-            
-            // Add the file
-            setFileSystem(prev => {
-              const newFileSystem = { ...prev };
-              
-              newFileSystem.items = {
-                ...newFileSystem.items,
-                [fileId]: {
-                  id: fileId,
-                  name: fileName,
-                  type: 'file',
-                  content: content,
-                  language: language,
-                  parent: parentId
-                }
-              };
-              
-              // Add to parent's children or root
-              if (parentId) {
-                const parent = newFileSystem.items[parentId];
-                newFileSystem.items[parentId] = {
-                  ...parent,
-                  children: [...(parent.children || []), fileId]
-                };
-              } else {
-                newFileSystem.rootItems = [...newFileSystem.rootItems, fileId];
-              }
-              
-              return newFileSystem;
-            });
-          }
-        }
-        
-        toast({
-          title: "ZIP file extracted",
-          description: `Files have been added to your workspace`,
-        });
       } catch (error) {
         console.error("Error processing ZIP file:", error);
         toast({
@@ -1699,58 +1720,137 @@ console.log("Let's start coding with more storage!");`,
       }
     });
     
-    // Then add all files
+    // Process files with smarter handling of binary content
+    let filesProcessed = 0;
+    const totalFiles = files.length;
+    
     files.forEach(file => {
-      const reader = new FileReader();
       const pathParts = file.webkitRelativePath.split('/');
       const fileName = pathParts.pop() || '';
       const folderPath = pathParts.join('/');
       
       // Get the parent folder ID (or null for root)
       const parentId = folderMap[folderPath] || null;
+      const fileId = generateId();
+      const language = getLanguageByFilename(fileName);
       
-      reader.onload = (e) => {
-        const content = e.target?.result as string;
-        const fileId = generateId();
-        const language = getLanguageByFilename(fileName);
+      // Determine if this is a text file or binary file
+      const extension = fileName.split('.').pop()?.toLowerCase() || '';
+      const isLikelyText = !['zip', 'png', 'jpg', 'jpeg', 'gif', 'pdf', 'exe', 'dll', 
+                           'so', 'a', 'o', 'class', 'jar', 'war', 'ear', 'mp3', 
+                           'mp4', 'avi', 'mov', 'mpg', 'mpeg', 'webm', 'woff', 
+                           'woff2', 'eot', 'ttf', 'otf', 'ico', 'gz', 'tar', 
+                           'rar', '7z', 'dat', 'bin', 'iso', 'dmg'].includes(extension);
+      
+      if (isLikelyText) {
+        // For text files, use text reading
+        const reader = new FileReader();
         
-        // Add the file
-        setFileSystem(prev => {
-          const newFileSystem = { ...prev };
+        reader.onload = (e) => {
+          const content = e.target?.result as string;
           
-          newFileSystem.items = {
-            ...newFileSystem.items,
-            [fileId]: {
-              id: fileId,
-              name: fileName,
-              type: 'file',
-              content: content,
-              language: language,
-              parent: parentId
-            }
-          };
-          
-          // Add to parent's children or root
-          if (parentId) {
-            const parent = newFileSystem.items[parentId];
-            newFileSystem.items[parentId] = {
-              ...parent,
-              children: [...(parent.children || []), fileId]
+          // Add the file
+          setFileSystem(prev => {
+            const newFileSystem = { ...prev };
+            
+            newFileSystem.items = {
+              ...newFileSystem.items,
+              [fileId]: {
+                id: fileId,
+                name: fileName,
+                type: 'file',
+                content: content,
+                language: language,
+                parent: parentId
+              }
             };
-          } else {
-            newFileSystem.rootItems = [...newFileSystem.rootItems, fileId];
-          }
+            
+            // Add to parent's children or root
+            if (parentId) {
+              const parent = newFileSystem.items[parentId];
+              newFileSystem.items[parentId] = {
+                ...parent,
+                children: [...(parent.children || []), fileId]
+              };
+            } else {
+              newFileSystem.rootItems = [...newFileSystem.rootItems, fileId];
+            }
+            
+            filesProcessed++;
+            if (filesProcessed === totalFiles) {
+              toast({
+                title: "Folder uploaded",
+                description: `${filesProcessed} files have been added to your workspace`,
+              });
+            }
+            
+            return newFileSystem;
+          });
+        };
+        
+        reader.readAsText(file);
+      } else {
+        // For binary files, use binary reading and base64 encoding
+        const reader = new FileReader();
+        
+        reader.onload = (e) => {
+          const arrayBuffer = e.target?.result as ArrayBuffer;
+          const bytes = new Uint8Array(arrayBuffer);
           
-          return newFileSystem;
-        });
-      };
-      
-      reader.readAsText(file);
+          // Convert to base64
+          let binary = '';
+          for (let i = 0; i < bytes.byteLength; i++) {
+            binary += String.fromCharCode(bytes[i]);
+          }
+          const content = btoa(binary);
+          
+          // Add the file
+          setFileSystem(prev => {
+            const newFileSystem = { ...prev };
+            
+            newFileSystem.items = {
+              ...newFileSystem.items,
+              [fileId]: {
+                id: fileId,
+                name: fileName,
+                type: 'file',
+                content: content,
+                language: language,
+                parent: parentId
+              }
+            };
+            
+            // Add to parent's children or root
+            if (parentId) {
+              const parent = newFileSystem.items[parentId];
+              newFileSystem.items[parentId] = {
+                ...parent,
+                children: [...(parent.children || []), fileId]
+              };
+            } else {
+              newFileSystem.rootItems = [...newFileSystem.rootItems, fileId];
+            }
+            
+            filesProcessed++;
+            if (filesProcessed === totalFiles) {
+              toast({
+                title: "Folder uploaded",
+                description: `${filesProcessed} files have been added to your workspace`,
+              });
+            }
+            
+            return newFileSystem;
+          });
+        };
+        
+        reader.readAsArrayBuffer(file);
+      }
     });
     
+    // Show initial toast
     toast({
-      title: "Folder uploaded",
-      description: `Files have been added to your workspace`,
+      title: "Processing folder",
+      description: `Uploading ${totalFiles} files, please wait...`,
     });
   };
 
@@ -3373,25 +3473,81 @@ console.log("Starting fresh with partial cleanup!");`,
       return;
     }
     
-    // Create a blob and download link
-    const blob = new Blob([file.content], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = file.name;
-    document.body.appendChild(a);
-    a.click();
-    
-    // Clean up
-    setTimeout(() => {
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }, 100);
-    
-    toast({
-      title: "Success",
-      description: `${file.name} downloaded successfully.`,
-    });
+    try {
+      // Determine MIME type based on file extension
+      const extension = file.name.split('.').pop()?.toLowerCase() || '';
+      const mimeTypes: Record<string, string> = {
+        'txt': 'text/plain',
+        'html': 'text/html',
+        'css': 'text/css',
+        'js': 'text/javascript',
+        'json': 'application/json',
+        'xml': 'application/xml',
+        'svg': 'image/svg+xml',
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'gif': 'image/gif',
+        'pdf': 'application/pdf',
+        'zip': 'application/zip',
+        'doc': 'application/msword',
+        'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      };
+      
+      const mimeType = mimeTypes[extension] || 'application/octet-stream';
+      
+      // Try to detect if content is base64 encoded binary data
+      let blob: Blob;
+      try {
+        // If it's binary data (encoded as base64), we need to decode it first
+        if (/^[A-Za-z0-9+/=]+$/.test(file.content)) {
+          try {
+            const binaryString = atob(file.content);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+              bytes[i] = binaryString.charCodeAt(i);
+            }
+            blob = new Blob([bytes], { type: mimeType });
+          } catch (e) {
+            // If decoding as base64 fails, treat as text
+            blob = new Blob([file.content], { type: mimeType });
+          }
+        } else {
+          // If clearly not base64, treat as text
+          blob = new Blob([file.content], { type: mimeType });
+        }
+      } catch (e) {
+        // Fallback for any errors
+        console.warn("Error processing file content, using fallback method", e);
+        blob = new Blob([file.content], { type: 'application/octet-stream' });
+      }
+      
+      // Create download link
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = file.name;
+      document.body.appendChild(a);
+      a.click();
+      
+      // Clean up
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 100);
+      
+      toast({
+        title: "Success",
+        description: `${file.name} downloaded successfully.`,
+      });
+    } catch (error) {
+      console.error("Error downloading file:", error);
+      toast({
+        title: "Download Failed",
+        description: "Failed to download the file.",
+        variant: "destructive"
+      });
+    }
   };
   
   // Function to extract a ZIP file
@@ -3419,17 +3575,29 @@ console.log("Starting fresh with partial cleanup!");`,
       // Extract the parent folder where the zip file is located
       const parentFolderId = file.parent;
       
-      // Create a blob from the file content
-      const binaryContent = atob(file.content);
-      const arrayBuffer = new ArrayBuffer(binaryContent.length);
-      const uint8Array = new Uint8Array(arrayBuffer);
+      // Create a blob from the file content (handle both base64 and regular content)
+      let arrayBuffer: ArrayBuffer;
       
-      for (let i = 0; i < binaryContent.length; i++) {
-        uint8Array[i] = binaryContent.charCodeAt(i);
+      try {
+        // Try to convert from base64 first (most likely for binary files)
+        const binaryContent = atob(file.content);
+        arrayBuffer = new ArrayBuffer(binaryContent.length);
+        const uint8Array = new Uint8Array(arrayBuffer);
+        
+        for (let i = 0; i < binaryContent.length; i++) {
+          uint8Array[i] = binaryContent.charCodeAt(i);
+        }
+      } catch (e) {
+        // If not base64, treat as regular string (less common)
+        console.warn("File content is not valid base64, trying direct encoding");
+        
+        const textEncoder = new TextEncoder();
+        const uint8Array = textEncoder.encode(file.content);
+        arrayBuffer = uint8Array.buffer;
       }
       
       // Create a blob and extract its contents
-      const blob = new Blob([uint8Array], { type: 'application/zip' });
+      const blob = new Blob([arrayBuffer], { type: 'application/zip' });
       
       // Create a folder name from the zip file name (remove .zip extension)
       const extractFolderName = file.name.replace(/\.zip$/i, '');
