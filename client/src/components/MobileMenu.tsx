@@ -37,7 +37,7 @@ export function MobileMenu({ isOpen, onClose, items }: MobileMenuProps) {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="md:hidden bg-white border-t"
+          className="md:hidden bg-background border-t border-border"
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: "auto", opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
@@ -49,7 +49,7 @@ export function MobileMenu({ isOpen, onClose, items }: MobileMenuProps) {
                 <motion.a
                   key={item.name}
                   href={item.href}
-                  className="text-text hover:text-primary transition-colors font-medium py-2"
+                  className="text-foreground hover:text-primary transition-colors font-medium py-2"
                   onClick={(e) => handleClick(e, item.href)}
                   initial={{ x: -20, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
@@ -60,7 +60,7 @@ export function MobileMenu({ isOpen, onClose, items }: MobileMenuProps) {
               ) : (
                 <Link key={item.name} href={item.href}>
                   <motion.div
-                    className="text-text hover:text-primary transition-colors font-medium py-2 cursor-pointer"
+                    className="text-foreground hover:text-primary transition-colors font-medium py-2 cursor-pointer"
                     onClick={onClose}
                     initial={{ x: -20, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
