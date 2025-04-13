@@ -2,11 +2,22 @@ import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { Container } from "@/components/ui/container";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import {
   Form,
   FormControl,
@@ -17,7 +28,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
@@ -62,7 +79,11 @@ const qrTypes = [
   { id: "tel", name: "Call", icon: <Phone className="h-6 w-6" /> },
   { id: "sms", name: "SMS", icon: <MessageSquare className="h-6 w-6" /> },
   { id: "vcard", name: "V-card", icon: <Smartphone className="h-6 w-6" /> },
-  { id: "whatsapp", name: "Whatsapp", icon: <MessageSquare className="h-6 w-6" /> },
+  {
+    id: "whatsapp",
+    name: "Whatsapp",
+    icon: <MessageSquare className="h-6 w-6" />,
+  },
   { id: "wifi", name: "WI-FI", icon: <Wifi className="h-6 w-6" /> },
   { id: "paypal", name: "PayPal", icon: <CreditCard className="h-6 w-6" /> },
   { id: "event", name: "Event", icon: <Calendar className="h-6 w-6" /> },
@@ -107,7 +128,10 @@ const vcardSchema = z.object({
   phone: z.string().optional(),
   email: z.string().email("Please enter a valid email address").optional(),
   company: z.string().optional(),
-  url: z.string().url("Please enter a valid URL including http:// or https://").optional(),
+  url: z
+    .string()
+    .url("Please enter a valid URL including http:// or https://")
+    .optional(),
 });
 
 const wifiSchema = z.object({
@@ -129,7 +153,7 @@ export default function QRCodeGenerator() {
     backgroundColor: "#FFFFFF",
     size: 300,
   });
-  
+
   const { toast } = useToast();
 
   // Reset form and QR code when type changes
@@ -142,10 +166,10 @@ export default function QRCodeGenerator() {
   const generateQRCode = async (data: any) => {
     setIsGenerating(true);
     setErrorMessage("");
-    
+
     try {
       let content;
-      
+
       // Format content based on the selected QR type
       switch (qrType) {
         case "url":
@@ -155,7 +179,7 @@ export default function QRCodeGenerator() {
           content = {
             email: data.email,
             subject: data.subject,
-            body: data.body
+            body: data.body,
           };
           break;
         case "text":
@@ -167,13 +191,13 @@ export default function QRCodeGenerator() {
         case "sms":
           content = {
             phone: data.phone,
-            message: data.message
+            message: data.message,
           };
           break;
         case "whatsapp":
           content = {
             phone: data.phone,
-            message: data.message
+            message: data.message,
           };
           break;
         case "vcard":
@@ -182,7 +206,7 @@ export default function QRCodeGenerator() {
             phone: data.phone,
             email: data.email,
             company: data.company,
-            url: data.url
+            url: data.url,
           };
           break;
         case "wifi":
@@ -190,7 +214,7 @@ export default function QRCodeGenerator() {
             ssid: data.ssid,
             password: data.password,
             encryption: data.encryption,
-            hidden: data.hidden
+            hidden: data.hidden,
           };
           break;
         default:
@@ -211,21 +235,21 @@ export default function QRCodeGenerator() {
             errorCorrectionLevel: qrOptions.errorCorrectionLevel,
             color: {
               dark: qrOptions.color,
-              light: qrOptions.backgroundColor
+              light: qrOptions.backgroundColor,
             },
-            width: qrOptions.size
-          }
+            width: qrOptions.size,
+          },
         }),
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to generate QR code");
       }
-      
+
       const result = await response.json();
       setQRCodeImage(result.qrcode);
-      
+
       toast({
         title: "QR Code Generated",
         description: "Your QR code has been successfully created",
@@ -246,14 +270,14 @@ export default function QRCodeGenerator() {
   // Download QR code image
   const downloadQRCode = () => {
     if (!qrCodeImage) return;
-    
+
     const link = document.createElement("a");
     link.href = qrCodeImage;
     link.download = `qrcode-${qrType}-${new Date().getTime()}.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
+
     toast({
       title: "QR Code Downloaded",
       description: "Your QR code has been downloaded",
@@ -282,10 +306,12 @@ export default function QRCodeGenerator() {
       default:
         return (
           <div className="py-10 text-center">
-            <p className="text-muted-foreground">This QR code type is coming soon!</p>
-            <Button 
-              className="mt-4" 
-              variant="outline" 
+            <p className="text-muted-foreground">
+              This QR code type is coming soon!
+            </p>
+            <Button
+              className="mt-4"
+              variant="outline"
               onClick={() => setQRType("url")}
             >
               Switch to URL QR code
@@ -302,14 +328,15 @@ export default function QRCodeGenerator() {
         <section className="py-20 px-6">
           <Container maxWidth="lg">
             <div className="mb-8">
-              <Link to="/apps" 
+              <Link
+                to="/apps"
                 className="inline-flex items-center text-primary hover:text-primary/80 transition-colors cursor-pointer"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Apps
               </Link>
             </div>
-            
+
             <motion.div
               className="text-center mb-12"
               initial={{ opacity: 0, y: 20 }}
@@ -320,13 +347,14 @@ export default function QRCodeGenerator() {
                 QR Code Generator
               </h1>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                Create customizable QR codes for websites, contact details, WiFi networks, and more
+                Create customizable QR codes for websites, contact details, WiFi
+                networks, and more
               </p>
             </motion.div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
               {/* QR Code Type Selection */}
-              <motion.div 
+              <motion.div
                 className="lg:col-span-7"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -345,21 +373,23 @@ export default function QRCodeGenerator() {
                         <button
                           key={type.id}
                           className={`aspect-square flex flex-col items-center justify-center rounded-lg p-2 transition-colors 
-                                    ${qrType === type.id 
-                                      ? 'bg-primary text-primary-foreground' 
-                                      : 'bg-muted/50 hover:bg-muted text-foreground'}`}
+                                    ${
+                                      qrType === type.id
+                                        ? "bg-primary text-primary-foreground"
+                                        : "bg-muted/50 hover:bg-muted text-foreground"
+                                    }`}
                           onClick={() => setQRType(type.id)}
                         >
                           {type.icon}
-                          <span className="mt-1 text-xs font-medium">{type.name}</span>
+                          <span className="mt-1 text-xs font-medium">
+                            {type.name}
+                          </span>
                         </button>
                       ))}
                     </div>
-                    
+
                     {/* Form for the selected QR type */}
-                    <div className="mt-8">
-                      {renderForm()}
-                    </div>
+                    <div className="mt-8">{renderForm()}</div>
                   </CardContent>
                 </Card>
               </motion.div>
@@ -383,37 +413,42 @@ export default function QRCodeGenerator() {
                       {isGenerating ? (
                         <div className="flex flex-col items-center justify-center text-center p-6">
                           <Loader2 className="h-10 w-10 text-primary animate-spin mb-4" />
-                          <p className="text-muted-foreground">Generating QR code...</p>
+                          <p className="text-muted-foreground">
+                            Generating QR code...
+                          </p>
                         </div>
                       ) : qrCodeImage ? (
-                        <img 
-                          src={qrCodeImage} 
-                          alt="Generated QR Code" 
+                        <img
+                          src={qrCodeImage}
+                          alt="Generated QR Code"
                           className="max-w-full"
-                          style={{ 
+                          style={{
                             width: `${qrOptions.size}px`,
-                            maxWidth: "100%"
+                            maxWidth: "100%",
                           }}
                         />
                       ) : errorMessage ? (
                         <div className="flex flex-col items-center justify-center text-center p-6">
                           <AlertCircle className="h-10 w-10 text-destructive mb-4" />
-                          <p className="text-destructive font-medium mb-2">Error</p>
-                          <p className="text-muted-foreground text-sm">{errorMessage}</p>
+                          <p className="text-destructive font-medium mb-2">
+                            Error
+                          </p>
+                          <p className="text-muted-foreground text-sm">
+                            {errorMessage}
+                          </p>
                         </div>
                       ) : (
                         <div className="flex flex-col items-center justify-center text-center p-6">
                           <QRPlaceholder />
-                          <p className="text-muted-foreground mt-4">Fill out the form and generate your QR code</p>
+                          <p className="text-muted-foreground mt-4">
+                            Fill out the form and generate your QR code
+                          </p>
                         </div>
                       )}
                     </div>
-                    
+
                     {qrCodeImage && (
-                      <Button
-                        className="mt-6 w-full"
-                        onClick={downloadQRCode}
-                      >
+                      <Button className="mt-6 w-full" onClick={downloadQRCode}>
                         <Download className="h-4 w-4 mr-2" />
                         Download QR Code
                       </Button>
@@ -440,7 +475,9 @@ export default function QRCodeGenerator() {
                           <div className="space-y-4">
                             <div>
                               <div className="flex justify-between mb-2">
-                                <Label htmlFor="qr-size">QR Code Size: {qrOptions.size}px</Label>
+                                <Label htmlFor="qr-size">
+                                  QR Code Size: {qrOptions.size}px
+                                </Label>
                               </div>
                               <Slider
                                 id="qr-size"
@@ -448,12 +485,16 @@ export default function QRCodeGenerator() {
                                 max={1000}
                                 step={10}
                                 value={[qrOptions.size]}
-                                onValueChange={(value) => setQROptions({...qrOptions, size: value[0]})}
+                                onValueChange={(value) =>
+                                  setQROptions({ ...qrOptions, size: value[0] })
+                                }
                               />
                             </div>
                             <div>
                               <div className="flex justify-between mb-2">
-                                <Label htmlFor="qr-margin">Margin: {qrOptions.margin}</Label>
+                                <Label htmlFor="qr-margin">
+                                  Margin: {qrOptions.margin}
+                                </Label>
                               </div>
                               <Slider
                                 id="qr-margin"
@@ -461,7 +502,12 @@ export default function QRCodeGenerator() {
                                 max={10}
                                 step={1}
                                 value={[qrOptions.margin]}
-                                onValueChange={(value) => setQROptions({...qrOptions, margin: value[0]})}
+                                onValueChange={(value) =>
+                                  setQROptions({
+                                    ...qrOptions,
+                                    margin: value[0],
+                                  })
+                                }
                               />
                             </div>
                           </div>
@@ -479,29 +525,51 @@ export default function QRCodeGenerator() {
                                   type="color"
                                   className="w-12 h-10 p-1"
                                   value={qrOptions.color}
-                                  onChange={(e) => setQROptions({...qrOptions, color: e.target.value})}
+                                  onChange={(e) =>
+                                    setQROptions({
+                                      ...qrOptions,
+                                      color: e.target.value,
+                                    })
+                                  }
                                 />
-                                <Input 
+                                <Input
                                   className="flex-1 ml-2"
                                   value={qrOptions.color}
-                                  onChange={(e) => setQROptions({...qrOptions, color: e.target.value})}
+                                  onChange={(e) =>
+                                    setQROptions({
+                                      ...qrOptions,
+                                      color: e.target.value,
+                                    })
+                                  }
                                 />
                               </div>
                             </div>
                             <div>
-                              <Label htmlFor="qr-bg-color">Background Color</Label>
+                              <Label htmlFor="qr-bg-color">
+                                Background Color
+                              </Label>
                               <div className="flex mt-2">
                                 <Input
                                   id="qr-bg-color"
                                   type="color"
                                   className="w-12 h-10 p-1"
                                   value={qrOptions.backgroundColor}
-                                  onChange={(e) => setQROptions({...qrOptions, backgroundColor: e.target.value})}
+                                  onChange={(e) =>
+                                    setQROptions({
+                                      ...qrOptions,
+                                      backgroundColor: e.target.value,
+                                    })
+                                  }
                                 />
-                                <Input 
+                                <Input
                                   className="flex-1 ml-2"
                                   value={qrOptions.backgroundColor}
-                                  onChange={(e) => setQROptions({...qrOptions, backgroundColor: e.target.value})}
+                                  onChange={(e) =>
+                                    setQROptions({
+                                      ...qrOptions,
+                                      backgroundColor: e.target.value,
+                                    })
+                                  }
                                 />
                               </div>
                             </div>
@@ -511,9 +579,14 @@ export default function QRCodeGenerator() {
                       <AccordionItem value="quality">
                         <AccordionTrigger>Error Correction</AccordionTrigger>
                         <AccordionContent>
-                          <RadioGroup 
+                          <RadioGroup
                             defaultValue={qrOptions.errorCorrectionLevel}
-                            onValueChange={(value) => setQROptions({...qrOptions, errorCorrectionLevel: value})}
+                            onValueChange={(value) =>
+                              setQROptions({
+                                ...qrOptions,
+                                errorCorrectionLevel: value,
+                              })
+                            }
                           >
                             <div className="flex items-center space-x-2">
                               <RadioGroupItem value="L" id="r1" />
@@ -533,7 +606,8 @@ export default function QRCodeGenerator() {
                             </div>
                           </RadioGroup>
                           <div className="mt-2 text-xs text-muted-foreground">
-                            Higher correction levels make QR codes more resistant to damage, but also increase complexity.
+                            Higher correction levels make QR codes more
+                            resistant to damage, but also increase complexity.
                           </div>
                         </AccordionContent>
                       </AccordionItem>
@@ -578,9 +652,9 @@ function URLForm({ onSubmit }: { onSubmit: (data: any) => void }) {
             </FormItem>
           )}
         />
-        <Button 
-          type="submit" 
-          className="w-full" 
+        <Button
+          type="submit"
+          className="w-full"
           disabled={form.formState.isSubmitting}
         >
           {form.formState.isSubmitting ? (
@@ -643,19 +717,19 @@ function EmailForm({ onSubmit }: { onSubmit: (data: any) => void }) {
             <FormItem>
               <FormLabel>Message (Optional)</FormLabel>
               <FormControl>
-                <Textarea 
-                  placeholder="Your email message" 
-                  className="min-h-[100px]" 
-                  {...field} 
+                <Textarea
+                  placeholder="Your email message"
+                  className="min-h-[100px]"
+                  {...field}
                 />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button 
-          type="submit" 
-          className="w-full" 
+        <Button
+          type="submit"
+          className="w-full"
           disabled={form.formState.isSubmitting}
         >
           {form.formState.isSubmitting ? (
@@ -690,19 +764,19 @@ function TextForm({ onSubmit }: { onSubmit: (data: any) => void }) {
             <FormItem>
               <FormLabel>Text</FormLabel>
               <FormControl>
-                <Textarea 
-                  placeholder="Enter any text that you want to encode" 
-                  className="min-h-[150px]" 
-                  {...field} 
+                <Textarea
+                  placeholder="Enter any text that you want to encode"
+                  className="min-h-[150px]"
+                  {...field}
                 />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button 
-          type="submit" 
-          className="w-full" 
+        <Button
+          type="submit"
+          className="w-full"
           disabled={form.formState.isSubmitting}
         >
           {form.formState.isSubmitting ? (
@@ -746,9 +820,9 @@ function PhoneForm({ onSubmit }: { onSubmit: (data: any) => void }) {
             </FormItem>
           )}
         />
-        <Button 
-          type="submit" 
-          className="w-full" 
+        <Button
+          type="submit"
+          className="w-full"
           disabled={form.formState.isSubmitting}
         >
           {form.formState.isSubmitting ? (
@@ -797,19 +871,19 @@ function SMSForm({ onSubmit }: { onSubmit: (data: any) => void }) {
             <FormItem>
               <FormLabel>Message (Optional)</FormLabel>
               <FormControl>
-                <Textarea 
-                  placeholder="Your SMS message" 
-                  className="min-h-[100px]" 
-                  {...field} 
+                <Textarea
+                  placeholder="Your SMS message"
+                  className="min-h-[100px]"
+                  {...field}
                 />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button 
-          type="submit" 
-          className="w-full" 
+        <Button
+          type="submit"
+          className="w-full"
           disabled={form.formState.isSubmitting}
         >
           {form.formState.isSubmitting ? (
@@ -861,19 +935,19 @@ function WhatsAppForm({ onSubmit }: { onSubmit: (data: any) => void }) {
             <FormItem>
               <FormLabel>Message (Optional)</FormLabel>
               <FormControl>
-                <Textarea 
-                  placeholder="Pre-filled message for WhatsApp" 
-                  className="min-h-[100px]" 
-                  {...field} 
+                <Textarea
+                  placeholder="Pre-filled message for WhatsApp"
+                  className="min-h-[100px]"
+                  {...field}
                 />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button 
-          type="submit" 
-          className="w-full" 
+        <Button
+          type="submit"
+          className="w-full"
           disabled={form.formState.isSubmitting}
         >
           {form.formState.isSubmitting ? (
@@ -912,7 +986,7 @@ function VCardForm({ onSubmit }: { onSubmit: (data: any) => void }) {
             <FormItem>
               <FormLabel>Name</FormLabel>
               <FormControl>
-                <Input placeholder="John Doe" {...field} />
+                <Input placeholder="Mailo Bedo" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -970,9 +1044,9 @@ function VCardForm({ onSubmit }: { onSubmit: (data: any) => void }) {
             </FormItem>
           )}
         />
-        <Button 
-          type="submit" 
-          className="w-full" 
+        <Button
+          type="submit"
+          className="w-full"
           disabled={form.formState.isSubmitting}
         >
           {form.formState.isSubmitting ? (
@@ -1035,10 +1109,7 @@ function WiFiForm({ onSubmit }: { onSubmit: (data: any) => void }) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Security Type</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-              >
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select security type" />
@@ -1074,9 +1145,9 @@ function WiFiForm({ onSubmit }: { onSubmit: (data: any) => void }) {
             </FormItem>
           )}
         />
-        <Button 
-          type="submit" 
-          className="w-full" 
+        <Button
+          type="submit"
+          className="w-full"
           disabled={form.formState.isSubmitting}
         >
           {form.formState.isSubmitting ? (

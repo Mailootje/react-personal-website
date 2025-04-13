@@ -11,7 +11,7 @@ import {
 } from "./types";
 
 export const personalInfo: PersonalInfo = {
-  name: "Mail Obedo",
+  name: "Mailo Bedo",
   email: "info@mailobedo.nl",
   location: "The Netherlands",
   experience: "5+ Years",
@@ -69,7 +69,8 @@ export const professionalSkills: ProfessionalSkill[] = [
   },
   {
     name: "UI/UX Design",
-    description: "Creating intuitive and aesthetically pleasing user interfaces",
+    description:
+      "Creating intuitive and aesthetically pleasing user interfaces",
     icon: "ri-layout-2-fill",
     color: "secondary",
   },
@@ -81,7 +82,8 @@ export const professionalSkills: ProfessionalSkill[] = [
   },
   {
     name: "Continuous Learning",
-    description: "Constantly updating skills and staying current with new technologies",
+    description:
+      "Constantly updating skills and staying current with new technologies",
     icon: "ri-book-open-fill",
     color: "green",
   },
@@ -90,8 +92,10 @@ export const professionalSkills: ProfessionalSkill[] = [
 export const projects: Project[] = [
   {
     title: "Personal Website",
-    description: "My personal portfolio website showcasing my skills, projects, and experience. Built with modern web technologies for optimal performance.",
-    image: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+    description:
+      "My personal portfolio website showcasing my skills, projects, and experience. Built with modern web technologies for optimal performance.",
+    image:
+      "https://images.unsplash.com/photo-1499750310107-5fef28a66643?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
     type: "Web App",
     typeColor: "primary",
     technologies: ["HTML", "CSS", "JavaScript", "Bootstrap"],
@@ -100,8 +104,10 @@ export const projects: Project[] = [
   },
   {
     title: "Weather Dashboard",
-    description: "A responsive web application that displays current weather and forecasts for any location. Features clean UI and intuitive user experience.",
-    image: "https://images.unsplash.com/photo-1561484930-998b6a7b22e8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+    description:
+      "A responsive web application that displays current weather and forecasts for any location. Features clean UI and intuitive user experience.",
+    image:
+      "https://images.unsplash.com/photo-1561484930-998b6a7b22e8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
     type: "Web App",
     typeColor: "secondary",
     technologies: ["React", "OpenWeather API", "TailwindCSS"],
@@ -110,8 +116,10 @@ export const projects: Project[] = [
   },
   {
     title: "Recipe Finder",
-    description: "A web application that allows users to search for recipes based on ingredients they have on hand, helping reduce food waste and inspire cooking creativity.",
-    image: "https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+    description:
+      "A web application that allows users to search for recipes based on ingredients they have on hand, helping reduce food waste and inspire cooking creativity.",
+    image:
+      "https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
     type: "Web App",
     typeColor: "accent",
     technologies: ["JavaScript", "Node.js", "Express", "Recipe API"],
@@ -125,19 +133,22 @@ export const experiences: Experience[] = [
     title: "Web Developer",
     company: "Freelance",
     period: "2020 - Present",
-    description: "Develop custom websites and web applications for various clients. Specialize in creating responsive, user-friendly interfaces using modern web technologies. Focus on clean code and performance optimization.",
+    description:
+      "Develop custom websites and web applications for various clients. Specialize in creating responsive, user-friendly interfaces using modern web technologies. Focus on clean code and performance optimization.",
   },
   {
     title: "Front-End Developer",
     company: "Tech Company",
     period: "2018 - 2020",
-    description: "Built interactive user interfaces using React and modern JavaScript. Collaborated with designers and back-end developers to implement responsive and accessible web applications.",
+    description:
+      "Built interactive user interfaces using React and modern JavaScript. Collaborated with designers and back-end developers to implement responsive and accessible web applications.",
   },
   {
     title: "Junior Web Developer",
     company: "Digital Agency",
     period: "2016 - 2018",
-    description: "Created responsive websites for clients using HTML, CSS, and JavaScript. Worked with content management systems to deliver maintainable websites with easy content updates.",
+    description:
+      "Created responsive websites for clients using HTML, CSS, and JavaScript. Worked with content management systems to deliver maintainable websites with easy content updates.",
   },
 ];
 
@@ -146,13 +157,15 @@ export const educations: Education[] = [
     degree: "Bachelor's in Computer Science",
     institution: "University of Amsterdam",
     period: "2012 - 2016",
-    description: "Focused on software development and web technologies. Participated in various coding competitions and hackathons. Completed coursework in algorithms, data structures, and web development.",
+    description:
+      "Focused on software development and web technologies. Participated in various coding competitions and hackathons. Completed coursework in algorithms, data structures, and web development.",
   },
   {
     degree: "Web Development Bootcamp",
     institution: "Coding Academy",
     period: "2016",
-    description: "Intensive program covering front-end and back-end technologies. Developed multiple projects using modern frameworks and best practices in web development.",
+    description:
+      "Intensive program covering front-end and back-end technologies. Developed multiple projects using modern frameworks and best practices in web development.",
   },
 ];
 
