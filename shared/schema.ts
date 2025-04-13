@@ -22,7 +22,7 @@ export const shortenedLinks = pgTable("shortened_links", {
   originalUrl: text("original_url").notNull(),
   shortCode: text("short_code").notNull().unique(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
-  expiresAt: timestamp("expires_at").notNull(),
+  expiresAt: timestamp("expires_at"),
   clicks: integer("clicks").notNull().default(0),
 });
 

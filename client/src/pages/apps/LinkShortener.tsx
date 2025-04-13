@@ -4,9 +4,11 @@ import { Container } from "@/components/ui/container";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { ArrowLeft, Copy, Check, ExternalLink, AlertCircle, LinkIcon, Clock, BarChart } from "lucide-react";
+import { ArrowLeft, Copy, Check, ExternalLink, AlertCircle, LinkIcon, Clock, BarChart, Infinity } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -15,6 +17,7 @@ import { Link } from "wouter";
 // Define interfaces for API requests and responses
 interface ShortenLinkRequest {
   url: string;
+  neverExpire?: boolean;
 }
 
 interface ShortenedLinkResponse {
@@ -22,7 +25,7 @@ interface ShortenedLinkResponse {
   shortCode: string;
   originalUrl: string;
   createdAt?: string;
-  expiresAt: string;
+  expiresAt: string | null;
   clicks?: number;
   shortUrl: string;
 }
@@ -33,6 +36,7 @@ export default function LinkShortener() {
   const [shortUrl, setShortUrl] = useState("");
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState("");
+  const [neverExpire, setNeverExpire] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
@@ -56,14 +60,14 @@ export default function LinkShortener() {
   
   // Create shorten link mutation
   const shortenMutation = useMutation({
-    mutationFn: async (url: string) => {
+    mutationFn: async (data: { url: string, neverExpire: boolean }) => {
       try {
         const response = await fetch('/api/shorten', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ url }),
+          body: JSON.stringify(data),
         });
         
         if (!response.ok) {
@@ -79,6 +83,7 @@ export default function LinkShortener() {
     },
     onSuccess: (data) => {
       setShortUrl(data.shortUrl);
+      setNeverExpire(false); // Reset checkbox after successful shortening
       queryClient.invalidateQueries({ queryKey: ['/api/links'] });
       toast({
         title: "URL shortened successfully",
@@ -141,7 +146,7 @@ export default function LinkShortener() {
     }
 
     setError("");
-    shortenMutation.mutate(url);
+    shortenMutation.mutate({ url, neverExpire });
   };
 
   // Clear form function
@@ -149,6 +154,7 @@ export default function LinkShortener() {
     setUrl("");
     setShortUrl("");
     setError("");
+    setNeverExpire(false);
   };
 
   // Handle input change
@@ -227,6 +233,22 @@ export default function LinkShortener() {
                     )}
                   </div>
 
+                  {/* Never Expire Option */}
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="never-expire" 
+                      checked={neverExpire}
+                      onCheckedChange={(checked) => setNeverExpire(checked === true)}
+                    />
+                    <Label
+                      htmlFor="never-expire"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center cursor-pointer"
+                    >
+                      <Infinity className="h-4 w-4 mr-2 text-primary" />
+                      Create a permanent link (never expires)
+                    </Label>
+                  </div>
+
                   {/* Action Button */}
                   <Button 
                     onClick={shortenUrl}
@@ -289,7 +311,7 @@ export default function LinkShortener() {
                       Recent Links
                     </CardTitle>
                     <CardDescription>
-                      Links will expire in 7 days from creation
+                      Links expire in 7 days unless created with the "Never Expire" option
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -341,7 +363,11 @@ export default function LinkShortener() {
                               <div className="flex gap-3">
                                 <div className="flex items-center">
                                   <Clock className="h-3 w-3 mr-1" />
-                                  <span>Expires: {new Date(link.expiresAt).toLocaleDateString()}</span>
+                                  <span>
+                                    {link.expiresAt 
+                                      ? `Expires: ${new Date(link.expiresAt).toLocaleDateString()}` 
+                                      : "Never expires"}
+                                  </span>
                                 </div>
                                 {link.clicks !== undefined && (
                                   <div className="flex items-center">

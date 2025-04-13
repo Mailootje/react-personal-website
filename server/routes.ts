@@ -19,7 +19,8 @@ interface PhotoItem {
 
 // Validation schema for creating a short link
 const createShortLinkSchema = z.object({
-  url: z.string().url("Please enter a valid URL including http:// or https://")
+  url: z.string().url("Please enter a valid URL including http:// or https://"),
+  neverExpire: z.boolean().optional().default(false)
 });
 
 // Generate a random short code
@@ -680,7 +681,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      const { url } = validationResult.data;
+      const { url, neverExpire } = validationResult.data;
       
       // Generate a unique short code
       let shortCode = generateShortCode();
@@ -692,8 +693,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         existingLink = await storage.getShortenedLinkByCode(shortCode);
       }
       
-      // Set expiration date (7 days from now)
-      const expiresAt = getExpirationDate();
+      // Set expiration date (null if never expires, otherwise 7 days from now)
+      const expiresAt = neverExpire ? null : getExpirationDate();
       
       // Create the shortened link
       const newLink = await storage.createShortenedLink({
@@ -768,7 +769,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const link = await storage.getShortenedLinkByCode(shortCode);
       
       // If link not found or expired, redirect to not-found page
-      if (!link || link.expiresAt < new Date()) {
+      if (!link || (link.expiresAt && link.expiresAt < new Date())) {
         return res.redirect('/not-found');
       }
       
