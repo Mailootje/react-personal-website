@@ -110,23 +110,13 @@ export function Contact() {
                 </div>
               </div>
               
-              <div className="flex items-start mb-6">
+              <div className="flex items-start">
                 <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mr-4 mt-1 flex-shrink-0">
                   <i className="ri-mail-fill text-xl"></i>
                 </div>
                 <div>
                   <h4 className="font-bold mb-1">Email</h4>
                   <p className="text-muted-foreground">{contactInfo.email}</p>
-                </div>
-              </div>
-              
-              <div className="flex items-start">
-                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mr-4 mt-1 flex-shrink-0">
-                  <i className="ri-phone-fill text-xl"></i>
-                </div>
-                <div>
-                  <h4 className="font-bold mb-1">Phone</h4>
-                  <p className="text-muted-foreground">{contactInfo.phone}</p>
                 </div>
               </div>
             </div>

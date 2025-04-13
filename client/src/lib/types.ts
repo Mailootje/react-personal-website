@@ -48,7 +48,6 @@ export interface Certification {
 export interface ContactInfo {
   location: string;
   email: string;
-  phone: string;
 }
 
 export interface ContactFormData {

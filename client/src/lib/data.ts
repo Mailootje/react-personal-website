@@ -20,17 +20,17 @@ export const personalInfo: PersonalInfo = {
 export const socialLinks: SocialLink[] = [
   {
     name: "GitHub",
-    url: "https://github.com/mailobedo",
+    url: "https://github.com/mailootje",
     icon: "ri-github-fill",
   },
   {
     name: "LinkedIn",
-    url: "https://www.linkedin.com/in/mail-obedo/",
+    url: "https://www.linkedin.com/in/mailobed%C3%B6/",
     icon: "ri-linkedin-fill",
   },
   {
     name: "Instagram",
-    url: "https://www.instagram.com/mailobedo/",
+    url: "https://www.instagram.com/mailootje/",
     icon: "ri-instagram-fill",
   },
   {
@@ -130,25 +130,25 @@ export const projects: Project[] = [
 
 export const experiences: Experience[] = [
   {
-    title: "Web Developer",
-    company: "Freelance",
-    period: "2020 - Present",
+    title: "Owner",
+    company: "MBIT For You",
+    period: "Sep. 2023 - Present",
     description:
-      "Develop custom websites and web applications for various clients. Specialize in creating responsive, user-friendly interfaces using modern web technologies. Focus on clean code and performance optimization.",
+      "Self-employed owner of MBIT For You, focusing on custom software solutions. Operating in The Netherlands with on-location services.",
   },
   {
-    title: "Front-End Developer",
-    company: "Tech Company",
-    period: "2018 - 2020",
+    title: "Software Developer",
+    company: "GIM",
+    period: "Sep. 2022 - Feb. 2023",
     description:
-      "Built interactive user interfaces using React and modern JavaScript. Collaborated with designers and back-end developers to implement responsive and accessible web applications.",
+      "Internship role at GIM, specializing in software development, specifically C#. Based in Arnhem, Gelderland, Netherlands.",
   },
   {
-    title: "Junior Web Developer",
-    company: "Digital Agency",
-    period: "2016 - 2018",
+    title: "Software Developer",
+    company: "Gemini Embedded Technology BV",
+    period: "Sep. 2021 - Feb. 2022",
     description:
-      "Created responsive websites for clients using HTML, CSS, and JavaScript. Worked with content management systems to deliver maintainable websites with easy content updates.",
+      "Internship at Gemini Embedded Technology BV, focusing on software development projects. Located in Arnhem, Gelderland, Netherlands.",
   },
 ];
 
@@ -156,16 +156,16 @@ export const educations: Education[] = [
   {
     degree: "Software Developer",
     institution: "ROC A12",
-    period: "2020 - 2025",
+    period: "2020 - Present",
     description:
-      "Focused on software development and web technologies. Completed coursework in algorithms, data structures, and web development.",
+      "An in-depth program emphasizing both software development and web technologies. The coursework included comprehensive studies in algorithms, data structures, and cutting-edge web development practices, preparing graduates for dynamic roles in the tech industry.",
   },
   {
-    degree: "Software Developer",
+    degree: "IT Support",
     institution: "ROC A12",
     period: "2018 - 2019",
     description:
-      "Intensive program focusing on modern software development practices and programming languages. Gained strong foundation in full-stack development, database design, and application architecture. Created multiple real-world projects using JavaScript, React, and Node.js while implementing industry best practices for code quality and efficiency.",
+      "Intensive program covering front-end and back-end technologies. Developed multiple projects using modern frameworks and best practices in web development.",
   },
 ];
 
@@ -179,5 +179,4 @@ export const certifications: Certification[] = [
 export const contactInfo: ContactInfo = {
   location: "Amsterdam, The Netherlands",
   email: "info@mailobedo.nl",
-  phone: "+31 6 12345678",
 };

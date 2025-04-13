@@ -80,10 +80,7 @@ export function Footer() {
                 <i className="ri-mail-line text-primary mt-1 mr-3"></i>
                 <span className="text-gray-400">{contactInfo.email}</span>
               </li>
-              <li className="flex items-start">
-                <i className="ri-phone-line text-primary mt-1 mr-3"></i>
-                <span className="text-gray-400">{contactInfo.phone}</span>
-              </li>
+
             </ul>
           </div>
         </div>
