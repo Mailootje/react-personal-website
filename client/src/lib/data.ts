@@ -11,10 +11,10 @@ import {
 } from "./types";
 
 export const personalInfo: PersonalInfo = {
-  name: "Mail Obedo",
+  name: "Mailo Bedo",
   email: "info@mailobedo.nl",
   location: "The Netherlands",
-  experience: "5+ Years",
+  experience: "3+ Years",
 };
 
 export const socialLinks: SocialLink[] = [
@@ -41,20 +41,24 @@ export const socialLinks: SocialLink[] = [
 ];
 
 export const navigationItems = [
+  { name: "Home", href: "#home" },
   { name: "About", href: "#about" },
-  { name: "Skills", href: "#skills" },
   { name: "Projects", href: "#projects" },
-  { name: "Resume", href: "#resume" },
+  { name: "Blog", href: "#blog" },
   { name: "Contact", href: "#contact" },
+  { name: "Webshop", href: "https://store.mailobedo.nl/" },
+  { name: "PhotoFolio", href: "https://mailobedo.nl/photography/" },
+  { name: "Password Generator", href: "https://mailobedo.nl/PasswordGenerator/" },
+  { name: "IP Lookup", href: "https://mailobedo.nl/apps/ip/" },
 ];
 
 export const skills: Skill[] = [
-  { name: "JavaScript", percentage: 95 },
-  { name: "Python", percentage: 90 },
-  { name: "React", percentage: 90 },
-  { name: "TailwindCSS", percentage: 85 },
-  { name: "NodeJS", percentage: 85 },
-  { name: "Docker", percentage: 75 },
+  { name: "C#", percentage: 95 },
+  { name: "JavaScript", percentage: 90 },
+  { name: "PHP", percentage: 85 },
+  { name: "HTML", percentage: 95 },
+  { name: "CSS", percentage: 85 },
+  { name: "WordPress", percentage: 80 },
 ];
 
 export const professionalSkills: ProfessionalSkill[] = [
@@ -86,34 +90,34 @@ export const professionalSkills: ProfessionalSkill[] = [
 
 export const projects: Project[] = [
   {
-    title: "Personal Website",
-    description: "My personal portfolio website showcasing my skills, projects, and experience. Built with modern web technologies for optimal performance.",
-    image: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+    title: "Zeuser Network",
+    description: "There are 3 sites in total. zeuser.net zeuser.tv zeuser.store",
+    image: "/assets/imgs/zeuser-surf-club.webp",
     type: "Web App",
     typeColor: "primary",
-    technologies: ["HTML", "CSS", "JavaScript", "Bootstrap"],
-    detailsLink: "https://mailobedo.nl",
-    githubLink: "https://github.com/mailobedo/mailobedo-website",
+    technologies: ["HTML", "CSS", "JavaScript", "PHP"],
+    detailsLink: "https://zeuser.net/",
+    githubLink: "#",
   },
   {
-    title: "Weather Dashboard",
-    description: "A responsive web application that displays current weather and forecasts for any location. Features clean UI and intuitive user experience.",
-    image: "https://images.unsplash.com/photo-1561484930-998b6a7b22e8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+    title: "Nightrex.net",
+    description: "This is a FiveM server. This is the website that I created.",
+    image: "/assets/imgs/Nightrex.webp",
     type: "Web App",
     typeColor: "secondary",
-    technologies: ["React", "OpenWeather API", "TailwindCSS"],
-    detailsLink: "#",
-    githubLink: "https://github.com/mailobedo/weather-app",
+    technologies: ["HTML", "CSS", "JavaScript", "PHP"],
+    detailsLink: "https://nightrex.net/",
+    githubLink: "#",
   },
   {
-    title: "Recipe Finder",
-    description: "A web application that allows users to search for recipes based on ingredients they have on hand, helping reduce food waste and inspire cooking creativity.",
-    image: "https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
-    type: "Web App",
+    title: "Password Generator",
+    description: "A simple password generator tool that allows users to create strong, secure passwords.",
+    image: "/assets/imgs/password-generator.webp",
+    type: "Web Tool",
     typeColor: "accent",
-    technologies: ["JavaScript", "Node.js", "Express", "Recipe API"],
-    detailsLink: "#",
-    githubLink: "https://github.com/mailobedo/recipe-finder",
+    technologies: ["HTML", "CSS", "JavaScript"],
+    detailsLink: "https://mailobedo.nl/PasswordGenerator/",
+    githubLink: "#",
   },
 ];
 
