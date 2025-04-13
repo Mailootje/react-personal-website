@@ -22,7 +22,7 @@ export default function Downloads() {
       id: "euro-truck-simulator-2",
       title: "Euro Truck Simulator 2",
       description: "Custom mods, maps, and vehicle enhancements for Euro Truck Simulator 2",
-      icon: "🚚",
+      icon: "🇪🇺",
       tags: ["Game Mods", "Vehicles"]
     },
     {
