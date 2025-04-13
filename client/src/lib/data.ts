@@ -48,6 +48,7 @@ export const navigationItems = [
   { name: "Contact", href: "#contact" },
   { name: "Photography", href: "/photography" },
   { name: "Apps", href: "/apps" },
+  { name: "Games", href: "/games" },
   { name: "Downloads", href: "/downloads" },
 ];
 
@@ -177,6 +178,6 @@ export const certifications: Certification[] = [
 ];
 
 export const contactInfo: ContactInfo = {
-  location: "Amsterdam, The Netherlands",
+  location: "The Netherlands",
   email: "info@mailobedo.nl",
 };
