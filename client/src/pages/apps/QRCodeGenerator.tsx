@@ -532,9 +532,9 @@ export default function QRCodeGenerator() {
                               <Label htmlFor="r4">High (30%)</Label>
                             </div>
                           </RadioGroup>
-                          <FormDescription className="mt-2 text-xs">
+                          <div className="mt-2 text-xs text-muted-foreground">
                             Higher correction levels make QR codes more resistant to damage, but also increase complexity.
-                          </FormDescription>
+                          </div>
                         </AccordionContent>
                       </AccordionItem>
                     </Accordion>
