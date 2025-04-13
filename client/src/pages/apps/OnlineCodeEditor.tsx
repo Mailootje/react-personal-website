@@ -1311,14 +1311,33 @@ console.log("Let's start coding!");`,
 
   // Save changes to the current file
   const saveCurrentFile = () => {
+    console.log("Save button clicked - saveCurrentFile function called");
+    console.log("Current workspace name:", workspaceName);
+    console.log("Active tabs:", tabs);
+    
     const activeTab = tabs.find(tab => tab.isActive);
-    if (!activeTab) return;
+    if (!activeTab) {
+      console.log("No active tab found, returning without saving");
+      toast({
+        title: "Save Failed",
+        description: "No active file to save",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    console.log("Active tab found:", activeTab);
     
     setFileSystem(prev => {
       const fileId = activeTab.fileId;
       const file = prev.items[fileId];
       
-      if (!file) return prev;
+      if (!file) {
+        console.log("File not found in fileSystem:", fileId);
+        return prev;
+      }
+      
+      console.log("Updating file content for:", file.name);
       
       const newFileSystem = {
         ...prev,
@@ -1335,7 +1354,8 @@ console.log("Let's start coding!");`,
     });
     
     // Save to current workspace's localStorage
-    saveToLocalStorage(workspaceName);
+    console.log("Calling saveToLocalStorage with workspace:", workspaceName);
+    saveToLocalStorage(workspaceName, true);
     setLastSaveTime(new Date());
     
     // Always show a toast notification on save
@@ -1628,14 +1648,30 @@ console.log("Let's start coding!");`,
 
   // Save to localStorage
   const saveToLocalStorage = (name: string = workspaceName, showNotification: boolean = true) => {
+    console.log("saveToLocalStorage called with name:", name);
+    console.log("fileSystem:", fileSystem);
+    console.log("tabs:", tabs);
+    console.log("editorOptions:", editorOptions);
+    
     try {
       // Save current workspace state
-      localStorage.setItem(`codeEditor_fileSystem_${name}`, JSON.stringify(fileSystem));
-      localStorage.setItem(`codeEditor_tabs_${name}`, JSON.stringify(tabs));
-      localStorage.setItem(`codeEditor_options_${name}`, JSON.stringify(editorOptions));
+      const fileSystemString = JSON.stringify(fileSystem);
+      const tabsString = JSON.stringify(tabs);
+      const optionsString = JSON.stringify(editorOptions);
+      
+      console.log("JSON.stringify fileSystem length:", fileSystemString.length);
+      console.log("JSON.stringify tabs length:", tabsString.length);
+      console.log("JSON.stringify options length:", optionsString.length);
+      
+      localStorage.setItem(`codeEditor_fileSystem_${name}`, fileSystemString);
+      localStorage.setItem(`codeEditor_tabs_${name}`, tabsString);
+      localStorage.setItem(`codeEditor_options_${name}`, optionsString);
+      
+      console.log("Items saved to localStorage successfully");
       
       // Update workspace list if this is a new workspace
       if (!savedWorkspaces.includes(name)) {
+        console.log("Adding new workspace to workspace list:", name);
         const updatedWorkspaces = [...savedWorkspaces, name];
         setSavedWorkspaces(updatedWorkspaces);
         localStorage.setItem('codeEditor_workspaceList', JSON.stringify(updatedWorkspaces));
@@ -1653,7 +1689,16 @@ console.log("Let's start coding!");`,
       // Set as current workspace
       setWorkspaceName(name);
       localStorage.setItem('codeEditor_currentWorkspace', name);
+      
+      // Verify data was saved correctly
+      const savedFileSystem = localStorage.getItem(`codeEditor_fileSystem_${name}`);
+      if (savedFileSystem) {
+        console.log("Verification: fileSystem saved successfully");
+      } else {
+        console.error("Verification failed: fileSystem not saved");
+      }
     } catch (error) {
+      console.error("Error saving to localStorage:", error);
       toast({
         title: "Save Failed",
         description: "Failed to save to browser storage. It might be disabled or full.",
@@ -1907,22 +1952,53 @@ console.log("Starting fresh!");`,
 
   // Check for localStorage data on first load
   useEffect(() => {
+    console.log("Running initial localStorage check effect");
+    
+    // Make sure localStorage is available
+    try {
+      const testKey = "codeEditor_testKey";
+      localStorage.setItem(testKey, "test");
+      localStorage.removeItem(testKey);
+      console.log("localStorage is available");
+    } catch (error) {
+      console.error("localStorage is not available:", error);
+      toast({
+        title: "Storage Unavailable",
+        description: "Your browser's localStorage is not available. Your data won't be saved between sessions.",
+        variant: "destructive",
+        duration: 10000
+      });
+      return;
+    }
+    
     // Load list of available workspaces
     loadWorkspaceList();
     
     // Get the current workspace name (if any)
     const currentWorkspace = localStorage.getItem('codeEditor_currentWorkspace') || 'default';
+    console.log("Current workspace from localStorage:", currentWorkspace);
     
     // Check if there's saved data for the current workspace
-    if (localStorage.getItem(`codeEditor_fileSystem_${currentWorkspace}`)) {
+    const hasWorkspaceData = localStorage.getItem(`codeEditor_fileSystem_${currentWorkspace}`);
+    console.log("Has workspace data:", !!hasWorkspaceData);
+    
+    if (hasWorkspaceData) {
       // We have saved data, ask the user if they want to load it
       const shouldLoad = window.confirm(`Would you like to restore your previous workspace "${currentWorkspace}"?`);
       if (shouldLoad) {
+        console.log("User confirmed loading workspace:", currentWorkspace);
         loadFromLocalStorage(currentWorkspace);
+      } else {
+        console.log("User declined loading workspace, using default");
+        // Force save current state to ensure it's initialized properly
+        setTimeout(() => {
+          saveToLocalStorage(currentWorkspace);
+        }, 1000);
       }
     }
     // If we have old format data, migrate it to the new format
     else if (localStorage.getItem('codeEditor_fileSystem')) {
+      console.log("Found old format data, migrating to new format");
       // Migrate old data to default workspace
       const oldFileSystem = localStorage.getItem('codeEditor_fileSystem');
       const oldTabs = localStorage.getItem('codeEditor_tabs');
@@ -1940,8 +2016,21 @@ console.log("Starting fresh!");`,
       // Ask the user if they want to load it
       const shouldLoad = window.confirm('Would you like to restore your previous workspace?');
       if (shouldLoad) {
+        console.log("User confirmed loading migrated workspace");
         loadFromLocalStorage('default');
+      } else {
+        console.log("User declined loading migrated workspace");
+        // Force save current state to ensure it's initialized properly
+        setTimeout(() => {
+          saveToLocalStorage('default');
+        }, 1000);
       }
+    } else {
+      console.log("No existing workspaces found, saving initial state");
+      // Force save current state to ensure it's initialized properly
+      setTimeout(() => {
+        saveToLocalStorage('default');
+      }, 1000);
     }
   }, []);
 
