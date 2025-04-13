@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 
 // Snake game constants
 const GRID_SIZE = 20;
@@ -416,156 +418,162 @@ export default function Snake() {
   }, [gameState, gameLoop]);
   
   return (
-    <section className="py-16 bg-gray-50 min-h-screen">
-      <Container maxWidth="xl">
-        <div className="mb-8">
-          <Link href="/games">
-            <a className="text-primary hover:underline inline-flex items-center">
-              <i className="ri-arrow-left-line mr-2"></i>
-              Back to Games
-            </a>
-          </Link>
-        </div>
-        
-        <SectionHeading 
-          subtitle="Classic Arcade" 
-          title="Snake Game"
-          center
-        />
-        
-        <div className="mt-8 flex flex-col items-center">
-          <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl">
-            <div className="flex justify-between items-center mb-4">
-              <div className="flex items-center space-x-4">
-                <div>
-                  <div className="text-sm text-gray-500">Score</div>
-                  <div className="text-2xl font-bold">{score}</div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-500">High Score</div>
-                  <div className="text-2xl font-bold">{highScore}</div>
-                </div>
-              </div>
-              
-              <div>
-                <div className="text-sm text-gray-500">Level</div>
-                <Badge variant="outline" className="px-3 py-1">
-                  {level}
-                </Badge>
-              </div>
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
+      <Header />
+      <main className="flex-grow">
+        <section className="py-16 bg-gray-50">
+          <Container maxWidth="xl">
+            <div className="mb-8">
+              <Link href="/games">
+                <span className="text-primary hover:underline inline-flex items-center">
+                  <span className="mr-2">←</span>
+                  Back to Games
+                </span>
+              </Link>
             </div>
             
-            <div className="relative border-2 border-gray-200 rounded-md overflow-hidden mb-6">
-              <canvas
-                ref={canvasRef}
-                width={GRID_SIZE * CELL_SIZE}
-                height={GRID_SIZE * CELL_SIZE}
-                className="bg-gray-50"
-              />
-              
-              {gameState === GameState.READY && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/70 text-white">
-                  <div className="text-center p-6">
-                    <h3 className="text-2xl font-bold mb-4">Snake Game</h3>
-                    <p className="mb-6">Eat food to grow longer, but don't hit the walls or yourself!</p>
-                    <Button onClick={initGame} size="lg">
-                      Start Game
-                    </Button>
-                  </div>
-                </div>
-              )}
-              
-              {gameState === GameState.PAUSED && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/70 text-white">
-                  <div className="text-center p-6">
-                    <h3 className="text-2xl font-bold mb-4">Game Paused</h3>
-                    <Button onClick={resumeGame} size="lg">
-                      Resume
-                    </Button>
-                  </div>
-                </div>
-              )}
-              
-              {gameState === GameState.GAME_OVER && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/70 text-white">
-                  <div className="text-center p-6">
-                    <h3 className="text-2xl font-bold mb-2">Game Over</h3>
-                    <p className="mb-4">Your score: {score}</p>
-                    {score === highScore && score > 0 && (
-                      <p className="text-yellow-400 font-bold mb-4">New High Score!</p>
-                    )}
-                    <Button onClick={initGame} size="lg">
-                      Play Again
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </div>
+            <SectionHeading 
+              subtitle="Classic Arcade" 
+              title="Snake Game"
+              center
+            />
             
-            {/* Mobile controls */}
-            <div className="md:hidden mt-4">
-              <div className="grid grid-cols-3 gap-2 max-w-xs mx-auto">
-                <div></div>
-                <button
-                  className="p-4 bg-gray-200 rounded-md active:bg-gray-300"
-                  onClick={() => handleTouchInput(Direction.UP)}
-                >
-                  <i className="ri-arrow-up-s-line text-xl"></i>
-                </button>
-                <div></div>
+            <div className="mt-8 flex flex-col items-center">
+              <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl">
+                <div className="flex justify-between items-center mb-4">
+                  <div className="flex items-center space-x-4">
+                    <div>
+                      <div className="text-sm text-gray-500">Score</div>
+                      <div className="text-2xl font-bold">{score}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-500">High Score</div>
+                      <div className="text-2xl font-bold">{highScore}</div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <div className="text-sm text-gray-500">Level</div>
+                    <Badge variant="outline" className="px-3 py-1">
+                      {level}
+                    </Badge>
+                  </div>
+                </div>
                 
-                <button
-                  className="p-4 bg-gray-200 rounded-md active:bg-gray-300"
-                  onClick={() => handleTouchInput(Direction.LEFT)}
-                >
-                  <i className="ri-arrow-left-s-line text-xl"></i>
-                </button>
+                <div className="relative border-2 border-gray-200 rounded-md overflow-hidden mb-6">
+                  <canvas
+                    ref={canvasRef}
+                    width={GRID_SIZE * CELL_SIZE}
+                    height={GRID_SIZE * CELL_SIZE}
+                    className="bg-gray-50"
+                  />
+                  
+                  {gameState === GameState.READY && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/70 text-white">
+                      <div className="text-center p-6">
+                        <h3 className="text-2xl font-bold mb-4">Snake Game</h3>
+                        <p className="mb-6">Eat food to grow longer, but don't hit the walls or yourself!</p>
+                        <Button onClick={initGame} size="lg">
+                          Start Game
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {gameState === GameState.PAUSED && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/70 text-white">
+                      <div className="text-center p-6">
+                        <h3 className="text-2xl font-bold mb-4">Game Paused</h3>
+                        <Button onClick={resumeGame} size="lg">
+                          Resume
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {gameState === GameState.GAME_OVER && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/70 text-white">
+                      <div className="text-center p-6">
+                        <h3 className="text-2xl font-bold mb-2">Game Over</h3>
+                        <p className="mb-4">Your score: {score}</p>
+                        {score === highScore && score > 0 && (
+                          <p className="text-yellow-400 font-bold mb-4">New High Score!</p>
+                        )}
+                        <Button onClick={initGame} size="lg">
+                          Play Again
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
                 
-                <button
-                  className="p-4 bg-gray-200 rounded-md active:bg-gray-300"
-                  onClick={() => handleTouchInput(Direction.DOWN)}
-                >
-                  <i className="ri-arrow-down-s-line text-xl"></i>
-                </button>
+                {/* Mobile controls */}
+                <div className="md:hidden mt-4">
+                  <div className="grid grid-cols-3 gap-2 max-w-xs mx-auto">
+                    <div></div>
+                    <button
+                      className="p-4 bg-gray-200 rounded-md active:bg-gray-300"
+                      onClick={() => handleTouchInput(Direction.UP)}
+                    >
+                      <span className="text-xl">↑</span>
+                    </button>
+                    <div></div>
+                    
+                    <button
+                      className="p-4 bg-gray-200 rounded-md active:bg-gray-300"
+                      onClick={() => handleTouchInput(Direction.LEFT)}
+                    >
+                      <span className="text-xl">←</span>
+                    </button>
+                    
+                    <button
+                      className="p-4 bg-gray-200 rounded-md active:bg-gray-300"
+                      onClick={() => handleTouchInput(Direction.DOWN)}
+                    >
+                      <span className="text-xl">↓</span>
+                    </button>
+                    
+                    <button
+                      className="p-4 bg-gray-200 rounded-md active:bg-gray-300"
+                      onClick={() => handleTouchInput(Direction.RIGHT)}
+                    >
+                      <span className="text-xl">→</span>
+                    </button>
+                  </div>
+                </div>
                 
-                <button
-                  className="p-4 bg-gray-200 rounded-md active:bg-gray-300"
-                  onClick={() => handleTouchInput(Direction.RIGHT)}
-                >
-                  <i className="ri-arrow-right-s-line text-xl"></i>
-                </button>
+                <div className="mt-6">
+                  <h3 className="font-bold text-lg mb-2">Controls</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="bg-gray-50 p-3 rounded border">
+                      <div className="font-medium">Move Up</div>
+                      <div className="text-sm text-gray-500">Arrow Up / W</div>
+                    </div>
+                    <div className="bg-gray-50 p-3 rounded border">
+                      <div className="font-medium">Move Down</div>
+                      <div className="text-sm text-gray-500">Arrow Down / S</div>
+                    </div>
+                    <div className="bg-gray-50 p-3 rounded border">
+                      <div className="font-medium">Move Left</div>
+                      <div className="text-sm text-gray-500">Arrow Left / A</div>
+                    </div>
+                    <div className="bg-gray-50 p-3 rounded border">
+                      <div className="font-medium">Move Right</div>
+                      <div className="text-sm text-gray-500">Arrow Right / D</div>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-4 bg-gray-50 p-3 rounded border">
+                    <div className="font-medium">Pause/Resume</div>
+                    <div className="text-sm text-gray-500">Escape Key</div>
+                  </div>
+                </div>
               </div>
             </div>
-            
-            <div className="mt-6">
-              <h3 className="font-bold text-lg mb-2">Controls</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-gray-50 p-3 rounded border">
-                  <div className="font-medium">Move Up</div>
-                  <div className="text-sm text-gray-500">Arrow Up / W</div>
-                </div>
-                <div className="bg-gray-50 p-3 rounded border">
-                  <div className="font-medium">Move Down</div>
-                  <div className="text-sm text-gray-500">Arrow Down / S</div>
-                </div>
-                <div className="bg-gray-50 p-3 rounded border">
-                  <div className="font-medium">Move Left</div>
-                  <div className="text-sm text-gray-500">Arrow Left / A</div>
-                </div>
-                <div className="bg-gray-50 p-3 rounded border">
-                  <div className="font-medium">Move Right</div>
-                  <div className="text-sm text-gray-500">Arrow Right / D</div>
-                </div>
-              </div>
-              
-              <div className="mt-4 bg-gray-50 p-3 rounded border">
-                <div className="font-medium">Pause/Resume</div>
-                <div className="text-sm text-gray-500">Escape Key</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </Container>
-    </section>
+          </Container>
+        </section>
+      </main>
+      <Footer />
+    </div>
   );
 }
