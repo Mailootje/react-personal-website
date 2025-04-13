@@ -134,6 +134,8 @@ const OnlineCodeEditor: React.FC = () => {
   const [executeResults, setExecuteResults] = useState<string>('');
   const [isConsoleOpen, setIsConsoleOpen] = useState<boolean>(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState<boolean>(false);
+  const [deleteConfirmInput, setDeleteConfirmInput] = useState<string>("");
   const [isKeyboardShortcutsOpen, setIsKeyboardShortcutsOpen] = useState<boolean>(false);
   const [isSnippetsOpen, setIsSnippetsOpen] = useState<boolean>(false);
   const [autoSaveEnabled, setAutoSaveEnabled] = useState<boolean>(true);
@@ -1722,6 +1724,76 @@ console.log("Let's start coding in workspace ${name}!");`,
       description: `Workspace "${name}" has been deleted`
     });
   };
+  
+  // Delete all localStorage data
+  const deleteAllLocalStorage = () => {
+    if (deleteConfirmInput !== "Confirm") {
+      toast({
+        title: "Confirmation Failed",
+        description: "You must type 'Confirm' exactly to proceed with deletion",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Get all keys from localStorage
+    const keys = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('codeEditor_')) {
+        keys.push(key);
+      }
+    }
+    
+    // Remove all code editor related localStorage items
+    keys.forEach(key => {
+      localStorage.removeItem(key);
+    });
+    
+    // Reset state
+    setSavedWorkspaces(['default']);
+    setWorkspaceName('default');
+    
+    // Reset editor to initial state
+    const welcomeId = generateId();
+    const initialFileSystem: FileSystemState = {
+      items: {
+        [welcomeId]: {
+          id: welcomeId,
+          name: 'welcome.js',
+          type: 'file',
+          content: `// Welcome to the Online Code Editor
+// This editor runs completely in your browser
+// All previous workspaces have been cleared
+// Your local storage has been emptied of all editor data
+
+console.log("Starting fresh!");`,
+          language: 'javascript',
+          parent: null
+        }
+      },
+      rootItems: [welcomeId]
+    };
+    
+    setFileSystem(initialFileSystem);
+    setTabs([{
+      id: generateId(),
+      fileId: welcomeId,
+      isActive: true
+    }]);
+    setCurrentContent(initialFileSystem.items[welcomeId].content || '');
+    setCurrentLanguage('javascript');
+    
+    // Close the confirmation dialog
+    setIsDeleteConfirmOpen(false);
+    setDeleteConfirmInput("");
+    
+    toast({
+      title: "All Data Deleted",
+      description: "All code editor data has been cleared from your browser",
+      duration: 5000
+    });
+  };
 
   // Auto-save effect
   useEffect(() => {
@@ -2468,7 +2540,75 @@ console.log("Let's start coding in workspace ${name}!");`,
                 </Button>
               </div>
             </div>
+            
+            <Separator className="bg-gray-700 my-2" />
+            <div className="space-y-2">
+              <Label className="text-red-500">Danger Zone</Label>
+              <div className="border border-red-800 rounded-md p-3 bg-red-950/30">
+                <h4 className="text-sm font-medium mb-1 text-red-400">Delete All Data</h4>
+                <p className="text-xs text-gray-400 mb-2">
+                  This will permanently delete ALL workspaces and editor data from your browser's 
+                  local storage. This action CANNOT be undone.
+                </p>
+                <Button 
+                  variant="destructive" 
+                  size="sm" 
+                  onClick={() => setIsDeleteConfirmOpen(true)}
+                  className="w-full"
+                >
+                  Delete All Data
+                </Button>
+              </div>
+            </div>
           </div>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
+        <DialogContent className="sm:max-w-md bg-gray-900 text-white border-gray-700">
+          <DialogHeader>
+            <DialogTitle className="text-red-500">⚠️ Warning: Delete All Data</DialogTitle>
+            <DialogDescription className="text-gray-400">
+              <p className="my-2">You are about to delete <strong>ALL</strong> workspaces and code editor data stored in your browser.</p>
+              <div className="my-2 border border-red-800 rounded-md p-3 bg-red-950/30">
+                <h4 className="text-sm font-medium text-red-400">This action cannot be undone!</h4>
+                <p className="text-xs text-gray-300 mt-1">
+                  All your workspaces, files, folders, and editor settings will be permanently deleted.
+                </p>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-2">
+            <Label htmlFor="confirm-delete" className="text-white">
+              To confirm, type <strong className="text-red-500 font-mono">Confirm</strong> below:
+            </Label>
+            <Input
+              id="confirm-delete"
+              type="text"
+              placeholder="Type 'Confirm' here"
+              value={deleteConfirmInput}
+              onChange={(e) => setDeleteConfirmInput(e.target.value)}
+              className="bg-gray-800 border-gray-700"
+            />
+          </div>
+          
+          <DialogFooter className="flex flex-col sm:flex-row sm:justify-between gap-2">
+            <Button variant="outline" onClick={() => {
+              setIsDeleteConfirmOpen(false);
+              setDeleteConfirmInput("");
+            }}>
+              Cancel
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={deleteAllLocalStorage}
+              disabled={deleteConfirmInput !== "Confirm"}
+            >
+              Delete All Data
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
