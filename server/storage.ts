@@ -7,12 +7,16 @@ import {
   type InsertShortenedLink,
   conversionCounters,
   type ConversionCounter,
-  type InsertConversionCounter
+  type InsertConversionCounter,
+  counterTokens,
+  type CounterToken,
+  type InsertCounterToken
 } from "@shared/schema";
 import { drizzle } from 'drizzle-orm/postgres-js';
-import { eq, lt, desc } from 'drizzle-orm';
+import { eq, lt, desc, and } from 'drizzle-orm';
 import postgres from 'postgres';
 import { log } from './vite';
+import crypto from 'crypto';
 
 // modify the interface with any CRUD methods
 // you might need
@@ -33,6 +37,12 @@ export interface IStorage {
   getConversionCounter(name: string): Promise<ConversionCounter | undefined>;
   incrementConversionCounter(name: string, incrementBy?: number): Promise<ConversionCounter>;
   getAllConversionCounters(): Promise<ConversionCounter[]>;
+  
+  // Counter token methods
+  createCounterToken(): Promise<CounterToken>;
+  getCounterToken(token: string): Promise<CounterToken | undefined>;
+  useCounterToken(token: string): Promise<boolean>;
+  cleanupExpiredTokens(): Promise<void>;
 }
 
 // Database storage implementation using PostgreSQL
@@ -191,6 +201,85 @@ export class DbStorage implements IStorage {
       return [];
     }
   }
+  
+  async createCounterToken(): Promise<CounterToken> {
+    try {
+      // Generate a secure random token
+      const token = crypto.randomBytes(32).toString('hex');
+      
+      // Set expiration time to 5 minutes from now
+      const expiresAt = new Date();
+      expiresAt.setMinutes(expiresAt.getMinutes() + 5);
+      
+      // Insert the token into the database
+      const result = await this.db.insert(counterTokens)
+        .values({
+          token,
+          expiresAt,
+          used: false
+        })
+        .returning();
+      
+      return result[0];
+    } catch (error) {
+      log(`Error creating counter token: ${error}`, "storage");
+      throw error;
+    }
+  }
+  
+  async getCounterToken(token: string): Promise<CounterToken | undefined> {
+    try {
+      const result = await this.db.select()
+        .from(counterTokens)
+        .where(eq(counterTokens.token, token));
+      
+      return result[0];
+    } catch (error) {
+      log(`Error getting counter token: ${error}`, "storage");
+      return undefined;
+    }
+  }
+  
+  async useCounterToken(token: string): Promise<boolean> {
+    try {
+      // Get the token and check if it's valid
+      const tokenObj = await this.getCounterToken(token);
+      
+      if (!tokenObj) {
+        return false; // Token doesn't exist
+      }
+      
+      if (tokenObj.used) {
+        return false; // Token already used
+      }
+      
+      if (tokenObj.expiresAt < new Date()) {
+        return false; // Token expired
+      }
+      
+      // Mark the token as used
+      await this.db.update(counterTokens)
+        .set({ used: true })
+        .where(eq(counterTokens.token, token));
+      
+      return true;
+    } catch (error) {
+      log(`Error using counter token: ${error}`, "storage");
+      return false;
+    }
+  }
+  
+  async cleanupExpiredTokens(): Promise<void> {
+    try {
+      const now = new Date();
+      await this.db.delete(counterTokens)
+        .where(lt(counterTokens.expiresAt, now));
+      
+      log("Expired counter tokens cleaned up", "storage");
+    } catch (error) {
+      log(`Error cleaning up expired tokens: ${error}`, "storage");
+    }
+  }
 }
 
 // Memory storage implementation for backward compatibility
@@ -198,22 +287,33 @@ export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private shortenedLinks: Map<string, ShortenedLink>;
   private conversionCounters: Map<string, ConversionCounter>;
+  private counterTokens: Map<string, CounterToken>;
   private currentUserId: number;
   private currentLinkId: number;
   private currentCounterId: number;
+  private currentTokenId: number;
 
   constructor() {
     this.users = new Map();
     this.shortenedLinks = new Map();
     this.conversionCounters = new Map();
+    this.counterTokens = new Map();
     this.currentUserId = 1;
     this.currentLinkId = 1;
     this.currentCounterId = 1;
+    this.currentTokenId = 1;
     
-    // Schedule cleanup of expired links every hour
+    // Schedule cleanup of expired items every hour
     setInterval(() => {
-      this.cleanupExpiredLinks().catch(error => {
+      this.cleanupExpiredLinks().catch((error: any) => {
         log(`Error cleaning up expired links: ${error}`, "storage");
+      });
+    }, 60 * 60 * 1000); // 1 hour
+    
+    // Also cleanup expired tokens every hour on a different schedule
+    setInterval(() => {
+      this.cleanupExpiredTokens().catch((error: any) => {
+        log(`Error cleaning up expired tokens: ${error}`, "storage");
       });
     }, 60 * 60 * 1000); // 1 hour
   }
@@ -310,6 +410,66 @@ export class MemStorage implements IStorage {
   async getAllConversionCounters(): Promise<ConversionCounter[]> {
     return Array.from(this.conversionCounters.values())
       .sort((a, b) => b.count - a.count);
+  }
+  
+  async createCounterToken(): Promise<CounterToken> {
+    // Generate a secure random token
+    const token = crypto.randomBytes(32).toString('hex');
+    
+    // Set expiration time to 5 minutes from now
+    const expiresAt = new Date();
+    expiresAt.setMinutes(expiresAt.getMinutes() + 5);
+    
+    const id = this.currentTokenId++;
+    const counterToken: CounterToken = {
+      id,
+      token,
+      expiresAt,
+      used: false,
+      createdAt: new Date()
+    };
+    
+    this.counterTokens.set(token, counterToken);
+    return counterToken;
+  }
+  
+  async getCounterToken(token: string): Promise<CounterToken | undefined> {
+    return this.counterTokens.get(token);
+  }
+  
+  async useCounterToken(token: string): Promise<boolean> {
+    const tokenObj = this.counterTokens.get(token);
+    
+    if (!tokenObj) {
+      return false; // Token doesn't exist
+    }
+    
+    if (tokenObj.used) {
+      return false; // Token already used
+    }
+    
+    if (tokenObj.expiresAt < new Date()) {
+      return false; // Token expired
+    }
+    
+    // Mark token as used
+    tokenObj.used = true;
+    this.counterTokens.set(token, tokenObj);
+    
+    return true;
+  }
+  
+  async cleanupExpiredTokens(): Promise<void> {
+    const now = new Date();
+    
+    // Convert the Map.entries() to an array first to avoid iteration issues
+    Array.from(this.counterTokens.entries()).forEach(([token, tokenObj]) => {
+      if (tokenObj.expiresAt < now) {
+        this.counterTokens.delete(token);
+      }
+    });
+    
+    log("Expired counter tokens cleaned up", "storage");
   }
 }
 

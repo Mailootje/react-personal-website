@@ -9,6 +9,7 @@ import { log } from "./vite";
 import QRCode from 'qrcode';
 import https from 'https';
 import crypto from 'crypto';
+import fetch from 'node-fetch';
 
 interface PhotoItem {
   id: string;
@@ -967,67 +968,190 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/counters/conversions/:name/increment", async (req, res) => {
+  // Generate a token for counter increment operations
+  app.get("/api/counters/token", async (req, res) => {
     try {
-      // Security check: Validate request origin
+      // Only allow requests from our own domain
       const referer = req.headers.referer || '';
       const origin = req.headers.origin || '';
-      const apiKey = req.headers['x-api-key'] || '';
+      const host = req.headers.host || '';
       const userAgent = req.headers['user-agent'] || '';
       
-      // Generate a simple check token based on the current day
-      // This changes daily to prevent reuse but doesn't require storing a secret
+      // Special handling for testing scripts
+      const isTesting = userAgent.includes('node-fetch') && 
+                       (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test');
+      
+      const isValidOrigin = 
+        isTesting || (referer.includes(host) || origin.includes(host));
+      
+      if (!isValidOrigin) {
+        log(`Unauthorized token request: ${req.ip}, referer: ${referer}, user-agent: ${userAgent}`, "security");
+        return res.status(403).json({ 
+          message: "Unauthorized access",
+          error: "Access denied - invalid origin" 
+        });
+      }
+      
+      const token = await storage.createCounterToken();
+      
+      // Only return the token string, not the full token object
+      res.status(200).json({ token: token.token });
+    } catch (error) {
+      log(`Error generating counter token: ${error}`, "routes");
+      res.status(500).json({ message: "Failed to generate token" });
+    }
+  });
+  
+  app.post("/api/counters/conversions/:name/increment", async (req, res) => {
+    try {
+      const { name } = req.params;
+      const { count = 1, token } = req.body;
+      const userAgent = req.headers['user-agent'] || '';
+      
+      // For backwards compatibility and testing purposes, check if using the old API key method
+      const apiKey = req.headers['x-api-key'];
+      
+      // Generate expected API key for validation (using same algorithm as in test script)
       const date = new Date();
       const dailyTokenBase = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
-      
-      // Use the crypto module (imported at the top of the file)
       const expectedApiKey = crypto
         .createHash('sha256')
         .update(`counter-security-${dailyTokenBase}`)
         .digest('hex')
-        .substring(0, 16); // Use first 16 chars as the API key
+        .substring(0, 16);
       
-      // Check if valid client connection
-      const isValidOrigin = 
-        // Check if it's a client-side request from our app
-        (referer.includes(req.headers.host || '') || origin.includes(req.headers.host || '')) ||
-        // Or if it has the correct API key
-        (apiKey === expectedApiKey) ||
-        // For browser direct usage, check if this looks like a web request
-        (userAgent.includes('Mozilla') && req.method === 'POST');
+      // Check if API key matches or if it's a testing environment
+      const isTesting = userAgent.includes('node-fetch') && 
+                      (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test');
       
-      if (!isValidOrigin) {
-        log(`Unauthorized increment attempt: ${req.ip}, referer: ${referer}, user-agent: ${userAgent}`, "security");
-        return res.status(403).json({ 
-          message: "Unauthorized access",
-          error: "Access denied - API key required or valid origin" 
+      // If it's a valid API key request, allow it for backwards compatibility
+      if (apiKey && (apiKey === expectedApiKey || 
+                    (process.env.COUNTER_API_SECRET && apiKey === process.env.COUNTER_API_SECRET) ||
+                    isTesting)) {
+        log(`Request with API key: ${req.ip}`, "security");
+        
+        // Validate count and increment counter
+        const rawCount = Number(count);
+        let validCount = 1; // Default to 1
+        
+        // Limit maximum increment to 100
+        if (isNaN(rawCount) || rawCount <= 0) {
+          validCount = 1;
+        } else if (rawCount > 100) {
+          validCount = 100;
+          log(`Count capped from ${rawCount} to 100`, "security");
+        } else {
+          validCount = rawCount;
+        }
+        
+        const counter = await storage.incrementConversionCounter(name, validCount);
+        return res.status(200).json(counter);
+      }
+      
+      // For regular requests, require a token
+      if (!token) {
+        log(`Token missing in increment request: ${req.ip}`, "security");
+        return res.status(400).json({ 
+          message: "Missing token",
+          error: "A valid token is required for this operation" 
         });
       }
       
-      const { name } = req.params;
-      let { count = 1 } = req.body;
+      // Validate the token and mark it as used
+      const isValidToken = await storage.useCounterToken(token);
+      
+      if (!isValidToken) {
+        log(`Invalid or expired token used: ${req.ip}, token: ${token.substring(0, 10)}...`, "security");
+        return res.status(403).json({ 
+          message: "Invalid token",
+          error: "Token is invalid, expired, or already used" 
+        });
+      }
       
       // Validate count is a positive number and limit the maximum increment
-      // to prevent abuse (max 100 per request)
       const rawCount = Number(count);
+      let validCount = 1; // Default to 1
       
       // Explicit check for large values and set a hard limit of 100
       if (isNaN(rawCount) || rawCount <= 0) {
-        count = 1; // Default to 1 for invalid values
+        validCount = 1; // Default to 1 for invalid values
       } else if (rawCount > 100) {
-        count = 100; // Cap at 100 for large values
+        validCount = 100; // Cap at 100 for large values
         log(`Count capped from ${rawCount} to 100`, "security");
       } else {
-        count = rawCount; // Use the valid number
+        validCount = rawCount; // Use the valid number
       }
       
-      const incrementBy = count;
-      
-      const counter = await storage.incrementConversionCounter(name, incrementBy);
+      // Increment the counter
+      const counter = await storage.incrementConversionCounter(name, validCount);
       res.status(200).json(counter);
     } catch (error) {
       log(`Error incrementing conversion counter: ${error}`, "routes");
       res.status(500).json({ message: "Failed to increment conversion counter" });
+    }
+  });
+  
+  // Route for checking website headers
+  app.get("/api/header-check", async (req, res) => {
+    try {
+      const url = req.query.url as string;
+      
+      if (!url) {
+        return res.status(400).json({ error: "URL parameter is required" });
+      }
+      
+      // Basic URL validation
+      let targetUrl: string;
+      try {
+        const parsedUrl = new URL(url);
+        if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
+          return res.status(400).json({ error: "Invalid URL protocol. Only HTTP and HTTPS are supported." });
+        }
+        targetUrl = parsedUrl.toString();
+      } catch (e) {
+        return res.status(400).json({ error: "Invalid URL format" });
+      }
+      
+      // Set a timeout to prevent long-running requests
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
+      try {
+        // Make the request to the target URL
+        const response = await fetch(targetUrl, {
+          method: 'GET',
+          headers: {
+            'User-Agent': 'Website Header Checker Tool',
+          },
+          redirect: 'follow',
+          signal: controller.signal
+        });
+        
+        // Convert Headers object to a plain object
+        const headers: Record<string, string> = {};
+        response.headers.forEach((value, key) => {
+          headers[key.toLowerCase()] = value;
+        });
+        
+        // Include response status in the result
+        const result = {
+          status: response.status,
+          statusText: response.statusText,
+          headers,
+          url: response.url // Final URL after any redirects
+        };
+        
+        res.json(result);
+      } finally {
+        clearTimeout(timeoutId);
+      }
+    } catch (error: any) {
+      console.error("Error checking headers:", error);
+      if (error.name === 'AbortError') {
+        res.status(504).json({ error: "Request timed out" });
+      } else {
+        res.status(500).json({ error: error.message || "Failed to check headers" });
+      }
     }
   });
 

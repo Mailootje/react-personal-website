@@ -50,3 +50,20 @@ export const insertConversionCounterSchema = createInsertSchema(conversionCounte
 
 export type InsertConversionCounter = z.infer<typeof insertConversionCounterSchema>;
 export type ConversionCounter = typeof conversionCounters.$inferSelect;
+
+// One-time use tokens for secure counter increments
+export const counterTokens = pgTable("counter_tokens", {
+  id: serial("id").primaryKey(),
+  token: text("token").notNull().unique(),
+  used: boolean("used").notNull().default(false),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow()
+});
+
+export const insertCounterTokenSchema = createInsertSchema(counterTokens).pick({
+  token: true,
+  expiresAt: true,
+});
+
+export type InsertCounterToken = z.infer<typeof insertCounterTokenSchema>;
+export type CounterToken = typeof counterTokens.$inferSelect;

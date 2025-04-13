@@ -144,27 +144,47 @@ export default function ImageConverter() {
   // Mutation to increment the counter
   const incrementCounterMutation = useMutation({
     mutationFn: async (count: number) => {
-      // Generate API key for secure access to the counter increment endpoint
-      const apiKey = CryptoES.SHA256(`counter-security-${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()}`)
-        .toString()
-        .substring(0, 16);
+      try {
+        // Step 1: Get a one-time token for this request
+        const tokenResponse = await fetch('/api/counters/token', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
         
-      const response = await fetch('/api/counters/conversions/total_images/increment', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-Key': apiKey,
-          'Origin': window.location.origin
-        },
-        body: JSON.stringify({ count })
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Failed to increment counter');
+        if (!tokenResponse.ok) {
+          throw new Error('Failed to get token for counter increment');
+        }
+        
+        const { token } = await tokenResponse.json();
+        
+        if (!token) {
+          throw new Error('Invalid token received');
+        }
+        
+        // Step 2: Use the token to increment the counter
+        const incrementResponse = await fetch('/api/counters/conversions/total_images/increment', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ 
+            count,
+            token
+          })
+        });
+        
+        if (!incrementResponse.ok) {
+          const errorData = await incrementResponse.json().catch(() => ({}));
+          throw new Error(errorData.message || 'Failed to increment counter');
+        }
+        
+        return incrementResponse.json();
+      } catch (error) {
+        console.error('Error incrementing counter:', error);
+        throw error;
       }
-      
-      return response.json();
     },
     onSuccess: () => {
       // Invalidate the counter query to refresh the data
