@@ -252,9 +252,8 @@ export default function PacmanGame() {
     // Reset the game state
     setScore(0);
     setLives(3);
-    setGameState(GameState.PLAYING);
     
-    // Reset Pacman position
+    // Reset Pacman position with no initial direction
     setPacman({
       x: 14,
       y: 23,
@@ -264,6 +263,11 @@ export default function PacmanGame() {
       mouthOpen: true,
       mouthAngle: 0.2
     });
+    
+    // After making sure everything is reset, set game state to PLAYING
+    // This explicit ordering ensures that Pac-Man doesn't move before the player
+    // provides input
+    setGameState(GameState.PLAYING);
     
     // Reset ghost positions
     setGhosts([
@@ -571,6 +575,7 @@ export default function PacmanGame() {
   
   // Update game logic
   const update = (deltaTime: number) => {
+    // Double-check that game state is PLAYING
     if (gameState !== GameState.PLAYING) return;
     
     // Update Pacman animation (mouth opening/closing)
@@ -905,7 +910,7 @@ export default function PacmanGame() {
       
       // Update game logic at a controlled rate (slower than animation frame rate)
       const updateInterval = 150; // milliseconds between updates
-      if (deltaTime > updateInterval) {
+      if (deltaTime > updateInterval && gameState === GameState.PLAYING) {
         update(deltaTime);
       }
       
@@ -918,8 +923,20 @@ export default function PacmanGame() {
       }
     };
     
-    // Start game loop
+    // Start game loop only for drawing if in READY state
+    if (gameState === GameState.READY) {
+      // Just draw the initial state without updating
+      if (gameLoopRef.current) {
+        cancelAnimationFrame(gameLoopRef.current);
+      }
+      gameLoopRef.current = requestAnimationFrame(gameLoop);
+    }
+    
+    // Start the full game loop if PLAYING
     if (gameState === GameState.PLAYING) {
+      if (gameLoopRef.current) {
+        cancelAnimationFrame(gameLoopRef.current);
+      }
       gameLoopRef.current = requestAnimationFrame(gameLoop);
     }
     
