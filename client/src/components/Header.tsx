@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { navigationItems } from "@/lib/data";
 import { MobileMenu } from "./MobileMenu";
 import { scrollToElement } from "@/lib/utils";
@@ -7,6 +7,7 @@ import { scrollToElement } from "@/lib/utils";
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [location] = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -18,9 +19,22 @@ export function Header() {
   }, []);
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    // If it's a standard navigation item (like Photography page)
+    if (!href.startsWith('#')) {
+      return; // Let the normal link navigation happen
+    }
+    
+    // For hash navigation within the home page
     e.preventDefault();
-    const elementId = href.replace("#", "");
-    scrollToElement(elementId);
+    
+    if (location !== '/') {
+      // If we're not on the home page, navigate to home first
+      window.location.href = "/" + href;
+    } else {
+      // Otherwise just scroll to the element
+      const elementId = href.replace("#", "");
+      scrollToElement(elementId);
+    }
   };
 
   return (
@@ -28,26 +42,35 @@ export function Header() {
       isScrolled ? "bg-white/90 backdrop-blur-sm shadow-sm" : "bg-transparent"
     }`}>
       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-        <a 
-          href="#hero" 
+        <Link 
+          to="/"
           className="text-xl font-bold text-primary flex items-center space-x-2"
-          onClick={(e) => handleNavClick(e, "#hero")}
         >
           <span className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white">JD</span>
           <span>John Doe</span>
-        </a>
+        </Link>
         
         {/* Desktop Navigation */}
         <nav className="hidden md:flex space-x-8">
           {navigationItems.map((item) => (
-            <a
-              key={item.name}
-              href={item.href}
-              className="text-text hover:text-primary transition-colors font-medium"
-              onClick={(e) => handleNavClick(e, item.href)}
-            >
-              {item.name}
-            </a>
+            item.href.startsWith('#') ? (
+              <a
+                key={item.name}
+                href={item.href}
+                className="text-text hover:text-primary transition-colors font-medium"
+                onClick={(e) => handleNavClick(e, item.href)}
+              >
+                {item.name}
+              </a>
+            ) : (
+              <Link
+                key={item.name}
+                href={item.href}
+                className="text-text hover:text-primary transition-colors font-medium"
+              >
+                {item.name}
+              </Link>
+            )
           ))}
         </nav>
         
