@@ -238,15 +238,15 @@ export default function EuroTruckSimulator2() {
                   </div>
                   
                   <TabsContent value="all" className="mt-0">
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                      <div className="lg:col-span-2">
+                    <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                      <div className="lg:col-span-3">
                         <div className="grid grid-cols-1 gap-6">
                           {downloadFiles.map(file => (
                             <DownloadCard key={file.id} file={file} />
                           ))}
                         </div>
                       </div>
-                      <div className={`lg:col-span-1 ${!showLoadOrder ? 'hidden lg:block' : ''}`}>
+                      <div className={`lg:col-span-2 ${!showLoadOrder ? 'hidden lg:block' : ''}`}>
                         <Card className="shadow-sm mb-6">
                           <CardHeader>
                             <CardTitle className="text-xl">Recommended Load Order</CardTitle>
@@ -300,8 +300,8 @@ export default function EuroTruckSimulator2() {
                   
                   {categories.map(category => (
                     <TabsContent key={category} value={category} className="mt-0">
-                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div className="lg:col-span-2">
+                      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                        <div className="lg:col-span-3">
                           <div className="grid grid-cols-1 gap-6">
                             {downloadFiles
                               .filter(file => file.category === category)
@@ -311,7 +311,7 @@ export default function EuroTruckSimulator2() {
                             }
                           </div>
                         </div>
-                        <div className={`lg:col-span-1 ${!showLoadOrder ? 'hidden lg:block' : ''}`}>
+                        <div className={`lg:col-span-2 ${!showLoadOrder ? 'hidden lg:block' : ''}`}>
                           <Card className="shadow-sm mb-6">
                             <CardHeader>
                               <CardTitle className="text-xl">Recommended Load Order</CardTitle>
