@@ -50,6 +50,101 @@ const downloadStats: Map<string, DownloadStat> = new Map();
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Download files API
+  app.get("/api/downloads/ets2", async (req, res) => {
+    try {
+      // Fetch the ETS2 mods from mailobedo.nl
+      const response = await fetch('https://mailobedo.nl/files/');
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch mods: ${response.status} ${response.statusText}`);
+      }
+      
+      const files = await response.json();
+      
+      // Process the files to create a proper response
+      const processedFiles = files.map((url: string, index: number) => {
+        // Extract filename from URL
+        const filename = url.split('/').pop() || '';
+        const cleanFilename = filename.replace('.scs', '').replace('.zip', '');
+        
+        // Create a more user-friendly name from the filename
+        const name = cleanFilename
+          .split('-')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ')
+          .replace(/_/g, ' ');
+        
+        // Determine file type from extension
+        const fileType = filename.endsWith('.scs') ? 'SCS Mod' : 'ZIP Archive';
+        
+        // Determine category based on filename patterns
+        let category = 'Other';
+        if (filename.includes('traffic')) category = 'Traffic';
+        else if (filename.includes('map') || filename.includes('Map')) category = 'Maps';
+        else if (filename.includes('model') || filename.includes('assets')) category = 'Models & Assets';
+        else if (filename.includes('def')) category = 'Definition Files';
+        else if (filename.includes('media')) category = 'Media';
+        
+        // Create tags from the filename components
+        const tags = cleanFilename.split(/[-_]/).filter(tag => 
+          tag.length > 2 && 
+          !['and', 'the', 'for', 'with', 'v1', 'v2', 'v3'].includes(tag.toLowerCase())
+        );
+        
+        return {
+          id: `ets2-${index}`,
+          name: name,
+          description: `${fileType} for Euro Truck Simulator 2 v1.53.x`,
+          fileSize: "Unknown", // We don't have actual file sizes
+          version: filename.match(/v[0-9.]+/)?.[0] || 'Latest',
+          uploadDate: "2025-03-01", // Placeholder date
+          downloadCount: Math.floor(Math.random() * 1000) + 500, // Random count for display
+          category: category,
+          tags: Array.from(new Set(tags)).slice(0, 3), // Take up to 3 unique tags
+          originalUrl: url,
+          downloadUrl: `/api/downloads/proxy?url=${encodeURIComponent(url)}`
+        };
+      });
+      
+      res.json(processedFiles);
+    } catch (error) {
+      console.error("Error fetching ETS2 mods:", error);
+      res.status(500).json({ message: "Failed to fetch ETS2 mods from source" });
+    }
+  });
+  
+  // Proxy endpoint for downloading files
+  app.get("/api/downloads/proxy", async (req, res) => {
+    try {
+      const url = req.query.url as string;
+      
+      if (!url) {
+        return res.status(400).json({ message: "URL parameter is required" });
+      }
+      
+      // Extract the filename from the URL
+      const filename = url.split('/').pop() || 'download';
+      
+      // Set headers for file download
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      
+      // Create a fetch request to the original URL
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch file: ${response.status} ${response.statusText}`);
+      }
+      
+      // Pipe the response to our response
+      const body = await response.arrayBuffer();
+      res.send(Buffer.from(body));
+      
+    } catch (error) {
+      console.error("Error proxying download:", error);
+      res.status(500).json({ message: "Failed to download file" });
+    }
+  });
+  
   app.get("/api/downloads/stats/:fileId", (req, res) => {
     try {
       const { fileId } = req.params;

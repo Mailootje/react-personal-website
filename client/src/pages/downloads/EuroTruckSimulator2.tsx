@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
-import { ArrowLeft, Download, FileText, Info, Clock, Tag } from "lucide-react";
+import { ArrowLeft, Download, FileText, Info, Clock, Tag, Loader2, AlertCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -10,6 +10,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { toast } from "@/hooks/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface DownloadFile {
   id: string;
@@ -22,71 +24,43 @@ interface DownloadFile {
   category: string;
   tags: string[];
   downloadUrl: string;
+  originalUrl?: string;
 }
 
 export default function EuroTruckSimulator2() {
-  const [downloadFiles] = useState<DownloadFile[]>([
-    {
-      id: "ets2-realistic-weather",
-      name: "Realistic Weather Mod",
-      description: "Enhances weather effects with more realistic rain, snow, and fog variations that dynamically change based on region and season.",
-      fileSize: "24.7 MB",
-      version: "v2.1.0",
-      uploadDate: "2025-02-15",
-      downloadCount: 1245,
-      category: "Graphics",
-      tags: ["Weather", "Graphics", "Immersion"],
-      downloadUrl: "/downloads/files/ets2-realistic-weather"
-    },
-    {
-      id: "ets2-real-european-companies",
-      name: "Real European Companies Pack",
-      description: "Adds 50+ real European company depots and cargo destinations across the map with authentic logos and delivery points.",
-      fileSize: "156 MB",
-      version: "v3.4.2",
-      uploadDate: "2025-03-01",
-      downloadCount: 876,
-      category: "Maps",
-      tags: ["Companies", "Europe", "Realism"],
-      downloadUrl: "/downloads/files/ets2-real-european-companies"
-    },
-    {
-      id: "ets2-custom-truck-sounds",
-      name: "Custom Truck Engine Sounds",
-      description: "High-quality recordings of real truck engines for all in-game trucks. Includes interior and exterior sound variations.",
-      fileSize: "87.3 MB",
-      version: "v1.8.5",
-      uploadDate: "2025-02-28",
-      downloadCount: 2190,
-      category: "Sound",
-      tags: ["Engine", "Audio", "Immersion"],
-      downloadUrl: "/downloads/files/ets2-custom-truck-sounds"
-    },
-    {
-      id: "ets2-advanced-traffic",
-      name: "Advanced Traffic System",
-      description: "Completely overhauls AI traffic behavior with more realistic driving patterns, density controls, and new vehicle models.",
-      fileSize: "112 MB",
-      version: "v4.0.1",
-      uploadDate: "2025-03-10",
-      downloadCount: 1578,
-      category: "Gameplay",
-      tags: ["Traffic", "AI", "Realism"],
-      downloadUrl: "/downloads/files/ets2-advanced-traffic"
-    },
-    {
-      id: "ets2-scandinavia-expansion",
-      name: "Scandinavia Enhanced",
-      description: "Enhances the Scandinavia DLC with additional landmarks, cities, and roads for a more detailed Nordic experience.",
-      fileSize: "245 MB",
-      version: "v2.7.0",
-      uploadDate: "2025-01-20",
-      downloadCount: 932,
-      category: "Maps",
-      tags: ["Scandinavia", "Geography", "Expansion"],
-      downloadUrl: "/downloads/files/ets2-scandinavia-expansion"
-    }
-  ]);
+  const [downloadFiles, setDownloadFiles] = useState<DownloadFile[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  useEffect(() => {
+    const fetchDownloads = async () => {
+      setIsLoading(true);
+      setError(null);
+      
+      try {
+        const response = await fetch('/api/downloads/ets2');
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch downloads: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        setDownloadFiles(data);
+      } catch (err) {
+        console.error('Error fetching downloads:', err);
+        setError('Failed to load downloads. Please try again later.');
+        toast({
+          title: 'Error',
+          description: 'Failed to load downloads from the server.',
+          variant: 'destructive'
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchDownloads();
+  }, []);
 
   const categories = Array.from(new Set(downloadFiles.map(file => file.category)));
   
@@ -126,35 +100,87 @@ export default function EuroTruckSimulator2() {
               
               <Separator className="my-8" />
               
-              <Tabs defaultValue="all" className="w-full">
-                <TabsList className="mb-8 flex flex-wrap h-auto p-1">
-                  <TabsTrigger value="all">All Files</TabsTrigger>
-                  {categories.map(category => (
-                    <TabsTrigger key={category} value={category}>{category}</TabsTrigger>
-                  ))}
-                </TabsList>
-                
-                <TabsContent value="all" className="mt-0">
-                  <div className="grid grid-cols-1 gap-6">
-                    {downloadFiles.map(file => (
-                      <DownloadCard key={file.id} file={file} />
+              {isLoading ? (
+                <div className="space-y-6">
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="w-12 h-12 animate-spin text-primary" />
+                  </div>
+                  <div className="space-y-4">
+                    {[1, 2, 3].map(i => (
+                      <Card key={i} className="w-full">
+                        <CardHeader>
+                          <Skeleton className="h-6 w-1/3 mb-2" />
+                          <Skeleton className="h-4 w-full" />
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            {[1, 2, 3, 4].map(j => (
+                              <Skeleton key={j} className="h-4 w-full" />
+                            ))}
+                          </div>
+                          <div className="flex gap-2">
+                            {[1, 2, 3].map(j => (
+                              <Skeleton key={j} className="h-6 w-16" />
+                            ))}
+                          </div>
+                        </CardContent>
+                        <CardFooter className="flex justify-between border-t pt-4">
+                          <Skeleton className="h-6 w-20" />
+                          <Skeleton className="h-10 w-28" />
+                        </CardFooter>
+                      </Card>
                     ))}
                   </div>
-                </TabsContent>
-                
-                {categories.map(category => (
-                  <TabsContent key={category} value={category} className="mt-0">
+                </div>
+              ) : error ? (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <AlertCircle className="w-12 h-12 text-destructive mb-4" />
+                  <h3 className="text-xl font-semibold mb-2">Failed to Load Downloads</h3>
+                  <p className="text-muted-foreground mb-6">{error}</p>
+                  <Button
+                    onClick={() => window.location.reload()}
+                    variant="outline"
+                  >
+                    Try Again
+                  </Button>
+                </div>
+              ) : downloadFiles.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <AlertCircle className="w-12 h-12 text-muted-foreground mb-4" />
+                  <h3 className="text-xl font-semibold mb-2">No Downloads Available</h3>
+                  <p className="text-muted-foreground">No mods or files are currently available for download.</p>
+                </div>
+              ) : (
+                <Tabs defaultValue="all" className="w-full">
+                  <TabsList className="mb-8 flex flex-wrap h-auto p-1">
+                    <TabsTrigger value="all">All Files</TabsTrigger>
+                    {categories.map(category => (
+                      <TabsTrigger key={category} value={category}>{category}</TabsTrigger>
+                    ))}
+                  </TabsList>
+                  
+                  <TabsContent value="all" className="mt-0">
                     <div className="grid grid-cols-1 gap-6">
-                      {downloadFiles
-                        .filter(file => file.category === category)
-                        .map(file => (
-                          <DownloadCard key={file.id} file={file} />
-                        ))
-                      }
+                      {downloadFiles.map(file => (
+                        <DownloadCard key={file.id} file={file} />
+                      ))}
                     </div>
                   </TabsContent>
-                ))}
-              </Tabs>
+                  
+                  {categories.map(category => (
+                    <TabsContent key={category} value={category} className="mt-0">
+                      <div className="grid grid-cols-1 gap-6">
+                        {downloadFiles
+                          .filter(file => file.category === category)
+                          .map(file => (
+                            <DownloadCard key={file.id} file={file} />
+                          ))
+                        }
+                      </div>
+                    </TabsContent>
+                  ))}
+                </Tabs>
+              )}
             </motion.div>
           </Container>
         </section>
