@@ -827,7 +827,19 @@ console.log("Let's start coding!");`,
         
         {isFolder && item.isOpen && item.children && (
           <div className="children">
-            {item.children.map(childId => renderFileSystemItem(childId, depth + 1))}
+            {/* Sort children so folders appear first, then files */}
+            {item.children
+              .sort((a, b) => {
+                const itemA = fileSystem.items[a];
+                const itemB = fileSystem.items[b];
+                // If types are different, sort folders before files
+                if (itemA.type !== itemB.type) {
+                  return itemA.type === 'folder' ? -1 : 1;
+                }
+                // If types are the same, sort alphabetically
+                return itemA.name.localeCompare(itemB.name);
+              })
+              .map(childId => renderFileSystemItem(childId, depth + 1))}
             
             {/* New Item Input (conditionally rendered) */}
             {isCreatingFile && newItemParent === item.id && (
@@ -3164,8 +3176,19 @@ console.log("Starting fresh!");`,
                     </div>
                   )}
                   
-                  {/* Render File Tree */}
-                  {fileSystem.rootItems.map(itemId => renderFileSystemItem(itemId))}
+                  {/* Render File Tree - Sort folders first, then files */}
+                  {fileSystem.rootItems
+                    .sort((a, b) => {
+                      const itemA = fileSystem.items[a];
+                      const itemB = fileSystem.items[b];
+                      // If types are different, sort folders before files
+                      if (itemA.type !== itemB.type) {
+                        return itemA.type === 'folder' ? -1 : 1;
+                      }
+                      // If types are the same, sort alphabetically
+                      return itemA.name.localeCompare(itemB.name);
+                    })
+                    .map(itemId => renderFileSystemItem(itemId))}
                 </div>
               </div>
 
