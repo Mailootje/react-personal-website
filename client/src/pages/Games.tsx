@@ -35,7 +35,7 @@ export default function Games() {
     {
       id: "pacman",
       title: "Pac-Man",
-      description: "The classic arcade game. Navigate the maze, eat all the dots, and avoid the ghosts!",
+      description: "Our custom implementation of the classic arcade game. Navigate the maze, eat all the dots, and avoid the ghosts!",
       icon: "👾",
       tags: ["Game", "Arcade", "Classic"],
     },
