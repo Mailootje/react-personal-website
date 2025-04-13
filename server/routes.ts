@@ -941,6 +941,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Image conversion counter endpoints
+  app.get("/api/counters/conversions", async (req, res) => {
+    try {
+      const counters = await storage.getAllConversionCounters();
+      res.json(counters);
+    } catch (error) {
+      log(`Error getting conversion counters: ${error}`, "routes");
+      res.status(500).json({ message: "Failed to get conversion counters" });
+    }
+  });
+
+  app.get("/api/counters/conversions/:name", async (req, res) => {
+    try {
+      const { name } = req.params;
+      const counter = await storage.getConversionCounter(name);
+      if (!counter) {
+        return res.status(404).json({ message: "Counter not found" });
+      }
+      res.json(counter);
+    } catch (error) {
+      log(`Error getting conversion counter: ${error}`, "routes");
+      res.status(500).json({ message: "Failed to get conversion counter" });
+    }
+  });
+
+  app.post("/api/counters/conversions/:name/increment", async (req, res) => {
+    try {
+      const { name } = req.params;
+      const { count = 1 } = req.body;
+      
+      // Validate count is a positive number
+      const incrementBy = typeof count === 'number' && count > 0 ? count : 1;
+      
+      const counter = await storage.incrementConversionCounter(name, incrementBy);
+      res.status(200).json(counter);
+    } catch (error) {
+      log(`Error incrementing conversion counter: ${error}`, "routes");
+      res.status(500).json({ message: "Failed to increment conversion counter" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;

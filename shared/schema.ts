@@ -34,3 +34,19 @@ export const insertShortenedLinkSchema = createInsertSchema(shortenedLinks).pick
 
 export type InsertShortenedLink = z.infer<typeof insertShortenedLinkSchema>;
 export type ShortenedLink = typeof shortenedLinks.$inferSelect;
+
+// Conversion counters table
+export const conversionCounters = pgTable("conversion_counters", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull().unique(),
+  count: integer("count").notNull().default(0),
+  lastUpdated: timestamp("last_updated").notNull().defaultNow(),
+});
+
+export const insertConversionCounterSchema = createInsertSchema(conversionCounters).pick({
+  name: true,
+  count: true,
+});
+
+export type InsertConversionCounter = z.infer<typeof insertConversionCounterSchema>;
+export type ConversionCounter = typeof conversionCounters.$inferSelect;

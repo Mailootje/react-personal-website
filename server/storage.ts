@@ -4,7 +4,10 @@ import {
   type InsertUser, 
   shortenedLinks, 
   type ShortenedLink, 
-  type InsertShortenedLink 
+  type InsertShortenedLink,
+  conversionCounters,
+  type ConversionCounter,
+  type InsertConversionCounter
 } from "@shared/schema";
 import { drizzle } from 'drizzle-orm/postgres-js';
 import { eq, lt, desc } from 'drizzle-orm';
@@ -25,6 +28,11 @@ export interface IStorage {
   incrementLinkClicks(shortCode: string): Promise<void>;
   cleanupExpiredLinks(): Promise<void>;
   getRecentLinks(limit: number): Promise<ShortenedLink[]>;
+  
+  // Conversion counter methods
+  getConversionCounter(name: string): Promise<ConversionCounter | undefined>;
+  incrementConversionCounter(name: string, incrementBy?: number): Promise<ConversionCounter>;
+  getAllConversionCounters(): Promise<ConversionCounter[]>;
 }
 
 // Database storage implementation using PostgreSQL
@@ -127,20 +135,77 @@ export class DbStorage implements IStorage {
       return [];
     }
   }
+
+  async getConversionCounter(name: string): Promise<ConversionCounter | undefined> {
+    try {
+      const result = await this.db.select().from(conversionCounters).where(eq(conversionCounters.name, name));
+      return result[0];
+    } catch (error) {
+      log(`Error getting conversion counter: ${error}`, "storage");
+      return undefined;
+    }
+  }
+
+  async incrementConversionCounter(name: string, incrementBy: number = 1): Promise<ConversionCounter> {
+    try {
+      // First check if counter exists
+      const counter = await this.getConversionCounter(name);
+      
+      if (counter) {
+        // Counter exists, update it
+        const newCount = counter.count + incrementBy;
+        const result = await this.db.update(conversionCounters)
+          .set({ 
+            count: newCount,
+            lastUpdated: new Date()
+          })
+          .where(eq(conversionCounters.name, name))
+          .returning();
+        return result[0];
+      } else {
+        // Counter doesn't exist, create it
+        const result = await this.db.insert(conversionCounters)
+          .values({
+            name,
+            count: incrementBy,
+            lastUpdated: new Date()
+          })
+          .returning();
+        return result[0];
+      }
+    } catch (error) {
+      log(`Error incrementing conversion counter: ${error}`, "storage");
+      throw error;
+    }
+  }
+
+  async getAllConversionCounters(): Promise<ConversionCounter[]> {
+    try {
+      const result = await this.db.select().from(conversionCounters).orderBy(desc(conversionCounters.count));
+      return result;
+    } catch (error) {
+      log(`Error getting all conversion counters: ${error}`, "storage");
+      return [];
+    }
+  }
 }
 
 // Memory storage implementation for backward compatibility
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private shortenedLinks: Map<string, ShortenedLink>;
+  private conversionCounters: Map<string, ConversionCounter>;
   private currentUserId: number;
   private currentLinkId: number;
+  private currentCounterId: number;
 
   constructor() {
     this.users = new Map();
     this.shortenedLinks = new Map();
+    this.conversionCounters = new Map();
     this.currentUserId = 1;
     this.currentLinkId = 1;
+    this.currentCounterId = 1;
     
     // Schedule cleanup of expired links every hour
     setInterval(() => {
@@ -173,6 +238,7 @@ export class MemStorage implements IStorage {
       ...link,
       id,
       createdAt: new Date(),
+      expiresAt: link.expiresAt || null,
       clicks: 0
     };
     this.shortenedLinks.set(link.shortCode, newLink);
@@ -195,7 +261,8 @@ export class MemStorage implements IStorage {
     const now = new Date();
     // Convert the Map.entries() to an array first to avoid iteration issues
     Array.from(this.shortenedLinks.entries()).forEach(([shortCode, link]) => {
-      if (link.expiresAt < now) {
+      // Only delete links that have a non-null expiresAt date that's in the past
+      if (link.expiresAt !== null && link.expiresAt !== undefined && link.expiresAt < now) {
         this.shortenedLinks.delete(shortCode);
       }
     });
@@ -205,6 +272,38 @@ export class MemStorage implements IStorage {
     return Array.from(this.shortenedLinks.values())
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
       .slice(0, limit);
+  }
+
+  async getConversionCounter(name: string): Promise<ConversionCounter | undefined> {
+    return this.conversionCounters.get(name);
+  }
+
+  async incrementConversionCounter(name: string, incrementBy: number = 1): Promise<ConversionCounter> {
+    const counter = this.conversionCounters.get(name);
+    
+    if (counter) {
+      // Counter exists, update it
+      counter.count += incrementBy;
+      counter.lastUpdated = new Date();
+      this.conversionCounters.set(name, counter);
+      return counter;
+    } else {
+      // Counter doesn't exist, create it
+      const id = this.currentCounterId++;
+      const newCounter: ConversionCounter = {
+        id,
+        name,
+        count: incrementBy,
+        lastUpdated: new Date()
+      };
+      this.conversionCounters.set(name, newCounter);
+      return newCounter;
+    }
+  }
+
+  async getAllConversionCounters(): Promise<ConversionCounter[]> {
+    return Array.from(this.conversionCounters.values())
+      .sort((a, b) => b.count - a.count);
   }
 }
 
