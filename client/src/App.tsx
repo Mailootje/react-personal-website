@@ -48,8 +48,6 @@ function App() {
   return (
     <DarkModeProvider>
       <QueryClientProvider client={queryClient}>
-        {/* Global video background */}
-        <VideoBackground opacity={0.2} isGlobal={true} className="bg-black" />
         <Router />
         <Toaster />
       </QueryClientProvider>
