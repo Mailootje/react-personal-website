@@ -699,10 +699,10 @@ export default function WeatherDashboard() {
                           />
                           {/* Add weather layers */}
                           <TileLayer
-                            url={`https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${process.env.OPENWEATHER_API_KEY}`}
+                            url="/api/weather/map/precipitation_new/{z}/{x}/{y}"
                           />
                           <TileLayer
-                            url={`https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=${process.env.OPENWEATHER_API_KEY}`}
+                            url="/api/weather/map/clouds_new/{z}/{x}/{y}"
                           />
                           <CustomMarker position={[data.current.coord.lat, data.current.coord.lon] as [number, number]}>
                             <Popup>

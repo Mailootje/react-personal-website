@@ -51,6 +51,32 @@ interface DownloadStat {
 const downloadStats: Map<string, DownloadStat> = new Map();
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Proxy route for weather map tiles
+  app.get("/api/weather/map/:type/:z/:x/:y", async (req: Request, res: Response) => {
+    try {
+      const { type, z, x, y } = req.params;
+      const validTypes = ['precipitation_new', 'clouds_new'];
+      if (!validTypes.includes(type)) {
+        return res.status(400).json({ error: 'Invalid map type' });
+      }
+      
+      const url = `https://tile.openweathermap.org/map/${type}/${z}/${x}/${y}.png?appid=${process.env.OPENWEATHER_API_KEY}`;
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        return res.status(response.status).json({ error: 'Map tile not found' });
+      }
+      
+      const buffer = await response.arrayBuffer();
+      res.setHeader('Content-Type', 'image/png');
+      res.setHeader('Cache-Control', 'public, max-age=3600'); // Cache for 1 hour
+      res.send(Buffer.from(buffer));
+    } catch (error) {
+      console.error('Error fetching weather map tile:', error);
+      res.status(500).json({ error: 'Failed to fetch map tile' });
+    }
+  });
+  
   // Image proxy API for handling CORS issues with external images
   app.get("/api/image-proxy", async (req, res) => {
     try {
