@@ -1,237 +1,386 @@
-import { useState, useRef } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Container } from "@/components/ui/container";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { ArrowLeft, Copy, Check, Download, Upload, Trash, Code, PlayIcon } from "lucide-react";
-import { Link } from "wouter";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useToast } from "@/hooks/use-toast";
-import { Slider } from "@/components/ui/slider";
-import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Monaco } from "@monaco-editor/react";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
+import { Slider } from "@/components/ui/slider";
+import { 
+  ArrowLeft, 
+  Copy, 
+  Check, 
+  RefreshCw, 
+  Download,
+  Upload,
+  FileCode,
+  Code,
+  Binary,
+  Undo,
+  AlertTriangle
+} from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+
+// Define available themes
+const themes = [
+  { id: "default", name: "Default", classes: "bg-background text-foreground" },
+  { id: "monokai", name: "Monokai", classes: "bg-[#272822] text-[#F8F8F2]" },
+  { id: "github", name: "GitHub", classes: "bg-[#ffffff] text-[#24292e]" },
+  { id: "vscode", name: "VS Code", classes: "bg-[#1E1E1E] text-[#D4D4D4]" }
+];
 
 export default function JsonFormatter() {
   const { toast } = useToast();
-  const [jsonInput, setJsonInput] = useState("");
-  const [formattedJson, setFormattedJson] = useState("");
-  const [minifiedJson, setMinifiedJson] = useState("");
-  const [activeTab, setActiveTab] = useState("format");
+  const [activeTab, setActiveTab] = useState<string>("format");
+  const [inputJson, setInputJson] = useState<string>("");
+  const [outputJson, setOutputJson] = useState<string>("");
+  const [originalJson, setOriginalJson] = useState<string>("");
+  const [error, setError] = useState<string>("");
   const [indentSize, setIndentSize] = useState<number>(2);
-  const [searchText, setSearchText] = useState("");
-  const [validationResult, setValidationResult] = useState<{ valid: boolean; message?: string }>({ valid: true });
-  const [copied, setCopied] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [sortKeys, setSortKeys] = useState(false);
-  const [showTreeView, setShowTreeView] = useState(false);
-
-  // Format the JSON string
-  const formatJson = () => {
-    if (!jsonInput.trim()) {
-      toast({
-        title: "No JSON to format",
-        description: "Please enter some JSON first",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      // Parse the JSON to validate it
-      let parsed = JSON.parse(jsonInput);
-      
-      // Sort keys if option is enabled
-      if (sortKeys) {
-        parsed = sortObjectKeys(parsed);
+  const [sortKeys, setSortKeys] = useState<boolean>(false);
+  const [processing, setProcessing] = useState<boolean>(false);
+  const [copied, setCopied] = useState<boolean>(false);
+  const [selectedTheme, setSelectedTheme] = useState<string>("default");
+  
+  // Initial example JSON to guide users
+  const exampleJson = JSON.stringify({
+    name: "JSON Formatter",
+    description: "A tool to format, validate and transform JSON data",
+    features: ["Format", "Validate", "Minify", "Sort keys"],
+    active: true,
+    stats: {
+      users: 1250,
+      formatting: {
+        time: "35ms",
+        accuracy: 0.997
       }
+    }
+  }, null, 2);
+  
+  // Initialize with example JSON
+  useEffect(() => {
+    setInputJson(exampleJson);
+  }, []);
+  
+  // Process input whenever it changes
+  useEffect(() => {
+    handleProcess();
+  }, [activeTab, inputJson, indentSize, sortKeys]);
+  
+  // Format JSON
+  const formatJson = (json: string, spaces: number, sort: boolean): string => {
+    try {
+      // Parse the JSON string to an object
+      const parsedJson = JSON.parse(json);
       
-      // Format the JSON with the specified indent size
-      const formatted = JSON.stringify(parsed, null, indentSize);
-      setFormattedJson(formatted);
-      setMinifiedJson(JSON.stringify(parsed));
-      setValidationResult({ valid: true });
-      
-      toast({
-        title: "JSON Formatted",
-        description: "Your JSON has been successfully formatted",
-      });
-    } catch (error: any) {
-      setValidationResult({ 
-        valid: false, 
-        message: `Error: ${error.message}` 
-      });
-      
-      toast({
-        title: "Invalid JSON",
-        description: error.message,
-        variant: "destructive",
-      });
+      // Convert back to a formatted string
+      return JSON.stringify(parsedJson, sort ? sortObjectKeys : undefined, spaces);
+    } catch (error) {
+      throw new Error(`Invalid JSON: ${(error as Error).message}`);
     }
   };
-
-  // Recursively sort object keys
-  const sortObjectKeys = (obj: any): any => {
-    // If it's not an object or it's null, return it as is
-    if (obj === null || typeof obj !== 'object' || Array.isArray(obj)) {
-      // For arrays, sort the contents if they are objects
-      if (Array.isArray(obj)) {
-        return obj.map(item => {
-          if (item !== null && typeof item === 'object') {
-            return sortObjectKeys(item);
-          }
-          return item;
-        });
-      }
-      return obj;
+  
+  // Minify JSON
+  const minifyJson = (json: string): string => {
+    try {
+      // Parse the JSON string to an object
+      const parsedJson = JSON.parse(json);
+      
+      // Convert back to a minified string
+      return JSON.stringify(parsedJson);
+    } catch (error) {
+      throw new Error(`Invalid JSON: ${(error as Error).message}`);
+    }
+  };
+  
+  // Sort object keys function for JSON.stringify
+  const sortObjectKeys = (key: string, value: any): any => {
+    // Skip sorting arrays or non-objects
+    if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+      return value;
     }
     
-    // Create a new object with sorted keys
-    return Object.keys(obj)
+    // Sort keys and create a new sorted object
+    return Object.keys(value)
       .sort()
-      .reduce((result: any, key) => {
-        result[key] = sortObjectKeys(obj[key]);
+      .reduce((result: Record<string, any>, key) => {
+        result[key] = value[key];
         return result;
       }, {});
   };
-
-  // Copy the JSON to clipboard
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text).then(() => {
-      setCopied(true);
-      toast({
-        title: "Copied!",
-        description: "JSON copied to clipboard",
-      });
+  
+  // Validate JSON
+  const validateJson = (json: string): boolean => {
+    try {
+      JSON.parse(json);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+  
+  // Convert JSON to XML
+  const jsonToXml = (json: string): string => {
+    try {
+      const obj = JSON.parse(json);
+      const xml = objectToXml(obj, 'root');
+      return '<?xml version="1.0" encoding="UTF-8" ?>\n' + xml;
+    } catch (error) {
+      throw new Error(`Invalid JSON: ${(error as Error).message}`);
+    }
+  };
+  
+  // Helper to convert object to XML
+  const objectToXml = (obj: any, tagName: string, indent: string = ''): string => {
+    if (obj === null || obj === undefined) {
+      return `${indent}<${tagName} />\n`;
+    }
+    
+    if (typeof obj !== 'object') {
+      return `${indent}<${tagName}>${escapeXml(String(obj))}</${tagName}>\n`;
+    }
+    
+    if (Array.isArray(obj)) {
+      return `${indent}<${tagName}>\n${obj.map((item, index) => {
+        return objectToXml(item, 'item', indent + '  ');
+      }).join('')}${indent}</${tagName}>\n`;
+    }
+    
+    // Regular object
+    let xml = `${indent}<${tagName}>\n`;
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        xml += objectToXml(obj[key], key, indent + '  ');
+      }
+    }
+    xml += `${indent}</${tagName}>\n`;
+    return xml;
+  };
+  
+  // Escape XML special characters
+  const escapeXml = (unsafe: string): string => {
+    return unsafe
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;');
+  };
+  
+  // Convert JSON to YAML
+  const jsonToYaml = (json: string): string => {
+    try {
+      const obj = JSON.parse(json);
+      return objectToYaml(obj);
+    } catch (error) {
+      throw new Error(`Invalid JSON: ${(error as Error).message}`);
+    }
+  };
+  
+  // Helper to convert object to YAML
+  const objectToYaml = (obj: any, indent: string = ''): string => {
+    if (obj === null) return indent + 'null\n';
+    if (obj === undefined) return indent + 'undefined\n';
+    
+    if (typeof obj !== 'object') {
+      if (typeof obj === 'string') {
+        // Check if the string needs quotes (has special characters or starts with a symbol)
+        if (/^[0-9]/.test(obj) || /[\s:]/.test(obj) || obj === '') {
+          return indent + `"${obj}"\n`;
+        }
+        return indent + obj + '\n';
+      }
+      return indent + String(obj) + '\n';
+    }
+    
+    if (Array.isArray(obj)) {
+      if (obj.length === 0) return indent + '[]\n';
+      return obj.map(item => {
+        return indent + '- ' + objectToYaml(item, indent + '  ').trimEnd();
+      }).join('\n') + '\n';
+    }
+    
+    // Regular object
+    const keys = Object.keys(obj);
+    if (keys.length === 0) return indent + '{}\n';
+    
+    return keys.map(key => {
+      const keyStr = /[\s:]/.test(key) ? `"${key}"` : key;
+      const value = obj[key];
       
-      // Reset copied status after 2 seconds
-      setTimeout(() => setCopied(false), 2000);
-    });
+      if (typeof value === 'object' && value !== null) {
+        return indent + keyStr + ':\n' + objectToYaml(value, indent + '  ');
+      }
+      
+      return indent + keyStr + ': ' + objectToYaml(value, '').trimEnd();
+    }).join('\n') + '\n';
   };
-
-  // Clear the JSON input
-  const clearJson = () => {
-    setJsonInput("");
-    setFormattedJson("");
-    setMinifiedJson("");
-    setValidationResult({ valid: true });
+  
+  // Convert JSON to CSS
+  const jsonToCss = (json: string): string => {
+    try {
+      const obj = JSON.parse(json);
+      return objectToCss(obj);
+    } catch (error) {
+      throw new Error(`Invalid JSON: ${(error as Error).message}`);
+    }
   };
-
-  // Upload a JSON file
+  
+  // Helper to convert object to CSS
+  const objectToCss = (obj: any, prefix: string = ''): string => {
+    if (typeof obj !== 'object' || obj === null) {
+      return '';
+    }
+    
+    let css = '';
+    
+    for (const selector in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, selector)) {
+        const value = obj[selector];
+        
+        if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+          // Nested selector
+          const newPrefix = prefix ? `${prefix} ${selector}` : selector;
+          css += objectToCss(value, newPrefix);
+        } else {
+          // Regular selector with properties
+          if (prefix) {
+            css += `${prefix} {\n`;
+            css += `  ${selector}: ${value};\n`;
+            css += '}\n\n';
+          } else {
+            css += `${selector} {\n`;
+            
+            // If value is an object, process its properties
+            if (typeof value === 'object' && value !== null) {
+              for (const prop in value) {
+                if (Object.prototype.hasOwnProperty.call(value, prop)) {
+                  css += `  ${prop}: ${value[prop]};\n`;
+                }
+              }
+            }
+            
+            css += '}\n\n';
+          }
+        }
+      }
+    }
+    
+    return css;
+  };
+  
+  // Handle file upload
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-
+    
     const reader = new FileReader();
     reader.onload = (e) => {
       const content = e.target?.result as string;
-      setJsonInput(content);
+      setInputJson(content);
+      setOriginalJson(content);
     };
     reader.readAsText(file);
-    
-    // Reset file input
-    if (event.target) {
-      event.target.value = "";
-    }
   };
-
-  // Trigger file upload
-  const triggerFileUpload = () => {
-    fileInputRef.current?.click();
-  };
-
-  // Download formatted JSON
-  const downloadJson = (type: "formatted" | "minified") => {
-    const content = type === "formatted" ? formattedJson : minifiedJson;
-    if (!content) return;
-    
-    const blob = new Blob([content], { type: "application/json" });
+  
+  // Download the formatted JSON
+  const downloadJson = () => {
+    const blob = new Blob([outputJson], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     a.href = url;
-    a.download = `json-${type}-${new Date().getTime()}.json`;
+    a.download = 'formatted_json.json';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
-
-  // Validate JSON
-  const validateJson = () => {
-    if (!jsonInput.trim()) {
-      toast({
-        title: "No JSON to validate",
-        description: "Please enter some JSON first",
-        variant: "destructive",
-      });
+  
+  // Process the input based on the active tab
+  const handleProcess = () => {
+    if (!inputJson.trim()) {
+      setOutputJson("");
+      setError("");
       return;
     }
-
+    
+    setProcessing(true);
+    setError("");
+    
     try {
-      JSON.parse(jsonInput);
-      setValidationResult({ 
-        valid: true,
-        message: "JSON is valid! ✓"
-      });
-      
+      switch (activeTab) {
+        case "format":
+          setOutputJson(formatJson(inputJson, indentSize, sortKeys));
+          break;
+        case "minify":
+          setOutputJson(minifyJson(inputJson));
+          break;
+        case "validate":
+          if (validateJson(inputJson)) {
+            setOutputJson("JSON is valid");
+          } else {
+            throw new Error("Invalid JSON");
+          }
+          break;
+        case "toXML":
+          setOutputJson(jsonToXml(inputJson));
+          break;
+        case "toYAML":
+          setOutputJson(jsonToYaml(inputJson));
+          break;
+        case "toCSS":
+          setOutputJson(jsonToCss(inputJson));
+          break;
+        default:
+          setOutputJson(formatJson(inputJson, indentSize, sortKeys));
+      }
+    } catch (error) {
+      console.error("Processing error:", error);
+      setError((error as Error).message);
+      setOutputJson("");
+    } finally {
+      setProcessing(false);
+    }
+  };
+  
+  // Reset to original input
+  const resetToOriginal = () => {
+    if (originalJson) {
+      setInputJson(originalJson);
       toast({
-        title: "Valid JSON",
-        description: "Your JSON is correctly formatted",
-      });
-    } catch (error: any) {
-      setValidationResult({ 
-        valid: false, 
-        message: `Error: ${error.message}` 
-      });
-      
-      toast({
-        title: "Invalid JSON",
-        description: error.message,
-        variant: "destructive",
+        title: "Reset Complete",
+        description: "Input has been reset to the original JSON"
       });
     }
   };
-
-  // Generate sample JSON
-  const generateSample = () => {
-    const sample = {
-      "name": "John Doe",
-      "age": 30,
-      "email": "john.doe@example.com",
-      "isActive": true,
-      "address": {
-        "street": "123 Main St",
-        "city": "Anytown",
-        "state": "CA",
-        "zip": "12345"
-      },
-      "phone_numbers": [
-        {
-          "type": "home",
-          "number": "555-1234"
-        },
-        {
-          "type": "work",
-          "number": "555-5678"
-        }
-      ],
-      "tags": ["developer", "javascript", "react"],
-      "preferences": null
-    };
+  
+  // Copy output to clipboard
+  const copyToClipboard = () => {
+    if (!outputJson) return;
     
-    setJsonInput(JSON.stringify(sample));
+    navigator.clipboard.writeText(outputJson).then(() => {
+      setCopied(true);
+      toast({
+        title: "Copied!",
+        description: "Output copied to clipboard"
+      });
+      
+      // Reset copied state after 2 seconds
+      setTimeout(() => setCopied(false), 2000);
+    });
   };
-
+  
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <Header />
       <main className="flex-grow">
         <section className="py-20 px-6">
-          <Container maxWidth="lg">
+          <Container maxWidth="xl">
             <div className="mb-8">
               <div 
                 onClick={() => window.location.href = "/apps"}
@@ -250,100 +399,78 @@ export default function JsonFormatter() {
             >
               <h1 className="text-4xl md:text-5xl font-bold mb-4">JSON Formatter</h1>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                Format, validate, and minify JSON data for easier reading and debugging
+                Format, validate and transform JSON data
               </p>
             </motion.div>
-
+            
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
             >
-              <Card className="mb-8">
+              <Card>
                 <CardHeader>
-                  <CardTitle>JSON Input</CardTitle>
+                  <CardTitle>JSON Formatter & Converter</CardTitle>
                   <CardDescription>
-                    Paste your JSON data below or upload a JSON file
+                    Beautify, validate or transform JSON data into various formats
                   </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="border rounded-md relative">
-                    <Textarea
-                      value={jsonInput}
-                      onChange={(e) => setJsonInput(e.target.value)}
-                      placeholder="Paste your JSON here..."
-                      className="font-mono min-h-[200px] resize-y p-4"
-                    />
-                  </div>
                   
-                  <div className="flex flex-wrap gap-2">
-                    <Button
-                      variant="secondary"
-                      onClick={formatJson}
-                      className="flex items-center"
-                    >
-                      <Code className="h-4 w-4 mr-2" />
-                      Format JSON
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={validateJson}
-                      className="flex items-center"
-                    >
-                      <PlayIcon className="h-4 w-4 mr-2" />
-                      Validate
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={triggerFileUpload}
-                      className="flex items-center"
-                    >
-                      <Upload className="h-4 w-4 mr-2" />
-                      Upload
-                    </Button>
-                    <input
-                      type="file"
-                      ref={fileInputRef}
-                      onChange={handleFileUpload}
-                      accept=".json,application/json"
-                      style={{ display: "none" }}
-                    />
-                    <Button
-                      variant="outline"
-                      onClick={clearJson}
-                      className="flex items-center"
-                    >
-                      <Trash className="h-4 w-4 mr-2" />
-                      Clear
-                    </Button>
-                    <Button
-                      variant="link"
-                      onClick={generateSample}
-                      className="ml-auto"
-                    >
-                      Generate Sample
-                    </Button>
-                  </div>
-
-                  {/* Options */}
-                  <div className="p-4 border rounded-md bg-muted/50 space-y-4">
-                    <h3 className="font-medium mb-2">Options</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm">Indent Size: {indentSize}</span>
-                          <div className="w-[180px]">
-                            <Slider
-                              value={[indentSize]}
-                              min={1}
-                              max={8}
-                              step={1}
-                              onValueChange={(values) => setIndentSize(values[0])}
-                            />
+                  {/* Tool Tabs */}
+                  <Tabs 
+                    value={activeTab} 
+                    onValueChange={setActiveTab}
+                    className="mt-4"
+                  >
+                    <TabsList className="grid grid-cols-2 md:grid-cols-6 w-full">
+                      <TabsTrigger value="format" className="flex items-center">
+                        <Code className="h-4 w-4 mr-2" />
+                        Format
+                      </TabsTrigger>
+                      <TabsTrigger value="minify" className="flex items-center">
+                        <Binary className="h-4 w-4 mr-2" />
+                        Minify
+                      </TabsTrigger>
+                      <TabsTrigger value="validate" className="flex items-center">
+                        <AlertTriangle className="h-4 w-4 mr-2" />
+                        Validate
+                      </TabsTrigger>
+                      <TabsTrigger value="toXML" className="flex items-center">
+                        <FileCode className="h-4 w-4 mr-2" />
+                        to XML
+                      </TabsTrigger>
+                      <TabsTrigger value="toYAML" className="flex items-center">
+                        <FileCode className="h-4 w-4 mr-2" />
+                        to YAML
+                      </TabsTrigger>
+                      <TabsTrigger value="toCSS" className="flex items-center">
+                        <FileCode className="h-4 w-4 mr-2" />
+                        to CSS
+                      </TabsTrigger>
+                    </TabsList>
+                  </Tabs>
+                </CardHeader>
+                
+                <CardContent className="space-y-6">
+                  {/* Control Panel */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    {/* Format Options */}
+                    {activeTab === "format" && (
+                      <>
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <Label htmlFor="indentation">Indentation Size</Label>
+                            <span className="text-sm text-muted-foreground">{indentSize} spaces</span>
                           </div>
+                          <Slider
+                            id="indentation"
+                            min={0}
+                            max={8}
+                            step={1}
+                            value={[indentSize]}
+                            onValueChange={(value) => setIndentSize(value[0])}
+                          />
                         </div>
-                      </div>
-                      <div className="space-y-2">
+                        
                         <div className="flex items-center space-x-2">
                           <Switch
                             id="sort-keys"
@@ -352,158 +479,134 @@ export default function JsonFormatter() {
                           />
                           <Label htmlFor="sort-keys">Sort Object Keys</Label>
                         </div>
-                      </div>
+                      </>
+                    )}
+                    
+                    {/* Theme Selector */}
+                    <div className="space-y-2 md:col-start-3 md:col-span-2 md:justify-self-end">
+                      <Label htmlFor="theme">Theme</Label>
+                      <Select
+                        value={selectedTheme}
+                        onValueChange={setSelectedTheme}
+                      >
+                        <SelectTrigger id="theme" className="w-[180px]">
+                          <SelectValue placeholder="Select theme" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {themes.map(theme => (
+                            <SelectItem key={theme.id} value={theme.id}>
+                              {theme.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
-
-                  {/* Validation Result */}
-                  {validationResult.message && (
-                    <div className={`p-4 border rounded-md ${validationResult.valid ? 'bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800' : 'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800'}`}>
-                      <p className="font-mono text-sm">{validationResult.message}</p>
+                  
+                  {/* JSON Input & Output */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Input Panel */}
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <Label htmlFor="input-json">Input JSON</Label>
+                        <div className="flex space-x-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={resetToOriginal}
+                            disabled={!originalJson}
+                          >
+                            <Undo className="h-4 w-4 mr-2" />
+                            Reset
+                          </Button>
+                          <div className="relative">
+                            <input
+                              type="file"
+                              id="file-upload"
+                              accept=".json,.txt"
+                              onChange={handleFileUpload}
+                              className="absolute inset-0 opacity-0 w-full cursor-pointer"
+                            />
+                            <Button variant="outline" size="sm">
+                              <Upload className="h-4 w-4 mr-2" />
+                              Upload
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                      <Textarea
+                        id="input-json"
+                        value={inputJson}
+                        onChange={(e) => setInputJson(e.target.value)}
+                        className="font-mono h-[500px] resize-none"
+                        placeholder="Paste your JSON here..."
+                      />
                     </div>
-                  )}
+                    
+                    {/* Output Panel */}
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <Label htmlFor="output-json">
+                          {activeTab === "format" ? "Formatted JSON" : 
+                           activeTab === "minify" ? "Minified JSON" : 
+                           activeTab === "validate" ? "Validation Result" : 
+                           activeTab === "toXML" ? "XML Output" : 
+                           activeTab === "toYAML" ? "YAML Output" : 
+                           activeTab === "toCSS" ? "CSS Output" : 
+                           "Output"}
+                        </Label>
+                        <div className="flex space-x-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={copyToClipboard}
+                            disabled={!outputJson}
+                          >
+                            {copied ? (
+                              <Check className="h-4 w-4 mr-2 text-green-500" />
+                            ) : (
+                              <Copy className="h-4 w-4 mr-2" />
+                            )}
+                            Copy
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={downloadJson}
+                            disabled={!outputJson}
+                          >
+                            <Download className="h-4 w-4 mr-2" />
+                            Download
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      {error ? (
+                        <div className="bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-200 p-4 rounded-md h-[500px] overflow-auto">
+                          <p className="font-medium">Error:</p>
+                          <p>{error}</p>
+                        </div>
+                      ) : (
+                        <pre 
+                          id="output-json"
+                          className={`font-mono p-4 rounded-md border border-border h-[500px] overflow-auto 
+                            ${themes.find(t => t.id === selectedTheme)?.classes || themes[0].classes}`}
+                        >
+                          {processing ? (
+                            <div className="flex items-center justify-center h-full">
+                              <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
+                            </div>
+                          ) : outputJson ? (
+                            outputJson
+                          ) : (
+                            <span className="text-muted-foreground">Output will appear here...</span>
+                          )}
+                        </pre>
+                      )}
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
-
-              {(formattedJson || minifiedJson) && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>JSON Output</CardTitle>
-                    <CardDescription>
-                      View your formatted or minified JSON
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <Tabs 
-                      defaultValue="format" 
-                      value={activeTab}
-                      onValueChange={setActiveTab}
-                      className="w-full"
-                    >
-                      <TabsList className="grid grid-cols-2 mb-4">
-                        <TabsTrigger value="format">
-                          Formatted JSON
-                        </TabsTrigger>
-                        <TabsTrigger value="minify">
-                          Minified JSON
-                        </TabsTrigger>
-                      </TabsList>
-
-                      {/* Formatted JSON */}
-                      <TabsContent value="format" className="space-y-4">
-                        {formattedJson && (
-                          <>
-                            <div className="border rounded-md relative">
-                              <Textarea
-                                value={formattedJson}
-                                readOnly
-                                className="font-mono min-h-[200px] resize-y p-4"
-                              />
-                              <div className="absolute top-2 right-2 flex space-x-2">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => copyToClipboard(formattedJson)}
-                                  title="Copy to clipboard"
-                                >
-                                  {copied ? (
-                                    <Check className="h-4 w-4 text-green-500" />
-                                  ) : (
-                                    <Copy className="h-4 w-4" />
-                                  )}
-                                </Button>
-                              </div>
-                            </div>
-                            <div className="flex justify-end">
-                              <Button
-                                variant="outline"
-                                onClick={() => downloadJson("formatted")}
-                                className="flex items-center"
-                              >
-                                <Download className="h-4 w-4 mr-2" />
-                                Download Formatted JSON
-                              </Button>
-                            </div>
-                          </>
-                        )}
-                      </TabsContent>
-
-                      {/* Minified JSON */}
-                      <TabsContent value="minify" className="space-y-4">
-                        {minifiedJson && (
-                          <>
-                            <div className="border rounded-md relative">
-                              <Textarea
-                                value={minifiedJson}
-                                readOnly
-                                className="font-mono min-h-[200px] resize-y p-4"
-                              />
-                              <div className="absolute top-2 right-2 flex space-x-2">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => copyToClipboard(minifiedJson)}
-                                  title="Copy to clipboard"
-                                >
-                                  {copied ? (
-                                    <Check className="h-4 w-4 text-green-500" />
-                                  ) : (
-                                    <Copy className="h-4 w-4" />
-                                  )}
-                                </Button>
-                              </div>
-                            </div>
-                            <div className="flex justify-end">
-                              <Button
-                                variant="outline"
-                                onClick={() => downloadJson("minified")}
-                                className="flex items-center"
-                              >
-                                <Download className="h-4 w-4 mr-2" />
-                                Download Minified JSON
-                              </Button>
-                            </div>
-                          </>
-                        )}
-                      </TabsContent>
-                    </Tabs>
-                  </CardContent>
-                </Card>
-              )}
-            </motion.div>
-
-            <motion.div
-              className="max-w-3xl mx-auto mt-12 bg-muted/50 p-6 rounded-lg"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-            >
-              <h2 className="text-xl font-bold mb-4">About JSON</h2>
-              <p className="mb-4 text-muted-foreground">
-                JSON (JavaScript Object Notation) is a lightweight data-interchange format. It is easy for humans to read and write, and easy for machines to parse and generate.
-              </p>
-              <p className="mb-4 text-muted-foreground">
-                JSON is a text format that is completely language independent but uses conventions that are familiar to programmers of the C family of languages, including C, C++, C#, Java, JavaScript, Perl, Python, and many others.
-              </p>
-              <h3 className="text-lg font-bold mt-6 mb-2">Common Use Cases:</h3>
-              <ul className="space-y-2 text-muted-foreground">
-                <li className="flex items-start">
-                  <span className="text-primary mr-2">•</span>
-                  API responses and requests
-                </li>
-                <li className="flex items-start">
-                  <span className="text-primary mr-2">•</span>
-                  Configuration files
-                </li>
-                <li className="flex items-start">
-                  <span className="text-primary mr-2">•</span>
-                  Data storage
-                </li>
-                <li className="flex items-start">
-                  <span className="text-primary mr-2">•</span>
-                  Web application state management
-                </li>
-              </ul>
             </motion.div>
           </Container>
         </section>

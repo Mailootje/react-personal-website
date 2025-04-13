@@ -1,132 +1,294 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Container } from "@/components/ui/container";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { ArrowLeft, Clock, Calendar, ArrowDown, Copy, Check } from "lucide-react";
-import { Link } from "wouter";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { 
+  ArrowLeft, 
+  Copy, 
+  Check,
+  RefreshCw,
+  Clock,
+  Calendar,
+  ArrowDown
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+
+// Format options
+const dateFormatOptions = [
+  { id: "iso", name: "ISO 8601 (YYYY-MM-DD)", format: "YYYY-MM-DD" },
+  { id: "us", name: "US (MM/DD/YYYY)", format: "MM/DD/YYYY" },
+  { id: "eu", name: "European (DD/MM/YYYY)", format: "DD/MM/YYYY" },
+  { id: "custom", name: "Custom Format", format: "" }
+];
+
+const timeFormatOptions = [
+  { id: "24h", name: "24-hour (HH:MM:SS)", format: "HH:MM:SS" },
+  { id: "12h", name: "12-hour (hh:mm:ss AM/PM)", format: "hh:mm:ss A" },
+  { id: "custom", name: "Custom Format", format: "" }
+];
+
+// Timezone options (a subset of common ones)
+const timezoneOptions = [
+  { id: "local", name: "Local Browser Time", value: "Local" },
+  { id: "utc", name: "UTC/GMT", value: "UTC" },
+  { id: "est", name: "Eastern Standard Time (EST)", value: "America/New_York" },
+  { id: "cst", name: "Central Standard Time (CST)", value: "America/Chicago" },
+  { id: "mst", name: "Mountain Standard Time (MST)", value: "America/Denver" },
+  { id: "pst", name: "Pacific Standard Time (PST)", value: "America/Los_Angeles" },
+  { id: "gmt", name: "Greenwich Mean Time (GMT)", value: "Europe/London" },
+  { id: "cet", name: "Central European Time (CET)", value: "Europe/Paris" },
+  { id: "ist", name: "India Standard Time (IST)", value: "Asia/Kolkata" },
+  { id: "jst", name: "Japan Standard Time (JST)", value: "Asia/Tokyo" },
+  { id: "aest", name: "Australian Eastern Standard Time (AEST)", value: "Australia/Sydney" }
+];
 
 export default function TimestampConverter() {
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState("unix-to-human");
-  const [unixTimestamp, setUnixTimestamp] = useState("");
-  const [unixTimestampUnit, setUnixTimestampUnit] = useState("seconds");
-  const [dateTime, setDateTime] = useState("");
-  const [timezone, setTimezone] = useState("UTC");
-  const [convertedDateTime, setConvertedDateTime] = useState<string | null>(null);
-  const [convertedUnixTimestamp, setConvertedUnixTimestamp] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
-
-  // Set current date/time on component mount
+  const [activeTab, setActiveTab] = useState<string>("unix-to-date");
+  const [copied, setCopied] = useState<boolean>(false);
+  
+  // Unix to Date options
+  const [unixTimestamp, setUnixTimestamp] = useState<string>("1617235200");
+  const [unixUnit, setUnixUnit] = useState<string>("seconds");
+  const [unixIncludeTime, setUnixIncludeTime] = useState<boolean>(true);
+  const [unixDateFormat, setUnixDateFormat] = useState<string>("iso");
+  const [unixTimeFormat, setUnixTimeFormat] = useState<string>("24h");
+  const [unixTimezone, setUnixTimezone] = useState<string>("local");
+  const [unixCustomFormat, setUnixCustomFormat] = useState<string>("YYYY-MM-DD HH:mm:ss");
+  const [dateTimeResult, setDateTimeResult] = useState<string>("");
+  
+  // Date to Unix options
+  const [dateInput, setDateInput] = useState<string>("");
+  const [timeInput, setTimeInput] = useState<string>("");
+  const [dateToUnixTimezone, setDateToUnixTimezone] = useState<string>("local");
+  const [timestampResults, setTimestampResults] = useState<{ unit: string, value: string }[]>([]);
+  
+  // Initialize with current timestamp on mount
   useEffect(() => {
-    const now = new Date();
-    // Format as yyyy-MM-ddThh:mm
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-    const day = String(now.getDate()).padStart(2, "0");
-    const hours = String(now.getHours()).padStart(2, "0");
-    const minutes = String(now.getMinutes()).padStart(2, "0");
+    const now = Math.floor(Date.now() / 1000);
+    setUnixTimestamp(now.toString());
     
-    setDateTime(`${year}-${month}-${day}T${hours}:${minutes}`);
-    setUnixTimestamp(Math.floor(now.getTime() / 1000).toString());
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    const hours = String(today.getHours()).padStart(2, '0');
+    const minutes = String(today.getMinutes()).padStart(2, '0');
+    
+    setDateInput(`${year}-${month}-${day}`);
+    setTimeInput(`${hours}:${minutes}`);
+    
+    // Trigger initial conversions
+    handleUnixToDateConversion();
   }, []);
 
-  // Convert Unix timestamp to human-readable date
-  const convertUnixToHuman = () => {
-    if (!unixTimestamp) return;
-    
+  // Convert unix timestamp to date whenever inputs change
+  useEffect(() => {
+    if (activeTab === "unix-to-date") {
+      handleUnixToDateConversion();
+    }
+  }, [unixTimestamp, unixUnit, unixDateFormat, unixTimeFormat, unixCustomFormat, unixTimezone, unixIncludeTime]);
+
+  // Convert date to unix timestamp whenever inputs change
+  useEffect(() => {
+    if (activeTab === "date-to-unix" && dateInput) {
+      handleDateToUnixConversion();
+    }
+  }, [dateInput, timeInput, dateToUnixTimezone]);
+
+  // Handle tab change
+  useEffect(() => {
+    if (activeTab === "unix-to-date") {
+      handleUnixToDateConversion();
+    } else {
+      handleDateToUnixConversion();
+    }
+  }, [activeTab]);
+
+  // Format date based on selected format
+  const formatDate = (date: Date): string => {
     try {
-      let timestamp = parseInt(unixTimestamp);
+      if (unixDateFormat === "custom") {
+        return formatCustomDate(date, unixCustomFormat);
+      }
+
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const seconds = String(date.getSeconds()).padStart(2, '0');
+      const milliseconds = String(date.getMilliseconds()).padStart(3, '0');
       
-      // Convert to milliseconds if needed
-      if (unixTimestampUnit === "seconds") {
-        timestamp *= 1000;
+      // Base date format
+      let formattedDate = "";
+      
+      switch (unixDateFormat) {
+        case "iso":
+          formattedDate = `${year}-${month}-${day}`;
+          break;
+        case "us":
+          formattedDate = `${month}/${day}/${year}`;
+          break;
+        case "eu":
+          formattedDate = `${day}/${month}/${year}`;
+          break;
+        default:
+          formattedDate = `${year}-${month}-${day}`;
       }
       
-      const date = new Date(timestamp);
-      if (isNaN(date.getTime())) {
-        throw new Error("Invalid timestamp");
+      // Add time if requested
+      if (unixIncludeTime) {
+        let timeString = "";
+        
+        switch (unixTimeFormat) {
+          case "24h":
+            timeString = `${hours}:${minutes}:${seconds}`;
+            break;
+          case "12h":
+            {
+              const hour12 = date.getHours() % 12 || 12;
+              const ampm = date.getHours() >= 12 ? 'PM' : 'AM';
+              timeString = `${String(hour12).padStart(2, '0')}:${minutes}:${seconds} ${ampm}`;
+            }
+            break;
+          default:
+            timeString = `${hours}:${minutes}:${seconds}`;
+        }
+        
+        formattedDate += ` ${timeString}`;
       }
       
-      // Format the date based on the selected timezone
-      const options: Intl.DateTimeFormatOptions = {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        timeZoneName: 'short',
-        timeZone: timezone
-      };
+      // Add timezone information
+      if (unixTimezone !== "local") {
+        const tzOffset = date.getTimezoneOffset();
+        const tzHours = Math.abs(Math.floor(tzOffset / 60)).toString().padStart(2, '0');
+        const tzMinutes = Math.abs(tzOffset % 60).toString().padStart(2, '0');
+        const tzSign = tzOffset <= 0 ? '+' : '-';
+        
+        formattedDate += ` (UTC${tzSign}${tzHours}:${tzMinutes})`;
+      }
       
-      const formatter = new Intl.DateTimeFormat('en-US', options);
-      setConvertedDateTime(formatter.format(date));
+      return formattedDate;
     } catch (error) {
-      toast({
-        title: "Conversion Error",
-        description: "Invalid Unix timestamp provided",
-        variant: "destructive",
-      });
-      setConvertedDateTime(null);
+      console.error("Error formatting date:", error);
+      return "Invalid date format";
     }
   };
 
-  // Convert human-readable date to Unix timestamp
-  const convertHumanToUnix = () => {
-    if (!dateTime) return;
-    
+  // Custom date formatter (basic implementation)
+  const formatCustomDate = (date: Date, format: string): string => {
     try {
-      // Parse the local datetime input
-      const inputDate = new Date(dateTime);
-      if (isNaN(inputDate.getTime())) {
-        throw new Error("Invalid date");
+      return format
+        .replace(/YYYY/g, date.getFullYear().toString())
+        .replace(/MM/g, String(date.getMonth() + 1).padStart(2, '0'))
+        .replace(/DD/g, String(date.getDate()).padStart(2, '0'))
+        .replace(/HH/g, String(date.getHours()).padStart(2, '0'))
+        .replace(/hh/g, String(date.getHours() % 12 || 12).padStart(2, '0'))
+        .replace(/mm/g, String(date.getMinutes()).padStart(2, '0'))
+        .replace(/ss/g, String(date.getSeconds()).padStart(2, '0'))
+        .replace(/SSS/g, String(date.getMilliseconds()).padStart(3, '0'))
+        .replace(/A/g, date.getHours() >= 12 ? 'PM' : 'AM')
+        .replace(/a/g, date.getHours() >= 12 ? 'pm' : 'am');
+    } catch (error) {
+      console.error("Error with custom format:", error);
+      return "Invalid custom format";
+    }
+  };
+
+  // Convert Unix timestamp to human-readable date
+  const handleUnixToDateConversion = () => {
+    try {
+      if (!unixTimestamp.trim()) {
+        setDateTimeResult("");
+        return;
       }
 
-      // Handle timezone conversion
-      let timestamp: number;
+      let timestamp = parseInt(unixTimestamp);
       
-      if (timezone === "UTC") {
-        // Convert to UTC timestamp
-        const utcDate = new Date(
-          Date.UTC(
-            inputDate.getFullYear(),
-            inputDate.getMonth(),
-            inputDate.getDate(),
-            inputDate.getHours(),
-            inputDate.getMinutes(),
-            0
-          )
-        );
-        timestamp = utcDate.getTime();
-      } else if (timezone === "local") {
-        // Use local timezone
-        timestamp = inputDate.getTime();
-      } else {
-        // For specific timezone, we need to account for the offset
-        // This is simplified - in a production app, you'd use a library like date-fns-tz
-        timestamp = inputDate.getTime();
+      if (isNaN(timestamp)) {
+        setDateTimeResult("Invalid timestamp");
+        return;
       }
       
-      // Convert to seconds or milliseconds based on the selected unit
-      if (unixTimestampUnit === "seconds") {
-        timestamp = Math.floor(timestamp / 1000);
+      // Convert based on unit
+      if (unixUnit === "milliseconds") {
+        // Already in milliseconds
+      } else if (unixUnit === "seconds") {
+        timestamp *= 1000; // Convert seconds to milliseconds
+      } else if (unixUnit === "microseconds") {
+        timestamp /= 1000; // Convert microseconds to milliseconds
+      } else if (unixUnit === "nanoseconds") {
+        timestamp /= 1000000; // Convert nanoseconds to milliseconds
       }
       
-      setConvertedUnixTimestamp(timestamp.toString());
+      const date = new Date(timestamp);
+      
+      // Check if date is valid
+      if (isNaN(date.getTime())) {
+        setDateTimeResult("Invalid timestamp");
+        return;
+      }
+      
+      setDateTimeResult(formatDate(date));
     } catch (error) {
+      console.error("Error converting unix timestamp:", error);
+      setDateTimeResult("Conversion error");
       toast({
         title: "Conversion Error",
-        description: "Invalid date provided",
+        description: "Failed to convert timestamp",
         variant: "destructive",
       });
-      setConvertedUnixTimestamp(null);
+    }
+  };
+
+  // Convert date to Unix timestamp
+  const handleDateToUnixConversion = () => {
+    try {
+      if (!dateInput) {
+        setTimestampResults([]);
+        return;
+      }
+      
+      let dateTimeString = dateInput;
+      if (timeInput) {
+        dateTimeString += `T${timeInput}`;
+      } else {
+        dateTimeString += "T00:00:00";
+      }
+      
+      const date = new Date(dateTimeString);
+      
+      // Check if date is valid
+      if (isNaN(date.getTime())) {
+        setTimestampResults([{ unit: "error", value: "Invalid date/time" }]);
+        return;
+      }
+      
+      const timestampMs = date.getTime();
+      
+      setTimestampResults([
+        { unit: "Seconds", value: Math.floor(timestampMs / 1000).toString() },
+        { unit: "Milliseconds", value: timestampMs.toString() },
+        { unit: "Microseconds", value: (timestampMs * 1000).toString() },
+        { unit: "Nanoseconds", value: (timestampMs * 1000000).toString() }
+      ]);
+    } catch (error) {
+      console.error("Error converting date to timestamp:", error);
+      setTimestampResults([{ unit: "error", value: "Conversion error" }]);
+      toast({
+        title: "Conversion Error",
+        description: "Failed to convert date",
+        variant: "destructive",
+      });
     }
   };
 
@@ -136,50 +298,20 @@ export default function TimestampConverter() {
       setCopied(true);
       toast({
         title: "Copied!",
-        description: "Value copied to clipboard",
+        description: "Result copied to clipboard",
       });
       
-      // Reset copied status after 2 seconds
+      // Reset copied state after 2 seconds
       setTimeout(() => setCopied(false), 2000);
     });
   };
 
-  // Get the current Unix timestamp
-  const getCurrentTimestamp = () => {
-    const now = new Date();
-    const timestamp = unixTimestampUnit === "seconds" 
-      ? Math.floor(now.getTime() / 1000)
-      : now.getTime();
-    
-    setUnixTimestamp(timestamp.toString());
-    convertUnixToHuman();
+  // Get current timestamp for "now" button
+  const setCurrentTimestamp = () => {
+    const now = Math.floor(Date.now() / 1000);
+    setUnixTimestamp(now.toString());
+    setUnixUnit("seconds");
   };
-
-  // Get the current date and time
-  const getCurrentDateTime = () => {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-    const day = String(now.getDate()).padStart(2, "0");
-    const hours = String(now.getHours()).padStart(2, "0");
-    const minutes = String(now.getMinutes()).padStart(2, "0");
-    
-    setDateTime(`${year}-${month}-${day}T${hours}:${minutes}`);
-    convertHumanToUnix();
-  };
-
-  const timezones = [
-    { id: "UTC", name: "UTC (Coordinated Universal Time)" },
-    { id: "local", name: "Browser Local Time" },
-    { id: "America/New_York", name: "Eastern Time (ET) - New York" },
-    { id: "America/Chicago", name: "Central Time (CT) - Chicago" },
-    { id: "America/Denver", name: "Mountain Time (MT) - Denver" },
-    { id: "America/Los_Angeles", name: "Pacific Time (PT) - Los Angeles" },
-    { id: "Europe/London", name: "Greenwich Mean Time (GMT) - London" },
-    { id: "Europe/Paris", name: "Central European Time (CET) - Paris" },
-    { id: "Asia/Tokyo", name: "Japan Standard Time (JST) - Tokyo" },
-    { id: "Australia/Sydney", name: "Australian Eastern Time (AET) - Sydney" },
-  ];
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
@@ -208,254 +340,313 @@ export default function TimestampConverter() {
                 Convert between Unix timestamps and human-readable dates
               </p>
             </motion.div>
-
+            
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
             >
-              <Card className="max-w-2xl mx-auto">
+              <Card className="max-w-3xl mx-auto">
                 <CardHeader>
-                  <CardTitle>Time Converter</CardTitle>
+                  <CardTitle>Timestamp Converter</CardTitle>
                   <CardDescription>
-                    Convert between Unix timestamps and human-readable dates with timezone support
+                    Convert between different timestamp formats
                   </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
+                  
+                  {/* Conversion Type Tabs */}
                   <Tabs 
-                    defaultValue="unix-to-human" 
-                    value={activeTab}
+                    value={activeTab} 
                     onValueChange={setActiveTab}
-                    className="w-full"
+                    className="mt-4"
                   >
-                    <TabsList className="grid grid-cols-2 mb-4">
-                      <TabsTrigger value="unix-to-human">
-                        Unix → Human Date
+                    <TabsList className="grid grid-cols-2 w-full">
+                      <TabsTrigger value="unix-to-date" className="flex items-center">
+                        <Clock className="h-4 w-4 mr-2" />
+                        Unix to Date
                       </TabsTrigger>
-                      <TabsTrigger value="human-to-unix">
-                        Human Date → Unix
+                      <TabsTrigger value="date-to-unix" className="flex items-center">
+                        <Calendar className="h-4 w-4 mr-2" />
+                        Date to Unix
                       </TabsTrigger>
                     </TabsList>
-
-                    {/* Unix to Human Date */}
-                    <TabsContent value="unix-to-human" className="space-y-4">
-                      <div className="flex flex-col space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                          <div className="md:col-span-3">
-                            <label className="text-sm font-medium mb-2 block">
-                              Unix Timestamp
-                            </label>
+                  </Tabs>
+                </CardHeader>
+                
+                <CardContent className="space-y-6">
+                  {/* Unix to Date Conversion */}
+                  <TabsContent value="unix-to-date" className="mt-0 space-y-6">
+                    <div className="space-y-4">
+                      <div className="flex items-center space-x-4">
+                        <div className="flex-1 space-y-2">
+                          <Label htmlFor="unix-timestamp">Unix Timestamp</Label>
+                          <div className="flex space-x-2">
                             <Input
-                              type="number"
+                              id="unix-timestamp"
+                              type="text"
                               value={unixTimestamp}
                               onChange={(e) => setUnixTimestamp(e.target.value)}
-                              placeholder="Enter Unix timestamp"
+                              className="font-mono"
                             />
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium mb-2 block">
-                              Unit
-                            </label>
-                            <Select
-                              value={unixTimestampUnit}
-                              onValueChange={setUnixTimestampUnit}
+                            <Button 
+                              variant="outline" 
+                              onClick={setCurrentTimestamp}
+                              className="whitespace-nowrap"
                             >
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="seconds">Seconds</SelectItem>
-                                <SelectItem value="milliseconds">Milliseconds</SelectItem>
-                              </SelectContent>
-                            </Select>
+                              Now
+                            </Button>
                           </div>
                         </div>
-
-                        <div>
-                          <label className="text-sm font-medium mb-2 block">
-                            Timezone
-                          </label>
+                        
+                        <div className="w-44 space-y-2">
+                          <Label htmlFor="unix-unit">Unit</Label>
                           <Select
-                            value={timezone}
-                            onValueChange={setTimezone}
+                            value={unixUnit}
+                            onValueChange={setUnixUnit}
                           >
-                            <SelectTrigger>
-                              <SelectValue />
+                            <SelectTrigger id="unix-unit">
+                              <SelectValue placeholder="Select unit" />
                             </SelectTrigger>
                             <SelectContent>
-                              {timezones.map((tz) => (
-                                <SelectItem key={tz.id} value={tz.id}>
-                                  {tz.name}
+                              <SelectItem value="seconds">Seconds</SelectItem>
+                              <SelectItem value="milliseconds">Milliseconds</SelectItem>
+                              <SelectItem value="microseconds">Microseconds</SelectItem>
+                              <SelectItem value="nanoseconds">Nanoseconds</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="date-format">Date Format</Label>
+                          <Select
+                            value={unixDateFormat}
+                            onValueChange={setUnixDateFormat}
+                          >
+                            <SelectTrigger id="date-format">
+                              <SelectValue placeholder="Select format" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {dateFormatOptions.map(option => (
+                                <SelectItem key={option.id} value={option.id}>
+                                  {option.name}
                                 </SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
                         </div>
-
-                        <div className="flex space-x-2">
-                          <Button 
-                            onClick={convertUnixToHuman}
-                            className="flex-1"
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="timezone">Timezone</Label>
+                          <Select
+                            value={unixTimezone}
+                            onValueChange={setUnixTimezone}
                           >
-                            Convert
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            onClick={getCurrentTimestamp}
-                            title="Get current timestamp"
+                            <SelectTrigger id="timezone">
+                              <SelectValue placeholder="Select timezone" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {timezoneOptions.map(option => (
+                                <SelectItem key={option.id} value={option.id}>
+                                  {option.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-2">
+                          <Switch
+                            id="include-time"
+                            checked={unixIncludeTime}
+                            onCheckedChange={setUnixIncludeTime}
+                          />
+                          <Label htmlFor="include-time">Include Time</Label>
+                        </div>
+                      </div>
+                      
+                      {unixIncludeTime && (
+                        <div className="space-y-2">
+                          <Label htmlFor="time-format">Time Format</Label>
+                          <Select
+                            value={unixTimeFormat}
+                            onValueChange={setUnixTimeFormat}
                           >
-                            <Clock className="h-4 w-4" />
+                            <SelectTrigger id="time-format">
+                              <SelectValue placeholder="Select format" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {timeFormatOptions.map(option => (
+                                <SelectItem key={option.id} value={option.id}>
+                                  {option.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
+                      
+                      {(unixDateFormat === "custom" || unixTimeFormat === "custom") && (
+                        <div className="space-y-2">
+                          <Label htmlFor="custom-format">Custom Format</Label>
+                          <Input
+                            id="custom-format"
+                            type="text"
+                            value={unixCustomFormat}
+                            onChange={(e) => setUnixCustomFormat(e.target.value)}
+                            placeholder="YYYY-MM-DD HH:mm:ss"
+                          />
+                          <p className="text-xs text-muted-foreground">
+                            Format tokens: YYYY (year), MM (month), DD (day), HH (24h), hh (12h), mm (minutes), ss (seconds), A (AM/PM)
+                          </p>
+                        </div>
+                      )}
+                      
+                      <div className="border rounded-md p-4 space-y-2">
+                        <div className="flex justify-between items-center">
+                          <Label>Converted Date:</Label>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => copyToClipboard(dateTimeResult)}
+                            className="h-8 w-8"
+                            disabled={!dateTimeResult}
+                          >
+                            {copied ? (
+                              <Check className="h-4 w-4 text-green-500" />
+                            ) : (
+                              <Copy className="h-4 w-4" />
+                            )}
                           </Button>
                         </div>
-
-                        {convertedDateTime && (
-                          <div className="mt-6 p-4 bg-muted rounded-md relative">
-                            <h3 className="text-sm font-medium mb-2">Converted Date and Time:</h3>
-                            <p className="font-mono text-md">{convertedDateTime}</p>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="absolute top-2 right-2"
-                              onClick={() => copyToClipboard(convertedDateTime)}
-                            >
-                              {copied ? (
-                                <Check className="h-4 w-4 text-green-500" />
-                              ) : (
-                                <Copy className="h-4 w-4" />
-                              )}
-                            </Button>
-                          </div>
-                        )}
+                        <div className="bg-muted p-3 rounded-sm break-all">
+                          <p className="font-mono text-sm">
+                            {dateTimeResult || "Enter a valid timestamp"}
+                          </p>
+                        </div>
                       </div>
-                    </TabsContent>
-
-                    {/* Human Date to Unix */}
-                    <TabsContent value="human-to-unix" className="space-y-4">
-                      <div className="flex flex-col space-y-4">
-                        <div>
-                          <label className="text-sm font-medium mb-2 block">
-                            Date and Time
-                          </label>
+                    </div>
+                  </TabsContent>
+                  
+                  {/* Date to Unix Conversion */}
+                  <TabsContent value="date-to-unix" className="mt-0 space-y-6">
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="date-input">Date</Label>
                           <Input
-                            type="datetime-local"
-                            value={dateTime}
-                            onChange={(e) => setDateTime(e.target.value)}
+                            id="date-input"
+                            type="date"
+                            value={dateInput}
+                            onChange={(e) => setDateInput(e.target.value)}
                           />
                         </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <label className="text-sm font-medium mb-2 block">
-                              Timezone
-                            </label>
-                            <Select
-                              value={timezone}
-                              onValueChange={setTimezone}
-                            >
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {timezones.map((tz) => (
-                                  <SelectItem key={tz.id} value={tz.id}>
-                                    {tz.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium mb-2 block">
-                              Output Unit
-                            </label>
-                            <Select
-                              value={unixTimestampUnit}
-                              onValueChange={setUnixTimestampUnit}
-                            >
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="seconds">Seconds</SelectItem>
-                                <SelectItem value="milliseconds">Milliseconds</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="time-input">Time (optional)</Label>
+                          <Input
+                            id="time-input"
+                            type="time"
+                            value={timeInput}
+                            onChange={(e) => setTimeInput(e.target.value)}
+                          />
                         </div>
-
-                        <div className="flex space-x-2">
-                          <Button 
-                            onClick={convertHumanToUnix}
-                            className="flex-1"
-                          >
-                            Convert
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            onClick={getCurrentDateTime}
-                            title="Get current date/time"
-                          >
-                            <Calendar className="h-4 w-4" />
-                          </Button>
-                        </div>
-
-                        {convertedUnixTimestamp && (
-                          <div className="mt-6 p-4 bg-muted rounded-md relative">
-                            <h3 className="text-sm font-medium mb-2">Unix Timestamp ({unixTimestampUnit}):</h3>
-                            <p className="font-mono text-md">{convertedUnixTimestamp}</p>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="absolute top-2 right-2"
-                              onClick={() => copyToClipboard(convertedUnixTimestamp)}
-                            >
-                              {copied ? (
-                                <Check className="h-4 w-4 text-green-500" />
-                              ) : (
-                                <Copy className="h-4 w-4" />
-                              )}
-                            </Button>
-                          </div>
-                        )}
                       </div>
-                    </TabsContent>
-                  </Tabs>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="date-timezone">Timezone</Label>
+                        <Select
+                          value={dateToUnixTimezone}
+                          onValueChange={setDateToUnixTimezone}
+                        >
+                          <SelectTrigger id="date-timezone">
+                            <SelectValue placeholder="Select timezone" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {timezoneOptions.map(option => (
+                              <SelectItem key={option.id} value={option.id}>
+                                {option.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="flex justify-center py-4">
+                        <ArrowDown className="h-8 w-8 text-muted-foreground" />
+                      </div>
+                      
+                      <div className="border rounded-md p-4">
+                        <h4 className="font-medium mb-3">Unix Timestamps:</h4>
+                        <div className="space-y-3">
+                          {timestampResults.map((result, index) => (
+                            <div key={index} className="flex justify-between items-center border-b pb-2 last:border-0 last:pb-0">
+                              <div>
+                                <span className="text-sm font-medium">{result.unit}: </span>
+                                <span className="font-mono text-sm">{result.value}</span>
+                              </div>
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                onClick={() => copyToClipboard(result.value)}
+                                className="h-8 w-8"
+                              >
+                                <Copy className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ))}
+                          
+                          {timestampResults.length === 0 && (
+                            <p className="text-sm text-muted-foreground">Enter a valid date to see timestamps</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </TabsContent>
                 </CardContent>
               </Card>
             </motion.div>
-
+            
+            {/* Informational Section */}
             <motion.div
-              className="max-w-2xl mx-auto mt-12 bg-muted/50 p-6 rounded-lg"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="mt-8 max-w-3xl mx-auto"
             >
-              <h2 className="text-xl font-bold mb-4">About Unix Timestamps</h2>
-              <p className="mb-4 text-muted-foreground">
-                A Unix timestamp (also known as Epoch time, POSIX time, or Unix time) represents the number of seconds or milliseconds that have elapsed since January 1, 1970, at 00:00:00 UTC.
-              </p>
-              <p className="mb-4 text-muted-foreground">
-                Unix timestamps are widely used in computer systems and programming as they provide a standardized way to represent a point in time across different platforms and applications, regardless of timezone.
-              </p>
-              <h3 className="text-lg font-bold mt-6 mb-2">Common Uses:</h3>
-              <ul className="space-y-2 text-muted-foreground">
-                <li className="flex items-start">
-                  <span className="text-primary mr-2">•</span>
-                  Database timestamps
-                </li>
-                <li className="flex items-start">
-                  <span className="text-primary mr-2">•</span>
-                  API request/response timestamps
-                </li>
-                <li className="flex items-start">
-                  <span className="text-primary mr-2">•</span>
-                  File system metadata
-                </li>
-                <li className="flex items-start">
-                  <span className="text-primary mr-2">•</span>
-                  Session and token expiration times
-                </li>
-              </ul>
+              <h3 className="text-xl font-semibold mb-4">About Unix Timestamps</h3>
+              <div className="bg-card rounded-lg p-6 border border-border space-y-4">
+                <p className="text-muted-foreground">
+                  A Unix timestamp (also known as Epoch time) is the number of seconds that have elapsed since 
+                  January 1, 1970 (midnight UTC/GMT), not counting leap seconds.
+                </p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                  <div>
+                    <h4 className="font-medium mb-2">Common Unix Timestamps</h4>
+                    <ul className="text-sm text-muted-foreground space-y-1">
+                      <li><span className="font-mono">0</span> = 1970-01-01 00:00:00 UTC</li>
+                      <li><span className="font-mono">1000000000</span> = 2001-09-09 01:46:40 UTC</li>
+                      <li><span className="font-mono">1500000000</span> = 2017-07-14 02:40:00 UTC</li>
+                      <li><span className="font-mono">1609459200</span> = 2021-01-01 00:00:00 UTC</li>
+                      <li><span className="font-mono">1735689600</span> = 2025-01-01 00:00:00 UTC</li>
+                    </ul>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-medium mb-2">Usage</h4>
+                    <ul className="text-sm text-muted-foreground space-y-1">
+                      <li>Commonly used in programming and databases</li>
+                      <li>Simple for date arithmetic (add/subtract seconds)</li>
+                      <li>Timezone independent (always UTC)</li>
+                      <li>Used in APIs, logs, and file metadata</li>
+                      <li>Easy storage as integers</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
             </motion.div>
           </Container>
         </section>

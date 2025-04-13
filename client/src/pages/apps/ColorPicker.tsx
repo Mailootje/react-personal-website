@@ -1,383 +1,386 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Container } from "@/components/ui/container";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { ArrowLeft, Copy, Check, Shuffle, Plus, Trash, Save } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
+import { 
+  ArrowLeft, 
+  Copy, 
+  Check, 
+  RefreshCw, 
+  Palette,
+  Shuffle,
+  Pipette,
+  Download,
+  Plus,
+  Trash,
+  Save
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
-interface RGB {
-  r: number;
-  g: number;
-  b: number;
-}
+// Color conversion utilities
+const hexToRgb = (hex: string): { r: number, g: number, b: number } | null => {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex.trim());
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : null;
+};
 
-interface HSL {
-  h: number;
-  s: number;
-  l: number;
-}
+const rgbToHex = (r: number, g: number, b: number): string => {
+  return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+};
 
-interface SavedColor {
-  id: string;
-  name: string;
-  hex: string;
-  rgb: RGB;
-  hsl: HSL;
-}
+const rgbToHsl = (r: number, g: number, b: number): { h: number, s: number, l: number } => {
+  r /= 255;
+  g /= 255;
+  b /= 255;
+  
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  let h = 0, s = 0, l = (max + min) / 2;
+  
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: h = (b - r) / d + 2; break;
+      case b: h = (r - g) / d + 4; break;
+    }
+    
+    h /= 6;
+  }
+  
+  return {
+    h: Math.round(h * 360),
+    s: Math.round(s * 100),
+    l: Math.round(l * 100)
+  };
+};
 
-interface ColorPalette {
-  id: string;
-  name: string;
-  colors: string[];
-  type: "analogous" | "monochromatic" | "complementary" | "triadic" | "tetradic" | "custom";
-}
+const hslToRgb = (h: number, s: number, l: number): { r: number, g: number, b: number } => {
+  h /= 360;
+  s /= 100;
+  l /= 100;
+  
+  let r, g, b;
+  
+  if (s === 0) {
+    r = g = b = l; // achromatic
+  } else {
+    const hue2rgb = (p: number, q: number, t: number) => {
+      if (t < 0) t += 1;
+      if (t > 1) t -= 1;
+      if (t < 1/6) return p + (q - p) * 6 * t;
+      if (t < 1/2) return q;
+      if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+      return p;
+    };
+    
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    const p = 2 * l - q;
+    
+    r = hue2rgb(p, q, h + 1/3);
+    g = hue2rgb(p, q, h);
+    b = hue2rgb(p, q, h - 1/3);
+  }
+  
+  return {
+    r: Math.round(r * 255),
+    g: Math.round(g * 255),
+    b: Math.round(b * 255)
+  };
+};
+
+const getContrastColor = (hex: string): string => {
+  const rgb = hexToRgb(hex);
+  if (!rgb) return "#000000";
+  
+  // Calculate luminance
+  const luminance = (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
+  
+  // Return black for bright colors, white for dark ones
+  return luminance > 0.5 ? "#000000" : "#FFFFFF";
+};
+
+// Generate a random color
+const generateRandomColor = (): string => {
+  const r = Math.floor(Math.random() * 256);
+  const g = Math.floor(Math.random() * 256);
+  const b = Math.floor(Math.random() * 256);
+  return rgbToHex(r, g, b);
+};
+
+// Generate complementary color
+const getComplementaryColor = (hex: string): string => {
+  const rgb = hexToRgb(hex);
+  if (!rgb) return "#000000";
+  
+  // Complementary color is the inverted color
+  return rgbToHex(255 - rgb.r, 255 - rgb.g, 255 - rgb.b);
+};
+
+// Generate a color palette (analogous)
+const generateAnalogousPalette = (baseHex: string, count: number = 5): string[] => {
+  const rgb = hexToRgb(baseHex);
+  if (!rgb) return Array(count).fill("#000000");
+  
+  const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+  const step = 30; // 30 degrees step for analogous colors
+  
+  const palette: string[] = [];
+  const startHue = hsl.h - (step * Math.floor(count / 2));
+  
+  for (let i = 0; i < count; i++) {
+    const newHue = (startHue + step * i + 360) % 360; // Ensure hue is between 0-360
+    const { r, g, b } = hslToRgb(newHue, hsl.s, hsl.l);
+    palette.push(rgbToHex(r, g, b));
+  }
+  
+  return palette;
+};
+
+// Generate a monochromatic palette
+const generateMonochromaticPalette = (baseHex: string, count: number = 5): string[] => {
+  const rgb = hexToRgb(baseHex);
+  if (!rgb) return Array(count).fill("#000000");
+  
+  const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+  const palette: string[] = [];
+  
+  for (let i = 0; i < count; i++) {
+    const lightness = Math.max(10, Math.min(90, 20 + i * 70 / (count - 1)));
+    const { r, g, b } = hslToRgb(hsl.h, hsl.s, lightness);
+    palette.push(rgbToHex(r, g, b));
+  }
+  
+  return palette;
+};
+
+// Generate a triadic palette
+const generateTriadicPalette = (baseHex: string): string[] => {
+  const rgb = hexToRgb(baseHex);
+  if (!rgb) return Array(3).fill("#000000");
+  
+  const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+  const palette: string[] = [];
+  
+  for (let i = 0; i < 3; i++) {
+    const newHue = (hsl.h + i * 120) % 360;
+    const { r, g, b } = hslToRgb(newHue, hsl.s, hsl.l);
+    palette.push(rgbToHex(r, g, b));
+  }
+  
+  return palette;
+};
 
 export default function ColorPicker() {
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState("picker");
-  const [currentColor, setCurrentColor] = useState("#4f46e5");
-  const [colorName, setColorName] = useState("");
-  const [rgb, setRgb] = useState<RGB>({ r: 79, g: 70, b: 229 });
-  const [hsl, setHsl] = useState<HSL>({ h: 244, s: 76, l: 59 });
-  const [savedColors, setSavedColors] = useState<SavedColor[]>([]);
-  const [colorPalettes, setColorPalettes] = useState<ColorPalette[]>([]);
-  const [currentPalette, setCurrentPalette] = useState<string[]>([]);
-  const [paletteName, setPaletteName] = useState("");
-  const [paletteType, setPaletteType] = useState<ColorPalette["type"]>("custom");
-  const [copied, setCopied] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>("picker");
+  const [hexColor, setHexColor] = useState<string>("#3B82F6");
+  const [rgbColor, setRgbColor] = useState<{ r: number, g: number, b: number }>({ r: 59, g: 130, b: 246 });
+  const [hslColor, setHslColor] = useState<{ h: number, s: number, l: number }>({ h: 217, s: 91, l: 60 });
+  const [savedColors, setSavedColors] = useState<string[]>([]);
+  const [palette, setPalette] = useState<string[]>([]);
+  const [paletteType, setPaletteType] = useState<string>("analogous");
+  const [paletteCount, setPaletteCount] = useState<number>(5);
+  const [copied, setCopied] = useState<string | null>(null);
+  const [contrastText, setContrastText] = useState<string>("#FFFFFF");
   
-  // Convert HEX to RGB
-  const hexToRgb = (hex: string): RGB => {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result
-      ? {
-          r: parseInt(result[1], 16),
-          g: parseInt(result[2], 16),
-          b: parseInt(result[3], 16),
-        }
-      : { r: 0, g: 0, b: 0 };
-  };
-
-  // Convert RGB to HEX
-  const rgbToHex = (r: number, g: number, b: number): string => {
-    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-  };
-
-  // Convert RGB to HSL
-  const rgbToHsl = (r: number, g: number, b: number): HSL => {
-    r /= 255;
-    g /= 255;
-    b /= 255;
-
-    const max = Math.max(r, g, b);
-    const min = Math.min(r, g, b);
-    let h = 0;
-    let s = 0;
-    const l = (max + min) / 2;
-
-    if (max !== min) {
-      const d = max - min;
-      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-
-      switch (max) {
-        case r:
-          h = (g - b) / d + (g < b ? 6 : 0);
-          break;
-        case g:
-          h = (b - r) / d + 2;
-          break;
-        case b:
-          h = (r - g) / d + 4;
-          break;
-      }
-
-      h /= 6;
-    }
-
-    return {
-      h: Math.round(h * 360),
-      s: Math.round(s * 100),
-      l: Math.round(l * 100),
-    };
-  };
-
-  // Convert HSL to RGB
-  const hslToRgb = (h: number, s: number, l: number): RGB => {
-    h /= 360;
-    s /= 100;
-    l /= 100;
-    
-    let r, g, b;
-
-    if (s === 0) {
-      r = g = b = l; // achromatic
-    } else {
-      const hue2rgb = (p: number, q: number, t: number) => {
-        if (t < 0) t += 1;
-        if (t > 1) t -= 1;
-        if (t < 1/6) return p + (q - p) * 6 * t;
-        if (t < 1/2) return q;
-        if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
-        return p;
-      };
-
-      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-      const p = 2 * l - q;
-      
-      r = hue2rgb(p, q, h + 1/3);
-      g = hue2rgb(p, q, h);
-      b = hue2rgb(p, q, h - 1/3);
-    }
-
-    return {
-      r: Math.round(r * 255),
-      g: Math.round(g * 255),
-      b: Math.round(b * 255)
-    };
-  };
-
-  // Update values when color changes
+  // Load saved colors from localStorage
   useEffect(() => {
-    const newRgb = hexToRgb(currentColor);
-    setRgb(newRgb);
-    setHsl(rgbToHsl(newRgb.r, newRgb.g, newRgb.b));
-  }, [currentColor]);
-
-  // Handle RGB change
-  const handleRgbChange = (key: keyof RGB, value: number) => {
-    const newRgb = { ...rgb, [key]: value };
-    setRgb(newRgb);
-    setCurrentColor(rgbToHex(newRgb.r, newRgb.g, newRgb.b));
-    setHsl(rgbToHsl(newRgb.r, newRgb.g, newRgb.b));
-  };
-
-  // Handle HSL change
-  const handleHslChange = (key: keyof HSL, value: number) => {
-    const newHsl = { ...hsl, [key]: value };
-    setHsl(newHsl);
-    const newRgb = hslToRgb(newHsl.h, newHsl.s, newHsl.l);
-    setRgb(newRgb);
-    setCurrentColor(rgbToHex(newRgb.r, newRgb.g, newRgb.b));
-  };
-
-  // Generate a random color
-  const generateRandomColor = () => {
-    const randomColor = "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
-    setCurrentColor(randomColor);
-  };
-
-  // Save current color
-  const saveColor = () => {
-    if (savedColors.some(color => color.hex.toLowerCase() === currentColor.toLowerCase())) {
-      toast({
-        title: "Color already saved",
-        description: "This color is already in your saved colors",
-      });
-      return;
+    const stored = localStorage.getItem("savedColors");
+    if (stored) {
+      try {
+        setSavedColors(JSON.parse(stored));
+      } catch (e) {
+        console.error("Error loading saved colors:", e);
+      }
     }
-
-    const name = colorName.trim() || `Color ${savedColors.length + 1}`;
-    const newColor: SavedColor = {
-      id: Date.now().toString(),
-      name,
-      hex: currentColor,
-      rgb,
-      hsl,
-    };
-
-    setSavedColors([...savedColors, newColor]);
-    setColorName("");
+  }, []);
+  
+  // Update color values when hex changes
+  useEffect(() => {
+    const rgb = hexToRgb(hexColor);
+    if (rgb) {
+      setRgbColor(rgb);
+      setHslColor(rgbToHsl(rgb.r, rgb.g, rgb.b));
+      setContrastText(getContrastColor(hexColor));
+      updatePalette(hexColor);
+    }
+  }, [hexColor, paletteType, paletteCount]);
+  
+  // Handle hex input change
+  const handleHexChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value;
     
-    toast({
-      title: "Color saved",
-      description: `${name} has been added to your saved colors`,
-    });
+    // Ensure the value starts with #
+    if (!value.startsWith("#")) {
+      value = "#" + value;
+    }
+    
+    // Validate hex color format
+    if (/^#([0-9A-F]{3}){1,2}$/i.test(value)) {
+      setHexColor(value);
+    } else if (value === "#") {
+      setHexColor("#");
+    } else if (value.length <= 7) {
+      setHexColor(value);
+    }
   };
-
+  
+  // Handle RGB input changes
+  const handleRgbChange = (component: "r" | "g" | "b", value: number) => {
+    const newRgb = { ...rgbColor, [component]: value };
+    setRgbColor(newRgb);
+    setHexColor(rgbToHex(newRgb.r, newRgb.g, newRgb.b));
+  };
+  
+  // Handle HSL input changes
+  const handleHslChange = (component: "h" | "s" | "l", value: number) => {
+    const newHsl = { ...hslColor, [component]: value };
+    setHslColor(newHsl);
+    const rgb = hslToRgb(newHsl.h, newHsl.s, newHsl.l);
+    setRgbColor(rgb);
+    setHexColor(rgbToHex(rgb.r, rgb.g, rgb.b));
+  };
+  
+  // Generate random color
+  const randomizeColor = () => {
+    setHexColor(generateRandomColor());
+  };
+  
+  // Save current color
+  const saveCurrentColor = () => {
+    if (!savedColors.includes(hexColor)) {
+      const newSavedColors = [...savedColors, hexColor];
+      setSavedColors(newSavedColors);
+      localStorage.setItem("savedColors", JSON.stringify(newSavedColors));
+      toast({
+        title: "Color Saved",
+        description: `${hexColor} has been added to your saved colors`,
+      });
+    } else {
+      toast({
+        title: "Color Already Saved",
+        description: `${hexColor} is already in your saved colors`,
+        variant: "destructive",
+      });
+    }
+  };
+  
   // Remove a saved color
-  const removeColor = (id: string) => {
-    setSavedColors(savedColors.filter(color => color.id !== id));
+  const removeSavedColor = (colorToRemove: string) => {
+    const newSavedColors = savedColors.filter(color => color !== colorToRemove);
+    setSavedColors(newSavedColors);
+    localStorage.setItem("savedColors", JSON.stringify(newSavedColors));
   };
-
+  
+  // Update the palette based on the base color and palette type
+  const updatePalette = (baseColor: string) => {
+    switch (paletteType) {
+      case "analogous":
+        setPalette(generateAnalogousPalette(baseColor, paletteCount));
+        break;
+      case "monochromatic":
+        setPalette(generateMonochromaticPalette(baseColor, paletteCount));
+        break;
+      case "triadic":
+        setPalette(generateTriadicPalette(baseColor));
+        break;
+      default:
+        setPalette(generateAnalogousPalette(baseColor, paletteCount));
+    }
+  };
+  
   // Copy color to clipboard
-  const copyToClipboard = (text: string) => {
+  const copyToClipboard = (text: string, type: string = "hex") => {
     navigator.clipboard.writeText(text).then(() => {
-      setCopied(true);
+      setCopied(text);
       toast({
         title: "Copied!",
-        description: `${text} copied to clipboard`,
+        description: `${type.toUpperCase()} color copied to clipboard`,
       });
       
-      // Reset copied status after 2 seconds
-      setTimeout(() => setCopied(false), 2000);
+      // Reset copied state after 2 seconds
+      setTimeout(() => setCopied(null), 2000);
     });
   };
-
-  // Generate palette based on current color
-  const generatePalette = (type: ColorPalette["type"]) => {
-    setPaletteType(type);
+  
+  // Download palette as image
+  const downloadPalette = () => {
+    // Create a canvas element
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
     
-    // Start with the current color
-    const baseHsl = hsl;
-    let palette: string[] = [];
+    // Set canvas size
+    const tileSize = 100;
+    const padding = 10;
+    canvas.width = palette.length * tileSize + (palette.length + 1) * padding;
+    canvas.height = tileSize + padding * 2;
     
-    switch (type) {
-      case "analogous":
-        // Colors adjacent on the color wheel
-        palette = [
-          currentColor,
-          rgbToHex(...Object.values(hslToRgb((baseHsl.h - 30 + 360) % 360, baseHsl.s, baseHsl.l))),
-          rgbToHex(...Object.values(hslToRgb((baseHsl.h + 30) % 360, baseHsl.s, baseHsl.l))),
-          rgbToHex(...Object.values(hslToRgb((baseHsl.h - 60 + 360) % 360, baseHsl.s, baseHsl.l))),
-          rgbToHex(...Object.values(hslToRgb((baseHsl.h + 60) % 360, baseHsl.s, baseHsl.l))),
-        ];
-        break;
-        
-      case "monochromatic":
-        // Variations of the same hue
-        palette = [
-          currentColor,
-          rgbToHex(...Object.values(hslToRgb(baseHsl.h, baseHsl.s, Math.max(baseHsl.l - 30, 10)))),
-          rgbToHex(...Object.values(hslToRgb(baseHsl.h, baseHsl.s, Math.min(baseHsl.l + 30, 90)))),
-          rgbToHex(...Object.values(hslToRgb(baseHsl.h, Math.max(baseHsl.s - 30, 10), baseHsl.l))),
-          rgbToHex(...Object.values(hslToRgb(baseHsl.h, Math.min(baseHsl.s + 30, 100), baseHsl.l))),
-        ];
-        break;
-        
-      case "complementary":
-        // Colors opposite on the color wheel
-        palette = [
-          currentColor,
-          rgbToHex(...Object.values(hslToRgb((baseHsl.h + 180) % 360, baseHsl.s, baseHsl.l))),
-          rgbToHex(...Object.values(hslToRgb(baseHsl.h, Math.max(baseHsl.s - 20, 10), Math.max(baseHsl.l - 20, 10)))),
-          rgbToHex(...Object.values(hslToRgb(baseHsl.h, Math.min(baseHsl.s + 20, 100), Math.min(baseHsl.l + 20, 90)))),
-          rgbToHex(...Object.values(hslToRgb((baseHsl.h + 180) % 360, Math.max(baseHsl.s - 20, 10), Math.max(baseHsl.l - 20, 10)))),
-        ];
-        break;
-        
-      case "triadic":
-        // Three colors equally spaced on the color wheel
-        palette = [
-          currentColor,
-          rgbToHex(...Object.values(hslToRgb((baseHsl.h + 120) % 360, baseHsl.s, baseHsl.l))),
-          rgbToHex(...Object.values(hslToRgb((baseHsl.h + 240) % 360, baseHsl.s, baseHsl.l))),
-          rgbToHex(...Object.values(hslToRgb((baseHsl.h + 60) % 360, baseHsl.s, baseHsl.l))),
-          rgbToHex(...Object.values(hslToRgb((baseHsl.h + 300) % 360, baseHsl.s, baseHsl.l))),
-        ];
-        break;
-        
-      case "tetradic":
-        // Four colors arranged into two complementary pairs
-        palette = [
-          currentColor,
-          rgbToHex(...Object.values(hslToRgb((baseHsl.h + 90) % 360, baseHsl.s, baseHsl.l))),
-          rgbToHex(...Object.values(hslToRgb((baseHsl.h + 180) % 360, baseHsl.s, baseHsl.l))),
-          rgbToHex(...Object.values(hslToRgb((baseHsl.h + 270) % 360, baseHsl.s, baseHsl.l))),
-          rgbToHex(...Object.values(hslToRgb((baseHsl.h + 45) % 360, baseHsl.s, baseHsl.l))),
-        ];
-        break;
-        
-      case "custom":
-        if (currentPalette.length > 0) {
-          return; // Don't overwrite existing custom palette
-        }
-        // Default to complementary if custom is empty
-        palette = [
-          currentColor,
-          rgbToHex(...Object.values(hslToRgb((baseHsl.h + 180) % 360, baseHsl.s, baseHsl.l))),
-          rgbToHex(...Object.values(hslToRgb((baseHsl.h + 90) % 360, baseHsl.s, baseHsl.l))),
-          rgbToHex(...Object.values(hslToRgb((baseHsl.h + 270) % 360, baseHsl.s, baseHsl.l))),
-          rgbToHex(...Object.values(hslToRgb((baseHsl.h + 45) % 360, baseHsl.s, baseHsl.l))),
-        ];
-        break;
-    }
+    // Draw background
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    setCurrentPalette(palette);
-  };
-
-  // Add color to custom palette
-  const addColorToPalette = () => {
-    if (currentPalette.length >= 10) {
-      toast({
-        title: "Palette full",
-        description: "You can only have up to 10 colors in a palette",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    if (currentPalette.includes(currentColor)) {
-      toast({
-        title: "Color already in palette",
-        description: "This color is already in your current palette",
-      });
-      return;
-    }
-    
-    setCurrentPalette([...currentPalette, currentColor]);
-    setPaletteType("custom");
-  };
-
-  // Remove color from palette
-  const removeColorFromPalette = (colorHex: string) => {
-    setCurrentPalette(currentPalette.filter(c => c !== colorHex));
-  };
-
-  // Save current palette
-  const savePalette = () => {
-    if (currentPalette.length < 2) {
-      toast({
-        title: "Not enough colors",
-        description: "A palette must have at least 2 colors",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const name = paletteName.trim() || `Palette ${colorPalettes.length + 1}`;
-    const newPalette: ColorPalette = {
-      id: Date.now().toString(),
-      name,
-      colors: [...currentPalette],
-      type: paletteType,
-    };
-
-    setColorPalettes([...colorPalettes, newPalette]);
-    setPaletteName("");
-    
-    toast({
-      title: "Palette saved",
-      description: `${name} has been added to your saved palettes`,
+    // Draw color tiles
+    palette.forEach((color, index) => {
+      const x = padding + index * (tileSize + padding);
+      const y = padding;
+      
+      // Draw color swatch
+      ctx.fillStyle = color;
+      ctx.fillRect(x, y, tileSize, tileSize);
+      
+      // Draw color value
+      ctx.fillStyle = getContrastColor(color);
+      ctx.font = "12px Arial";
+      ctx.textAlign = "center";
+      ctx.fillText(color, x + tileSize / 2, y + tileSize / 2);
     });
+    
+    // Convert canvas to image and download
+    const dataUrl = canvas.toDataURL("image/png");
+    const a = document.createElement("a");
+    a.href = dataUrl;
+    a.download = "color-palette.png";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
-
-  // Load a saved palette
-  const loadPalette = (palette: ColorPalette) => {
-    setCurrentPalette(palette.colors);
-    setPaletteType(palette.type);
-    setPaletteName(palette.name);
+  
+  // Use eyedropper to pick a color if available
+  const useEyeDropper = async () => {
+    // @ts-ignore: EyeDropper API is not yet in TypeScript definitions
+    if (typeof window.EyeDropper !== "undefined") {
+      try {
+        // @ts-ignore
+        const eyeDropper = new EyeDropper();
+        const result = await eyeDropper.open();
+        setHexColor(result.sRGBHex);
+      } catch (e) {
+        console.error("Error using eyedropper:", e);
+      }
+    } else {
+      toast({
+        title: "Not Supported",
+        description: "The EyeDropper API is not supported in your browser",
+        variant: "destructive",
+      });
+    }
   };
-
-  // Delete a saved palette
-  const deletePalette = (id: string) => {
-    setColorPalettes(colorPalettes.filter(p => p.id !== id));
-  };
-
-  // Get a readable contrast color (black or white) based on background
-  const getContrastColor = (hex: string): string => {
-    const rgb = hexToRgb(hex);
-    // Calculate relative luminance
-    const luminance = (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
-    return luminance > 0.5 ? "#000000" : "#ffffff";
-  };
-
+  
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <Header />
@@ -402,724 +405,447 @@ export default function ColorPicker() {
             >
               <h1 className="text-4xl md:text-5xl font-bold mb-4">Color Picker & Palette Generator</h1>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                Select colors and create beautiful color palettes for your design projects
+                Choose colors and create beautiful color schemes
               </p>
             </motion.div>
-
+            
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
             >
               <Tabs 
-                defaultValue="picker" 
-                value={activeTab}
+                value={activeTab} 
                 onValueChange={setActiveTab}
-                className="w-full"
+                className="space-y-6"
               >
-                <TabsList className="grid grid-cols-3 mb-4 w-full max-w-md mx-auto">
-                  <TabsTrigger value="picker">
+                <TabsList className="grid grid-cols-2 w-full max-w-md mx-auto">
+                  <TabsTrigger value="picker" className="flex items-center">
+                    <Pipette className="h-4 w-4 mr-2" />
                     Color Picker
                   </TabsTrigger>
-                  <TabsTrigger value="palette">
+                  <TabsTrigger value="palette" className="flex items-center">
+                    <Palette className="h-4 w-4 mr-2" />
                     Palette Generator
                   </TabsTrigger>
-                  <TabsTrigger value="saved">
-                    Saved Colors
-                  </TabsTrigger>
                 </TabsList>
-
-                {/* Color Picker Tab */}
+                
                 <TabsContent value="picker" className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Color picker section */}
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Select Color</CardTitle>
-                        <CardDescription>
-                          Pick a color or enter color values
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-6">
-                        {/* Color preview */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Color Picker</CardTitle>
+                      <CardDescription>
+                        Choose a color and view its values in different formats
+                      </CardDescription>
+                    </CardHeader>
+                    
+                    <CardContent className="space-y-6">
+                      {/* Color Preview */}
+                      <div className="flex flex-col md:flex-row gap-6">
                         <div 
-                          className="h-40 rounded-md border flex items-center justify-center"
-                          style={{ 
-                            backgroundColor: currentColor,
-                            color: getContrastColor(currentColor)
-                          }}
+                          className="w-full md:w-1/3 aspect-square rounded-md shadow-md flex items-center justify-center"
+                          style={{ backgroundColor: hexColor, color: contrastText }}
                         >
-                          <div className="text-center p-4">
-                            <div className="text-2xl font-bold mb-2">{currentColor}</div>
-                            <div className="text-sm">
-                              RGB: {rgb.r}, {rgb.g}, {rgb.b}
-                            </div>
-                            <div className="text-sm">
-                              HSL: {hsl.h}°, {hsl.s}%, {hsl.l}%
-                            </div>
+                          <div className="text-center">
+                            <h3 className="text-xl font-bold" style={{ color: contrastText }}>
+                              {hexColor}
+                            </h3>
+                            <p style={{ color: contrastText }}>
+                              RGB({rgbColor.r}, {rgbColor.g}, {rgbColor.b})
+                            </p>
+                            <p style={{ color: contrastText }}>
+                              HSL({hslColor.h}°, {hslColor.s}%, {hslColor.l}%)
+                            </p>
                           </div>
                         </div>
-
-                        {/* Color input */}
-                        <div className="space-y-4">
-                          <div className="flex space-x-2">
-                            <Input
-                              type="color"
-                              value={currentColor}
-                              onChange={(e) => setCurrentColor(e.target.value)}
-                              className="w-12 h-10 p-1"
-                            />
-                            <Input
-                              type="text"
-                              value={currentColor}
-                              onChange={(e) => setCurrentColor(e.target.value)}
-                              placeholder="#RRGGBB"
-                              className="flex-1"
-                            />
-                            <Button
-                              variant="outline"
-                              onClick={generateRandomColor}
-                              title="Generate random color"
-                            >
-                              <Shuffle className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="outline"
-                              onClick={() => copyToClipboard(currentColor)}
-                              title="Copy to clipboard"
-                            >
-                              {copied ? (
-                                <Check className="h-4 w-4 text-green-500" />
-                              ) : (
-                                <Copy className="h-4 w-4" />
-                              )}
-                            </Button>
-                          </div>
-                        </div>
-
-                        {/* RGB Sliders */}
-                        <div className="space-y-4">
-                          <h3 className="text-sm font-medium">RGB</h3>
-
-                          <div className="space-y-4">
-                            <div className="space-y-2">
-                              <div className="flex justify-between">
-                                <label className="text-sm">Red: {rgb.r}</label>
-                              </div>
-                              <Slider
-                                value={[rgb.r]}
-                                min={0}
-                                max={255}
-                                step={1}
-                                onValueChange={(value) => handleRgbChange("r", value[0])}
-                                className="[&>[role=slider]]:bg-red-500"
+                        
+                        <div className="flex-1 space-y-4">
+                          {/* HEX Color Input */}
+                          <div className="space-y-2">
+                            <Label htmlFor="hex-color">Hex Color</Label>
+                            <div className="flex space-x-2">
+                              <Input
+                                id="hex-color"
+                                value={hexColor}
+                                onChange={handleHexChange}
+                                className="font-mono"
                               />
-                            </div>
-
-                            <div className="space-y-2">
-                              <div className="flex justify-between">
-                                <label className="text-sm">Green: {rgb.g}</label>
-                              </div>
-                              <Slider
-                                value={[rgb.g]}
-                                min={0}
-                                max={255}
-                                step={1}
-                                onValueChange={(value) => handleRgbChange("g", value[0])}
-                                className="[&>[role=slider]]:bg-green-500"
-                              />
-                            </div>
-
-                            <div className="space-y-2">
-                              <div className="flex justify-between">
-                                <label className="text-sm">Blue: {rgb.b}</label>
-                              </div>
-                              <Slider
-                                value={[rgb.b]}
-                                min={0}
-                                max={255}
-                                step={1}
-                                onValueChange={(value) => handleRgbChange("b", value[0])}
-                                className="[&>[role=slider]]:bg-blue-500"
-                              />
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* HSL Sliders */}
-                        <div className="space-y-4">
-                          <h3 className="text-sm font-medium">HSL</h3>
-
-                          <div className="space-y-4">
-                            <div className="space-y-2">
-                              <div className="flex justify-between">
-                                <label className="text-sm">Hue: {hsl.h}°</label>
-                              </div>
-                              <div 
-                                className="h-4 rounded-full mb-2"
-                                style={{
-                                  background: `linear-gradient(to right, 
-                                    hsl(0, ${hsl.s}%, ${hsl.l}%), 
-                                    hsl(60, ${hsl.s}%, ${hsl.l}%), 
-                                    hsl(120, ${hsl.s}%, ${hsl.l}%), 
-                                    hsl(180, ${hsl.s}%, ${hsl.l}%), 
-                                    hsl(240, ${hsl.s}%, ${hsl.l}%), 
-                                    hsl(300, ${hsl.s}%, ${hsl.l}%), 
-                                    hsl(360, ${hsl.s}%, ${hsl.l}%))`
-                                }}
-                              ></div>
-                              <Slider
-                                value={[hsl.h]}
-                                min={0}
-                                max={360}
-                                step={1}
-                                onValueChange={(value) => handleHslChange("h", value[0])}
-                              />
-                            </div>
-
-                            <div className="space-y-2">
-                              <div className="flex justify-between">
-                                <label className="text-sm">Saturation: {hsl.s}%</label>
-                              </div>
-                              <div 
-                                className="h-4 rounded-full mb-2"
-                                style={{
-                                  background: `linear-gradient(to right, 
-                                    hsl(${hsl.h}, 0%, ${hsl.l}%), 
-                                    hsl(${hsl.h}, 100%, ${hsl.l}%))`
-                                }}
-                              ></div>
-                              <Slider
-                                value={[hsl.s]}
-                                min={0}
-                                max={100}
-                                step={1}
-                                onValueChange={(value) => handleHslChange("s", value[0])}
-                              />
-                            </div>
-
-                            <div className="space-y-2">
-                              <div className="flex justify-between">
-                                <label className="text-sm">Lightness: {hsl.l}%</label>
-                              </div>
-                              <div 
-                                className="h-4 rounded-full mb-2"
-                                style={{
-                                  background: `linear-gradient(to right, 
-                                    hsl(${hsl.h}, ${hsl.s}%, 0%), 
-                                    hsl(${hsl.h}, ${hsl.s}%, 50%), 
-                                    hsl(${hsl.h}, ${hsl.s}%, 100%))`
-                                }}
-                              ></div>
-                              <Slider
-                                value={[hsl.l]}
-                                min={0}
-                                max={100}
-                                step={1}
-                                onValueChange={(value) => handleHslChange("l", value[0])}
-                              />
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Save Color */}
-                        <div className="pt-4 space-y-4">
-                          <div className="flex space-x-2">
-                            <Input
-                              type="text"
-                              value={colorName}
-                              onChange={(e) => setColorName(e.target.value)}
-                              placeholder="Color name (optional)"
-                              className="flex-1"
-                            />
-                            <Button onClick={saveColor}>
-                              Save Color
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    {/* Color information section */}
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Color Information</CardTitle>
-                        <CardDescription>
-                          Detailed color values and formats
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-6">
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>Format</TableHead>
-                              <TableHead>Value</TableHead>
-                              <TableHead className="w-[100px]">Action</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            <TableRow>
-                              <TableCell className="font-medium">HEX</TableCell>
-                              <TableCell>{currentColor}</TableCell>
-                              <TableCell>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => copyToClipboard(currentColor)}
-                                >
-                                  <Copy className="h-4 w-4" />
-                                </Button>
-                              </TableCell>
-                            </TableRow>
-                            <TableRow>
-                              <TableCell className="font-medium">RGB</TableCell>
-                              <TableCell>rgb({rgb.r}, {rgb.g}, {rgb.b})</TableCell>
-                              <TableCell>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => copyToClipboard(`rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`)}
-                                >
-                                  <Copy className="h-4 w-4" />
-                                </Button>
-                              </TableCell>
-                            </TableRow>
-                            <TableRow>
-                              <TableCell className="font-medium">HSL</TableCell>
-                              <TableCell>hsl({hsl.h}, {hsl.s}%, {hsl.l}%)</TableCell>
-                              <TableCell>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => copyToClipboard(`hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`)}
-                                >
-                                  <Copy className="h-4 w-4" />
-                                </Button>
-                              </TableCell>
-                            </TableRow>
-                            <TableRow>
-                              <TableCell className="font-medium">RGBA</TableCell>
-                              <TableCell>rgba({rgb.r}, {rgb.g}, {rgb.b}, 1)</TableCell>
-                              <TableCell>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => copyToClipboard(`rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1)`)}
-                                >
-                                  <Copy className="h-4 w-4" />
-                                </Button>
-                              </TableCell>
-                            </TableRow>
-                            <TableRow>
-                              <TableCell className="font-medium">HSLA</TableCell>
-                              <TableCell>hsla({hsl.h}, {hsl.s}%, {hsl.l}%, 1)</TableCell>
-                              <TableCell>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => copyToClipboard(`hsla(${hsl.h}, ${hsl.s}%, ${hsl.l}%, 1)`)}
-                                >
-                                  <Copy className="h-4 w-4" />
-                                </Button>
-                              </TableCell>
-                            </TableRow>
-                          </TableBody>
-                        </Table>
-
-                        <div className="pt-4">
-                          <h3 className="text-sm font-medium mb-4">Color Preview</h3>
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <h4 className="text-xs mb-2">Light Background</h4>
-                              <div className="bg-white p-4 rounded-md border">
-                                <div className="h-8 w-full rounded-md" style={{ backgroundColor: currentColor }}></div>
-                                <div className="mt-2 text-sm" style={{ color: currentColor }}>Text Color</div>
-                              </div>
-                            </div>
-                            <div>
-                              <h4 className="text-xs mb-2">Dark Background</h4>
-                              <div className="bg-gray-900 p-4 rounded-md border border-gray-700">
-                                <div className="h-8 w-full rounded-md" style={{ backgroundColor: currentColor }}></div>
-                                <div className="mt-2 text-sm" style={{ color: currentColor }}>Text Color</div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </TabsContent>
-
-                {/* Palette Generator Tab */}
-                <TabsContent value="palette" className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Current color and palette options */}
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Create Palette</CardTitle>
-                        <CardDescription>
-                          Generate or build a color palette
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-6">
-                        {/* Selected color preview */}
-                        <div className="flex items-center space-x-4">
-                          <div 
-                            className="h-12 w-12 rounded-md border"
-                            style={{ backgroundColor: currentColor }}
-                          ></div>
-                          <div>
-                            <h3 className="text-sm font-medium">Current Color</h3>
-                            <p className="text-xs text-muted-foreground">{currentColor}</p>
-                          </div>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={addColorToPalette}
-                            className="ml-auto"
-                          >
-                            <Plus className="h-4 w-4 mr-2" />
-                            Add to Palette
-                          </Button>
-                        </div>
-
-                        {/* Palette generation options */}
-                        <div className="space-y-4">
-                          <h3 className="text-sm font-medium">Generate Palette</h3>
-                          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => generatePalette("analogous")}
-                            >
-                              Analogous
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => generatePalette("complementary")}
-                            >
-                              Complementary
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => generatePalette("monochromatic")}
-                            >
-                              Monochromatic
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => generatePalette("triadic")}
-                            >
-                              Triadic
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => generatePalette("tetradic")}
-                            >
-                              Tetradic
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => {
-                                setCurrentPalette([]);
-                                setPaletteType("custom");
-                              }}
-                            >
-                              Clear
-                            </Button>
-                          </div>
-                        </div>
-
-                        {/* Save palette */}
-                        <div className="pt-4 space-y-4">
-                          <h3 className="text-sm font-medium">Save Palette</h3>
-                          <div className="flex space-x-2">
-                            <Input
-                              type="text"
-                              value={paletteName}
-                              onChange={(e) => setPaletteName(e.target.value)}
-                              placeholder="Palette name (optional)"
-                              className="flex-1"
-                            />
-                            <Button onClick={savePalette}>
-                              <Save className="h-4 w-4 mr-2" />
-                              Save
-                            </Button>
-                          </div>
-                        </div>
-
-                        {/* Saved palettes */}
-                        {colorPalettes.length > 0 && (
-                          <div className="pt-4 space-y-4">
-                            <h3 className="text-sm font-medium">Saved Palettes</h3>
-                            <div className="space-y-4 max-h-60 overflow-y-auto pr-1">
-                              {colorPalettes.map((palette) => (
-                                <div 
-                                  key={palette.id}
-                                  className="p-3 border rounded-md hover:bg-muted/50 transition-colors"
-                                >
-                                  <div className="flex justify-between items-center mb-2">
-                                    <h4 className="text-sm font-medium">{palette.name}</h4>
-                                    <div className="space-x-1">
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() => loadPalette(palette)}
-                                        title="Load palette"
-                                      >
-                                        <ArrowLeft className="h-3 w-3" />
-                                      </Button>
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() => deletePalette(palette.id)}
-                                        title="Delete palette"
-                                      >
-                                        <Trash className="h-3 w-3" />
-                                      </Button>
-                                    </div>
-                                  </div>
-                                  <div className="flex">
-                                    {palette.colors.map((color, i) => (
-                                      <div
-                                        key={i}
-                                        className="h-6 flex-1"
-                                        style={{ backgroundColor: color }}
-                                        title={color}
-                                      ></div>
-                                    ))}
-                                  </div>
-                                  <p className="text-xs text-muted-foreground mt-1">
-                                    {palette.type.charAt(0).toUpperCase() + palette.type.slice(1)} • {palette.colors.length} colors
-                                  </p>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
-
-                    {/* Current palette display */}
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Current Palette</CardTitle>
-                        <CardDescription>
-                          {paletteType.charAt(0).toUpperCase() + paletteType.slice(1)} palette with {currentPalette.length} colors
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-6">
-                        {currentPalette.length > 0 ? (
-                          <div className="space-y-6">
-                            {/* Palette preview */}
-                            <div className="flex h-20 rounded-md overflow-hidden border">
-                              {currentPalette.map((color, i) => (
-                                <div
-                                  key={i}
-                                  className="flex-1"
-                                  style={{ backgroundColor: color }}
-                                ></div>
-                              ))}
-                            </div>
-
-                            {/* Individual colors */}
-                            <div className="space-y-3">
-                              {currentPalette.map((color, i) => {
-                                const contrastColor = getContrastColor(color);
-                                return (
-                                  <div 
-                                    key={i}
-                                    className="flex items-center p-3 rounded-md"
-                                    style={{ 
-                                      backgroundColor: color,
-                                      color: contrastColor
-                                    }}
-                                  >
-                                    <div className="font-mono">{color}</div>
-                                    <div className="ml-auto flex space-x-1">
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() => copyToClipboard(color)}
-                                        style={{ color: contrastColor }}
-                                      >
-                                        <Copy className="h-4 w-4" />
-                                      </Button>
-                                      {paletteType === "custom" && (
-                                        <Button
-                                          variant="ghost"
-                                          size="icon"
-                                          onClick={() => removeColorFromPalette(color)}
-                                          style={{ color: contrastColor }}
-                                        >
-                                          <Trash className="h-4 w-4" />
-                                        </Button>
-                                      )}
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
-
-                            {/* CSS code */}
-                            <div className="p-4 border rounded-md bg-muted/50">
-                              <h3 className="text-sm font-medium mb-2">CSS Variables</h3>
-                              <pre className="text-xs whitespace-pre-wrap font-mono">
-{`:root {
-${currentPalette.map((color, i) => `  --color-${i + 1}: ${color};`).join('\n')}
-}`}
-                              </pre>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="mt-2"
-                                onClick={() => copyToClipboard(`:root {\n${currentPalette.map((color, i) => `  --color-${i + 1}: ${color};`).join('\n')}\n}`)}
+                              <Button 
+                                variant="outline" 
+                                size="icon"
+                                onClick={() => copyToClipboard(hexColor, "hex")}
                               >
-                                <Copy className="h-3 w-3 mr-2" />
-                                Copy CSS
+                                {copied === hexColor ? (
+                                  <Check className="h-4 w-4 text-green-500" />
+                                ) : (
+                                  <Copy className="h-4 w-4" />
+                                )}
                               </Button>
                             </div>
                           </div>
-                        ) : (
-                          <div className="text-center py-12 text-muted-foreground">
-                            <p>No colors in current palette</p>
-                            <p className="text-sm mt-2">Generate a palette or add colors individually</p>
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
-                  </div>
-                </TabsContent>
-
-                {/* Saved Colors Tab */}
-                <TabsContent value="saved" className="space-y-6">
-                  {savedColors.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {savedColors.map((color) => (
-                        <motion.div 
-                          key={color.id}
-                          whileHover={{ y: -5 }}
-                          transition={{ duration: 0.2 }}
-                        >
-                          <Card>
-                            <div
-                              className="h-32 rounded-t-lg flex items-center justify-center"
-                              style={{ 
-                                backgroundColor: color.hex,
-                                color: getContrastColor(color.hex)
-                              }}
-                            >
-                              <div className="text-center p-4">
-                                <div className="text-xl font-bold mb-1">{color.name}</div>
-                                <div className="text-sm">{color.hex}</div>
+                          
+                          {/* RGB Color Input */}
+                          <div className="space-y-2">
+                            <Label>RGB Color</Label>
+                            <div className="grid grid-cols-3 gap-2">
+                              <div className="space-y-1">
+                                <Label htmlFor="color-r" className="text-xs">Red</Label>
+                                <div className="flex space-x-2">
+                                  <Input
+                                    id="color-r"
+                                    type="number"
+                                    min="0"
+                                    max="255"
+                                    value={rgbColor.r}
+                                    onChange={(e) => handleRgbChange("r", parseInt(e.target.value) || 0)}
+                                    className="font-mono"
+                                  />
+                                </div>
+                              </div>
+                              <div className="space-y-1">
+                                <Label htmlFor="color-g" className="text-xs">Green</Label>
+                                <Input
+                                  id="color-g"
+                                  type="number"
+                                  min="0"
+                                  max="255"
+                                  value={rgbColor.g}
+                                  onChange={(e) => handleRgbChange("g", parseInt(e.target.value) || 0)}
+                                  className="font-mono"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <Label htmlFor="color-b" className="text-xs">Blue</Label>
+                                <Input
+                                  id="color-b"
+                                  type="number"
+                                  min="0"
+                                  max="255"
+                                  value={rgbColor.b}
+                                  onChange={(e) => handleRgbChange("b", parseInt(e.target.value) || 0)}
+                                  className="font-mono"
+                                />
                               </div>
                             </div>
-                            <CardContent className="pt-4">
-                              <div className="flex flex-col space-y-2">
-                                <div className="flex justify-between items-center">
-                                  <span className="text-sm">RGB</span>
-                                  <span className="text-xs font-mono">
-                                    ({color.rgb.r}, {color.rgb.g}, {color.rgb.b})
-                                  </span>
-                                </div>
-                                <div className="flex justify-between items-center">
-                                  <span className="text-sm">HSL</span>
-                                  <span className="text-xs font-mono">
-                                    ({color.hsl.h}°, {color.hsl.s}%, {color.hsl.l}%)
-                                  </span>
-                                </div>
-                                <div className="flex justify-end space-x-2 pt-2">
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => {
-                                      setCurrentColor(color.hex);
-                                      setActiveTab("picker");
-                                    }}
-                                  >
-                                    Edit
-                                  </Button>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => copyToClipboard(color.hex)}
-                                  >
-                                    <Copy className="h-3 w-3 mr-2" />
-                                    Copy
-                                  </Button>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => removeColor(color.id)}
-                                  >
-                                    <Trash className="h-3 w-3 mr-2" />
-                                    Delete
-                                  </Button>
-                                </div>
+                            <div className="flex justify-end">
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => copyToClipboard(`rgb(${rgbColor.r}, ${rgbColor.g}, ${rgbColor.b})`, "rgb")}
+                              >
+                                {copied === `rgb(${rgbColor.r}, ${rgbColor.g}, ${rgbColor.b})` ? (
+                                  <Check className="h-4 w-4 mr-2 text-green-500" />
+                                ) : (
+                                  <Copy className="h-4 w-4 mr-2" />
+                                )}
+                                Copy RGB
+                              </Button>
+                            </div>
+                          </div>
+                          
+                          {/* HSL Color Input */}
+                          <div className="space-y-2">
+                            <Label>HSL Color</Label>
+                            <div className="grid grid-cols-3 gap-2">
+                              <div className="space-y-1">
+                                <Label htmlFor="color-h" className="text-xs">Hue</Label>
+                                <Input
+                                  id="color-h"
+                                  type="number"
+                                  min="0"
+                                  max="360"
+                                  value={hslColor.h}
+                                  onChange={(e) => handleHslChange("h", parseInt(e.target.value) || 0)}
+                                  className="font-mono"
+                                />
                               </div>
-                            </CardContent>
-                          </Card>
-                        </motion.div>
-                      ))}
-                    </div>
-                  ) : (
-                    <Card>
-                      <CardContent className="text-center py-12">
-                        <h3 className="text-lg font-medium mb-2">No saved colors yet</h3>
-                        <p className="text-muted-foreground mb-4">
-                          Select colors in the picker tab and save them to your collection
-                        </p>
-                        <Button onClick={() => setActiveTab("picker")}>
-                          Go to Color Picker
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  )}
+                              <div className="space-y-1">
+                                <Label htmlFor="color-s" className="text-xs">Saturation</Label>
+                                <Input
+                                  id="color-s"
+                                  type="number"
+                                  min="0"
+                                  max="100"
+                                  value={hslColor.s}
+                                  onChange={(e) => handleHslChange("s", parseInt(e.target.value) || 0)}
+                                  className="font-mono"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <Label htmlFor="color-l" className="text-xs">Lightness</Label>
+                                <Input
+                                  id="color-l"
+                                  type="number"
+                                  min="0"
+                                  max="100"
+                                  value={hslColor.l}
+                                  onChange={(e) => handleHslChange("l", parseInt(e.target.value) || 0)}
+                                  className="font-mono"
+                                />
+                              </div>
+                            </div>
+                            <div className="flex justify-end">
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => copyToClipboard(`hsl(${hslColor.h}, ${hslColor.s}%, ${hslColor.l}%)`, "hsl")}
+                              >
+                                {copied === `hsl(${hslColor.h}, ${hslColor.s}%, ${hslColor.l}%)` ? (
+                                  <Check className="h-4 w-4 mr-2 text-green-500" />
+                                ) : (
+                                  <Copy className="h-4 w-4 mr-2" />
+                                )}
+                                Copy HSL
+                              </Button>
+                            </div>
+                          </div>
+                          
+                          {/* Action Buttons */}
+                          <div className="flex flex-wrap gap-2 pt-2">
+                            <Button 
+                              variant="outline" 
+                              onClick={randomizeColor}
+                            >
+                              <Shuffle className="h-4 w-4 mr-2" />
+                              Random Color
+                            </Button>
+                            
+                            <Button 
+                              onClick={saveCurrentColor}
+                              variant="default"
+                            >
+                              <Save className="h-4 w-4 mr-2" />
+                              Save Color
+                            </Button>
+                            
+                            {/* Show EyeDropper only if browser supports it */}
+                            {typeof window !== 'undefined' && 'EyeDropper' in window && (
+                              <Button
+                                variant="outline"
+                                onClick={useEyeDropper}
+                              >
+                                <Pipette className="h-4 w-4 mr-2" />
+                                Pick from Screen
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Saved Colors */}
+                      <div className="space-y-3">
+                        <h3 className="text-lg font-medium">Saved Colors</h3>
+                        
+                        {savedColors.length > 0 ? (
+                          <div className="flex flex-wrap gap-2">
+                            {savedColors.map((color, index) => (
+                              <div 
+                                key={index} 
+                                className="group relative"
+                              >
+                                <button
+                                  type="button"
+                                  className="w-10 h-10 rounded-md border border-border transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                                  style={{ backgroundColor: color }}
+                                  onClick={() => setHexColor(color)}
+                                  title={color}
+                                />
+                                <button
+                                  type="button"
+                                  className="absolute -top-2 -right-2 bg-background text-red-500 rounded-full p-0.5 border border-border opacity-0 group-hover:opacity-100 transition-opacity"
+                                  onClick={() => removeSavedColor(color)}
+                                >
+                                  <Trash className="h-3 w-3" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-muted-foreground text-sm">
+                            No colors saved yet. Click "Save Color" to add colors to your collection.
+                          </p>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+                
+                <TabsContent value="palette" className="space-y-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Palette Generator</CardTitle>
+                      <CardDescription>
+                        Create harmonious color palettes based on color theory
+                      </CardDescription>
+                    </CardHeader>
+                    
+                    <CardContent className="space-y-6">
+                      {/* Base Color Selection */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="space-y-2">
+                          <Label htmlFor="base-color">Base Color</Label>
+                          <div className="flex space-x-2">
+                            <Input
+                              id="base-color"
+                              value={hexColor}
+                              onChange={handleHexChange}
+                              className="font-mono"
+                            />
+                            <div 
+                              className="w-10 h-10 rounded-md border border-border"
+                              style={{ backgroundColor: hexColor }}
+                            />
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="palette-type">Palette Type</Label>
+                          <select
+                            id="palette-type"
+                            value={paletteType}
+                            onChange={(e) => setPaletteType(e.target.value)}
+                            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                          >
+                            <option value="analogous">Analogous</option>
+                            <option value="monochromatic">Monochromatic</option>
+                            <option value="triadic">Triadic</option>
+                          </select>
+                        </div>
+                        
+                        {paletteType !== "triadic" && (
+                          <div className="space-y-2">
+                            <div className="flex justify-between">
+                              <Label htmlFor="palette-count">Number of Colors</Label>
+                              <span className="text-sm text-muted-foreground">{paletteCount}</span>
+                            </div>
+                            <Slider
+                              id="palette-count"
+                              min={3}
+                              max={9}
+                              step={1}
+                              value={[paletteCount]}
+                              onValueChange={(value) => setPaletteCount(value[0])}
+                            />
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Color Palette Display */}
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center">
+                          <h3 className="text-lg font-medium">
+                            {paletteType === "analogous" ? "Analogous" : 
+                             paletteType === "monochromatic" ? "Monochromatic" : 
+                             "Triadic"} Palette
+                          </h3>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={downloadPalette}
+                          >
+                            <Download className="h-4 w-4 mr-2" />
+                            Download
+                          </Button>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+                          {palette.map((color, index) => (
+                            <div 
+                              key={index}
+                              className="relative group aspect-square p-4 rounded-md shadow-sm border border-border transition-transform hover:scale-105"
+                              style={{ backgroundColor: color }}
+                            >
+                              <div 
+                                className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/10 rounded-md"
+                              >
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => copyToClipboard(color)}
+                                  className="bg-background/80 hover:bg-background"
+                                >
+                                  <Copy className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => setHexColor(color)}
+                                  className="bg-background/80 hover:bg-background"
+                                >
+                                  <Pipette className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => {
+                                    if (!savedColors.includes(color)) {
+                                      const newSavedColors = [...savedColors, color];
+                                      setSavedColors(newSavedColors);
+                                      localStorage.setItem("savedColors", JSON.stringify(newSavedColors));
+                                    }
+                                  }}
+                                  className="bg-background/80 hover:bg-background"
+                                >
+                                  <Plus className="h-4 w-4" />
+                                </Button>
+                              </div>
+                              <div
+                                className="absolute bottom-2 left-2 text-xs font-mono"
+                                style={{ color: getContrastColor(color) }}
+                              >
+                                {color}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      {/* Color Harmonies */}
+                      <div className="space-y-4">
+                        <h3 className="text-lg font-medium">Other Color Harmonies</h3>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {/* Complementary Color */}
+                          <div className="space-y-2">
+                            <Label>Complementary Color</Label>
+                            <div className="flex">
+                              <div
+                                className="w-1/2 h-16 flex items-center justify-center"
+                                style={{ backgroundColor: hexColor, color: getContrastColor(hexColor) }}
+                              >
+                                <span className="text-sm font-mono">{hexColor}</span>
+                              </div>
+                              <div
+                                className="w-1/2 h-16 flex items-center justify-center"
+                                style={{ 
+                                  backgroundColor: getComplementaryColor(hexColor), 
+                                  color: getContrastColor(getComplementaryColor(hexColor)) 
+                                }}
+                              >
+                                <span className="text-sm font-mono">{getComplementaryColor(hexColor)}</span>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Monochromatic Shades */}
+                          <div className="space-y-2">
+                            <Label>Lightness Variations</Label>
+                            <div className="flex">
+                              {generateMonochromaticPalette(hexColor, 5).map((color, index) => (
+                                <div
+                                  key={index}
+                                  className="flex-1 h-16"
+                                  style={{ backgroundColor: color }}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </TabsContent>
               </Tabs>
-            </motion.div>
-
-            <motion.div
-              className="max-w-3xl mx-auto mt-12 bg-muted/50 p-6 rounded-lg"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-            >
-              <h2 className="text-xl font-bold mb-4">Color Theory Guide</h2>
-              <p className="mb-4 text-muted-foreground">
-                Understanding color theory helps create visually appealing designs. Here are some common color harmonies:
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <h3 className="font-medium">Analogous</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Colors that are adjacent to each other on the color wheel, creating a harmonious and cohesive look.
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <h3 className="font-medium">Complementary</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Colors opposite each other on the color wheel, creating a high-contrast, vibrant look.
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <h3 className="font-medium">Monochromatic</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Different shades, tones, and tints of a single color, creating a subtle and elegant look.
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <h3 className="font-medium">Triadic</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Three colors evenly spaced around the color wheel, creating a balanced yet vibrant look.
-                  </p>
-                </div>
-              </div>
             </motion.div>
           </Container>
         </section>
