@@ -118,45 +118,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Download files API
   app.get("/api/downloads/ets2", async (req, res) => {
     try {
-      // Get version from query parameter, default to 'v1.53.x'
-      const version = req.query.version as string || 'v1.53.x';
+      // Fetch the ETS2 mods data
+      const apiResponse = await fetch('https://mailobedo.nl/files/');
       
-      // Fetch the ETS2 mods from mailobedo.nl
-      const response = await fetch('https://mailobedo.nl/files/');
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch mods: ${response.status} ${response.statusText}`);
+      if (!apiResponse.ok) {
+        throw new Error(`Failed to fetch mods: ${apiResponse.status} ${apiResponse.statusText}`);
       }
       
-      const data = await response.json();
+      const apiData = await apiResponse.json();
       
       // Check if we have the new format with Euro_Truck_Simulator_2 key
-      if (!data.Euro_Truck_Simulator_2 || !Array.isArray(data.Euro_Truck_Simulator_2)) {
+      if (!apiData.Euro_Truck_Simulator_2 || !Array.isArray(apiData.Euro_Truck_Simulator_2)) {
         throw new Error('Invalid data format received from API');
       }
       
       // Extract available versions from the URLs
-      const availableVersions = new Set<string>();
-      data.Euro_Truck_Simulator_2.forEach((file: any) => {
+      const ets2VersionsSet = new Set<string>();
+      apiData.Euro_Truck_Simulator_2.forEach((file: any) => {
         if (file.url) {
           const urlParts = file.url.split('/');
           // Look for version pattern in the URL (e.g., v1.53.x)
           for (let i = 0; i < urlParts.length; i++) {
             if (/^v\d+\.\d+\.x$/i.test(urlParts[i])) {
-              availableVersions.add(urlParts[i].toLowerCase());
+              ets2VersionsSet.add(urlParts[i].toLowerCase());
               break;
             }
           }
         }
       });
       
+      // Sort versions and get the latest one
+      const sortedEts2Versions = Array.from(ets2VersionsSet).sort().reverse();
+      const latestEts2Version = sortedEts2Versions.length > 0 ? sortedEts2Versions[0] : 'v1.53.x';
+      
+      // Get version from query parameter or use latest version as default
+      const selectedVersion = req.query.version as string || latestEts2Version;
+      
       // Filter files by selected version
-      const filteredFiles = data.Euro_Truck_Simulator_2.filter((file: any) => {
-        return file.url && file.url.toLowerCase().includes(version.toLowerCase());
+      const ets2Files = apiData.Euro_Truck_Simulator_2.filter((file: any) => {
+        return file.url && file.url.toLowerCase().includes(selectedVersion.toLowerCase());
       });
       
       // Process the files to create a proper response
-      const processedFiles = filteredFiles.map((file: any, index: number) => {
+      const processedEts2Files = ets2Files.map((file: any, index: number) => {
         // Extract filename from file object
         const filename = file.name || '';
         const cleanFilename = filename.replace('.scs', '').replace('.zip', '');
@@ -194,7 +198,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return {
           id: `ets2-${index}`,
           name: name,
-          description: `${fileType} for Euro Truck Simulator 2 ${version}`,
+          description: `${fileType} for Euro Truck Simulator 2 ${selectedVersion}`,
           fileSize: fileSize,
           version: filename.match(/v[0-9.]+/)?.[0] || 'Latest',
           uploadDate: "2025-03-01", // Placeholder date
@@ -208,9 +212,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Return versions along with the files
       res.json({
-        versions: Array.from(availableVersions).sort().reverse(),
-        currentVersion: version,
-        files: processedFiles
+        versions: sortedEts2Versions,
+        currentVersion: selectedVersion,
+        files: processedEts2Files
       });
     } catch (error) {
       console.error("Error fetching ETS2 mods:", error);
@@ -221,24 +225,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // American Truck Simulator downloads API endpoint
   app.get("/api/downloads/ats", async (req, res) => {
     try {
-      // Get version from query parameter, default to 'v1.53.x'
-      const version = req.query.version as string || 'v1.53.x';
+      // Fetch the ATS mods data
+      const apiResponse = await fetch('https://mailobedo.nl/files/');
       
-      // Fetch the ATS mods from mailobedo.nl
-      const response = await fetch('https://mailobedo.nl/files/');
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch mods: ${response.status} ${response.statusText}`);
+      if (!apiResponse.ok) {
+        throw new Error(`Failed to fetch mods: ${apiResponse.status} ${apiResponse.statusText}`);
       }
       
-      const data = await response.json();
+      const apiData = await apiResponse.json();
       
       // Check if we have the American_Truck_Simulator key
-      if (!data.American_Truck_Simulator || !Array.isArray(data.American_Truck_Simulator)) {
+      if (!apiData.American_Truck_Simulator || !Array.isArray(apiData.American_Truck_Simulator)) {
         // If there's no ATS specific key, try to find files that might be for ATS
         // in the general collection or under a different key
         
-        const allFiles = data.Euro_Truck_Simulator_2 || [];
+        const allFiles = apiData.Euro_Truck_Simulator_2 || [];
+        
+        // Extract available versions from the URLs
+        const atsVersionsSet = new Set<string>();
+        allFiles.forEach((file: any) => {
+          if (file.url) {
+            const urlParts = file.url.split('/');
+            for (let i = 0; i < urlParts.length; i++) {
+              if (/^v\d+\.\d+\.x$/i.test(urlParts[i])) {
+                atsVersionsSet.add(urlParts[i].toLowerCase());
+                break;
+              }
+            }
+          }
+        });
+        
+        // Sort versions and get the latest one
+        const sortedAtsVersions = Array.from(atsVersionsSet).sort().reverse();
+        const latestAtsVersion = sortedAtsVersions.length > 0 ? sortedAtsVersions[0] : 'v1.53.x';
+        
+        // Get version from query parameter or use latest version as default
+        const selectedVersion = req.query.version as string || latestAtsVersion;
         
         // For now, we'll filter ETS2 files that might be compatible with ATS
         // based on common patterns (this is a fallback when no specific ATS files exist)
@@ -250,8 +272,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
                  filename.includes('north america');
         });
         
-        // Process the files similar to ETS2
-        const processedFiles = atsCompatibleFiles.map((file: any, index: number) => {
+        // Process the files for ATS
+        const processedAtsFiles = atsCompatibleFiles.map((file: any, index: number) => {
           const filename = file.name || '';
           const cleanFilename = filename.replace('.scs', '').replace('.zip', '');
           
@@ -283,7 +305,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return {
             id: `ats-${index}`,
             name: name.replace('Ets2', 'ATS'),
-            description: `${fileType} for American Truck Simulator ${version}`,
+            description: `${fileType} for American Truck Simulator ${selectedVersion}`,
             fileSize: fileSize,
             version: filename.match(/v[0-9.]+/)?.[0] || 'Latest',
             uploadDate: "2025-03-01", // Placeholder date
@@ -295,46 +317,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
           };
         });
         
-        // Return available versions (using same as ETS2 if needed)
-        const availableVersions = new Set<string>();
-        allFiles.forEach((file: any) => {
-          if (file.url) {
-            const urlParts = file.url.split('/');
-            for (let i = 0; i < urlParts.length; i++) {
-              if (/^v\d+\.\d+\.x$/i.test(urlParts[i])) {
-                availableVersions.add(urlParts[i].toLowerCase());
-                break;
-              }
-            }
-          }
-        });
-        
         return res.json({
-          versions: Array.from(availableVersions).sort().reverse(),
-          currentVersion: version,
-          files: processedFiles
+          versions: sortedAtsVersions,
+          currentVersion: selectedVersion,
+          files: processedAtsFiles
         });
       }
       
-      // If we have specific ATS files, process them similar to ETS2
-      const availableVersions = new Set<string>();
-      data.American_Truck_Simulator.forEach((file: any) => {
+      // If we have specific ATS files, process them
+      const atsVersionsSet = new Set<string>();
+      apiData.American_Truck_Simulator.forEach((file: any) => {
         if (file.url) {
           const urlParts = file.url.split('/');
           for (let i = 0; i < urlParts.length; i++) {
             if (/^v\d+\.\d+\.x$/i.test(urlParts[i])) {
-              availableVersions.add(urlParts[i].toLowerCase());
+              atsVersionsSet.add(urlParts[i].toLowerCase());
               break;
             }
           }
         }
       });
       
-      const filteredFiles = data.American_Truck_Simulator.filter((file: any) => {
-        return file.url && file.url.toLowerCase().includes(version.toLowerCase());
+      // Sort versions and get the latest one
+      const sortedAtsVersions = Array.from(atsVersionsSet).sort().reverse();
+      const latestAtsVersion = sortedAtsVersions.length > 0 ? sortedAtsVersions[0] : 'v1.53.x';
+      
+      // Get version from query parameter or use latest version as default
+      const selectedVersion = req.query.version as string || latestAtsVersion;
+      
+      const atsFiles = apiData.American_Truck_Simulator.filter((file: any) => {
+        return file.url && file.url.toLowerCase().includes(selectedVersion.toLowerCase());
       });
       
-      const processedFiles = filteredFiles.map((file: any, index: number) => {
+      const processedAtsFiles = atsFiles.map((file: any, index: number) => {
         const filename = file.name || '';
         const cleanFilename = filename.replace('.scs', '').replace('.zip', '');
         
@@ -366,7 +381,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return {
           id: `ats-${index}`,
           name: name,
-          description: `${fileType} for American Truck Simulator ${version}`,
+          description: `${fileType} for American Truck Simulator ${selectedVersion}`,
           fileSize: fileSize,
           version: filename.match(/v[0-9.]+/)?.[0] || 'Latest',
           uploadDate: "2025-03-01", // Placeholder date
@@ -379,9 +394,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       res.json({
-        versions: Array.from(availableVersions).sort().reverse(),
-        currentVersion: version,
-        files: processedFiles
+        versions: sortedAtsVersions,
+        currentVersion: selectedVersion,
+        files: processedAtsFiles
       });
     } catch (error) {
       console.error("Error fetching ATS mods:", error);
