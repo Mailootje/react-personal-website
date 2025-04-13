@@ -210,7 +210,7 @@ export default function SchoolPitch() {
               <p className="text-xl text-gray-400 max-w-3xl mx-auto mb-10">
                 {slide.subtitle}
               </p>
-              <slide.icon className="text-primary text-6xl mx-auto mb-8" />
+              {slide.icon && <slide.icon className="text-primary text-6xl mx-auto mb-8" />}
               <div className="text-gray-400 text-lg">
                 Gebruik de pijltjestoetsen of knoppen onderaan om te navigeren
               </div>
@@ -222,7 +222,7 @@ export default function SchoolPitch() {
         return (
           <div className="h-full flex flex-col justify-center py-16">
             <div className="flex items-center mb-10">
-              <slide.icon className="text-primary text-5xl mr-5" />
+              {slide.icon && <slide.icon className="text-primary text-5xl mr-5" />}
               <h2 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
                 {slide.title}
               </h2>
@@ -233,7 +233,7 @@ export default function SchoolPitch() {
               animate="visible"
               className="space-y-6 text-xl text-gray-300"
             >
-              {slide.content.map((para, idx) => (
+              {slide.content?.map((para, idx) => (
                 <motion.p key={idx} variants={itemVariants}>{para}</motion.p>
               ))}
             </motion.div>
@@ -244,7 +244,7 @@ export default function SchoolPitch() {
         return (
           <div className="h-full flex flex-col justify-center py-16">
             <div className="flex items-center mb-10">
-              <slide.icon className="text-primary text-5xl mr-5" />
+              {slide.icon && <slide.icon className="text-primary text-5xl mr-5" />}
               <h2 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
                 {slide.title}
               </h2>
@@ -255,13 +255,19 @@ export default function SchoolPitch() {
               animate="visible"
               className="space-y-5 text-xl"
             >
-              {slide.listItems.map((item, idx) => (
+              {slide.listItems?.map((item, idx) => (
                 <motion.li key={idx} variants={itemVariants} className="flex items-start">
                   <div className="text-primary text-2xl mr-4">•</div>
                   <div>
-                    <span className="font-bold text-white">{item.title}</span>
-                    <span className="mx-2 text-gray-500">—</span>
-                    <span className="text-gray-300">{item.desc}</span>
+                    {'title' in item ? (
+                      <>
+                        <span className="font-bold text-white">{item.title}</span>
+                        <span className="mx-2 text-gray-500">—</span>
+                        <span className="text-gray-300">{item.desc}</span>
+                      </>
+                    ) : (
+                      <span className="text-gray-300">{item}</span>
+                    )}
                   </div>
                 </motion.li>
               ))}
@@ -273,7 +279,7 @@ export default function SchoolPitch() {
         return (
           <div className="h-full flex flex-col justify-center py-16">
             <div className="flex items-center mb-10">
-              <slide.icon className="text-primary text-5xl mr-5" />
+              {slide.icon && <slide.icon className="text-primary text-5xl mr-5" />}
               <h2 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
                 {slide.title}
               </h2>
@@ -284,7 +290,7 @@ export default function SchoolPitch() {
               animate="visible"
               className="text-xl text-gray-300 mb-6"
             >
-              {slide.content[0]}
+              {slide.content && slide.content[0]}
             </motion.p>
             <motion.ul 
               variants={containerVariants}
@@ -292,10 +298,20 @@ export default function SchoolPitch() {
               animate="visible"
               className="space-y-4 text-xl text-gray-300 pl-5"
             >
-              {slide.listItems.map((item, idx) => (
+              {slide.listItems?.map((item, idx) => (
                 <motion.li key={idx} variants={itemVariants} className="flex items-start">
                   <div className="text-primary text-2xl mr-4">•</div>
-                  <div>{item}</div>
+                  <div>
+                    {'title' in item ? (
+                      <>
+                        <span className="font-bold text-white">{item.title}</span>
+                        <span className="mx-2 text-gray-500">—</span>
+                        <span className="text-gray-300">{item.desc}</span>
+                      </>
+                    ) : (
+                      <span className="text-gray-300">{item}</span>
+                    )}
+                  </div>
                 </motion.li>
               ))}
             </motion.ul>
@@ -306,7 +322,7 @@ export default function SchoolPitch() {
         return (
           <div className="h-full flex flex-col justify-center py-16">
             <div className="flex items-center mb-10">
-              <slide.icon className="text-primary text-5xl mr-5" />
+              {slide.icon && <slide.icon className="text-primary text-5xl mr-5" />}
               <h2 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
                 {slide.title}
               </h2>
@@ -317,7 +333,7 @@ export default function SchoolPitch() {
               animate="visible"
               className="text-xl text-gray-300 mb-6"
             >
-              {slide.content[0]}
+              {slide.content && slide.content[0]}
             </motion.p>
             <motion.ul 
               variants={containerVariants}
@@ -325,13 +341,19 @@ export default function SchoolPitch() {
               animate="visible"
               className="space-y-4 text-xl mb-6"
             >
-              {slide.listItems.map((item, idx) => (
+              {slide.listItems?.map((item, idx) => (
                 <motion.li key={idx} variants={itemVariants} className="flex items-start">
                   <div className="text-primary text-2xl mr-4">•</div>
                   <div>
-                    <span className="font-bold text-white">{item.title}</span>
-                    <span className="mx-2 text-gray-500">—</span>
-                    <span className="text-gray-300">{item.desc}</span>
+                    {'title' in item ? (
+                      <>
+                        <span className="font-bold text-white">{item.title}</span>
+                        <span className="mx-2 text-gray-500">—</span>
+                        <span className="text-gray-300">{item.desc}</span>
+                      </>
+                    ) : (
+                      <span className="text-gray-300">{item}</span>
+                    )}
                   </div>
                 </motion.li>
               ))}
@@ -352,7 +374,7 @@ export default function SchoolPitch() {
         return (
           <div className="h-full flex flex-col justify-center py-16">
             <div className="flex items-center mb-10">
-              <slide.icon className="text-primary text-5xl mr-5" />
+              {slide.icon && <slide.icon className="text-primary text-5xl mr-5" />}
               <h2 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
                 {slide.title}
               </h2>
@@ -363,7 +385,7 @@ export default function SchoolPitch() {
               animate="visible"
               className="text-xl text-gray-300 mb-8"
             >
-              {slide.content[0]}
+              {slide.content && slide.content[0]}
             </motion.p>
             <motion.div 
               variants={containerVariants}
@@ -371,7 +393,7 @@ export default function SchoolPitch() {
               animate="visible"
               className="grid grid-cols-1 gap-8 mb-8"
             >
-              {slide.options.map((option, idx) => (
+              {slide.options?.map((option, idx) => (
                 <motion.div 
                   key={idx} 
                   variants={itemVariants}
@@ -398,7 +420,7 @@ export default function SchoolPitch() {
         return (
           <div className="h-full flex flex-col justify-center py-16">
             <div className="flex items-center mb-10">
-              <slide.icon className="text-primary text-5xl mr-5" />
+              {slide.icon && <slide.icon className="text-primary text-5xl mr-5" />}
               <h2 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
                 {slide.title}
               </h2>
@@ -408,7 +430,7 @@ export default function SchoolPitch() {
               <div>
                 <h3 className="text-2xl font-semibold mb-5 text-white">Programmeertalen</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {slide.langs.map((lang, i) => (
+                  {slide.langs?.map((lang, i) => (
                     <motion.div 
                       key={lang}
                       initial={{ opacity: 0, y: 20 }}
@@ -425,12 +447,12 @@ export default function SchoolPitch() {
               <div>
                 <h3 className="text-2xl font-semibold mb-5 text-white">Frameworks & Tools</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {slide.tools.map((tool, i) => (
+                  {slide.tools?.map((tool, i) => (
                     <motion.div 
                       key={tool}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.4, delay: 0.1 * (i + slide.langs.length) }}
+                      transition={{ duration: 0.4, delay: 0.1 * (i + (slide.langs?.length || 0)) }}
                       className="flex flex-col items-center justify-center p-5 bg-gradient-to-b from-gray-900 to-black rounded-lg border border-gray-800"
                     >
                       <div className="text-2xl font-semibold mb-1 text-white">{tool}</div>
@@ -454,7 +476,7 @@ export default function SchoolPitch() {
                 {slide.title}
               </h2>
               <p className="text-2xl text-gray-300 max-w-3xl mx-auto mb-16">
-                {slide.content[0]}
+                {slide.content && slide.content[0]}
               </p>
               <div className="inline-block px-8 py-4 rounded-full bg-primary/20 border border-primary/50 text-primary text-xl">
                 {slide.footer}
@@ -473,9 +495,51 @@ export default function SchoolPitch() {
       <Header />
       <VideoBackground opacity={0.15} />
       
-      <main className="flex-grow min-h-[80vh] flex flex-col relative z-10">
-        <Container maxWidth="xl" className="flex-grow flex flex-col">
-          <div className="flex-grow flex flex-col relative overflow-hidden">
+      <main className="flex-grow pt-24 pb-16 flex flex-col relative z-10">
+        <Container maxWidth="xl" className="flex-grow flex flex-col my-4">
+          {/* PowerPoint style controls for desktop - top position */}
+          <div className="hidden md:flex justify-between items-center mb-4 px-4">
+            <div className="flex items-center space-x-3">
+              <Button 
+                variant="outline" 
+                onClick={handlePrev}
+                disabled={currentSlide === 0} 
+                className="bg-gray-900/80 border-gray-700 hover:bg-gray-800 text-white"
+              >
+                <FaChevronLeft className="h-4 w-4 mr-1" /> Previous
+              </Button>
+              
+              <span className="text-sm text-gray-400 font-medium">
+                Slide {currentSlide + 1} / {slides.length}
+              </span>
+              
+              <Button 
+                variant="outline" 
+                onClick={handleNext}
+                disabled={currentSlide === slides.length - 1} 
+                className="bg-gray-900/80 border-gray-700 hover:bg-gray-800 text-white"
+              >
+                Next <FaChevronRight className="h-4 w-4 ml-1" />
+              </Button>
+            </div>
+            
+            <div className="flex">
+              {slides.map((_, idx) => (
+                <div 
+                  key={idx}
+                  className={`w-3 h-3 mx-1 rounded-full cursor-pointer ${
+                    idx === currentSlide ? 'bg-primary' : 'bg-gray-600'
+                  }`}
+                  onClick={() => {
+                    setDirection(idx > currentSlide ? 1 : -1);
+                    setCurrentSlide(idx);
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+          
+          <div className="flex-grow flex flex-col relative">
             {/* Large Mobile Navigation Buttons (Absolute Positioned) */}
             <div className="absolute inset-y-0 left-0 z-20 flex items-center px-1">
               <Button 
@@ -483,7 +547,7 @@ export default function SchoolPitch() {
                 size="lg"
                 onClick={handlePrev}
                 disabled={currentSlide === 0} 
-                className="h-12 w-12 rounded-full bg-black/60 border-gray-700 hover:bg-gray-800 text-white md:hidden"
+                className="h-12 w-12 rounded-full bg-black/70 border-gray-700 hover:bg-gray-800 text-white md:hidden shadow-lg"
               >
                 <FaChevronLeft className="h-5 w-5" />
               </Button>
@@ -495,7 +559,7 @@ export default function SchoolPitch() {
                 size="lg"
                 onClick={handleNext}
                 disabled={currentSlide === slides.length - 1} 
-                className="h-12 w-12 rounded-full bg-black/60 border-gray-700 hover:bg-gray-800 text-white md:hidden"
+                className="h-12 w-12 rounded-full bg-black/70 border-gray-700 hover:bg-gray-800 text-white md:hidden shadow-lg"
               >
                 <FaChevronRight className="h-5 w-5" />
               </Button>
@@ -514,43 +578,19 @@ export default function SchoolPitch() {
                   x: { type: "spring", stiffness: 300, damping: 30 },
                   opacity: { duration: 0.2 }
                 }}
-                className="absolute inset-0 w-full h-full"
+                className="w-full h-full flex-grow"
               >
-                <Card className="w-full h-full bg-gray-900/60 backdrop-blur-sm border-gray-800">
-                  <CardContent className="p-6 md:p-10 h-full">
+                <Card className="w-full h-full bg-gray-900/60 backdrop-blur-sm border-gray-800 overflow-y-auto">
+                  <CardContent className="p-5 md:p-10 h-full flex flex-col justify-center">
                     {renderSlideContent(slides[currentSlide])}
                   </CardContent>
                 </Card>
               </motion.div>
             </AnimatePresence>
 
-            {/* PowerPoint style navigation */}
-            <div className="flex flex-col sm:flex-row justify-between items-center mt-6 mb-4 px-4 gap-4">
-              <div className="flex items-center space-x-2 order-2 sm:order-1">
-                <Button 
-                  variant="outline" 
-                  size="icon" 
-                  onClick={handlePrev}
-                  disabled={currentSlide === 0} 
-                  className="bg-gray-900/80 border-gray-700 hover:bg-gray-800 text-white hidden md:flex"
-                >
-                  <FaChevronLeft className="h-4 w-4" />
-                </Button>
-                <span className="text-sm text-gray-400">
-                  Slide {currentSlide + 1} / {slides.length}
-                </span>
-                <Button 
-                  variant="outline" 
-                  size="icon" 
-                  onClick={handleNext}
-                  disabled={currentSlide === slides.length - 1} 
-                  className="bg-gray-900/80 border-gray-700 hover:bg-gray-800 text-white hidden md:flex"
-                >
-                  <FaChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
-              
-              <div className="flex order-1 sm:order-2">
+            {/* Mobile navigation indicators (bottom) */}
+            <div className="md:hidden flex justify-center items-center mt-6 mb-2 px-4">
+              <div className="flex">
                 {slides.map((_, idx) => (
                   <div 
                     key={idx}
