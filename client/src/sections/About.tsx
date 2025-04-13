@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 
 export function About() {
   return (
-    <section id="about" className="py-20 px-6 bg-black/80">
+    <section id="about" className="py-20 px-6 bg-black/70 backdrop-blur-sm">
       <Container maxWidth="5xl">
         <SectionHeading subtitle="About Me" title="My Background" isDark={true} />
 

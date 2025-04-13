@@ -7,7 +7,7 @@ import { staggerContainer } from "@/lib/utils";
 
 export function Projects() {
   return (
-    <section id="projects" className="py-20 px-6 bg-black/80">
+    <section id="projects" className="py-20 px-6 bg-black/70 backdrop-blur-sm">
       <Container maxWidth="6xl">
         <SectionHeading subtitle="My Work" title="Recent Projects" isDark={true} />
         

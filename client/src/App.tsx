@@ -3,7 +3,7 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { DarkModeProvider } from "@/components/DarkModeProvider";
-import { BackgroundVideoProvider } from "@/components/BackgroundVideoProvider";
+import { GlobalVideoBackground } from "@/components/GlobalVideoBackground";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import Photography from "@/pages/Photography";
@@ -48,10 +48,12 @@ function App() {
   return (
     <DarkModeProvider>
       <QueryClientProvider client={queryClient}>
-        <BackgroundVideoProvider opacity={0.15}>
+        {/* Add the global video background once at the root */}
+        <GlobalVideoBackground />
+        <div className="relative min-h-screen z-10">
           <Router />
           <Toaster />
-        </BackgroundVideoProvider>
+        </div>
       </QueryClientProvider>
     </DarkModeProvider>
   );

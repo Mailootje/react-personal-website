@@ -1,7 +1,4 @@
 import React, { useEffect, useRef } from "react";
-// Import videos directly
-import webmVideo from "@assets/videoplayback.webm";
-import mp4Video from "@assets/videoplayback.mp4";
 
 interface BackgroundVideoProviderProps {
   children: React.ReactNode;
@@ -18,10 +15,36 @@ export function BackgroundVideoProvider({
     // Ensure video is muted to allow autoplay
     if (videoRef.current) {
       videoRef.current.muted = true;
+      videoRef.current.defaultMuted = true;
+      
       // Force video to play
-      videoRef.current.play().catch(err => {
-        console.error("Error playing video:", err);
-      });
+      const playVideo = () => {
+        if (videoRef.current) {
+          videoRef.current.play().catch(err => {
+            console.error("Error playing video:", err);
+          });
+        }
+      };
+
+      playVideo();
+      
+      // Try playing again after a delay just in case
+      setTimeout(playVideo, 1000);
+      
+      // Also try to play on user interaction
+      const handleInteraction = () => {
+        playVideo();
+        window.removeEventListener('click', handleInteraction);
+        window.removeEventListener('touchstart', handleInteraction);
+      };
+      
+      window.addEventListener('click', handleInteraction);
+      window.addEventListener('touchstart', handleInteraction);
+      
+      return () => {
+        window.removeEventListener('click', handleInteraction);
+        window.removeEventListener('touchstart', handleInteraction);
+      };
     }
   }, []);
 
@@ -35,11 +58,12 @@ export function BackgroundVideoProvider({
           loop
           muted
           playsInline
+          preload="auto"
           className="absolute inset-0 object-cover w-full h-full"
           style={{ opacity }}
         >
-          <source src={webmVideo} type="video/webm" />
-          <source src={mp4Video} type="video/mp4" />
+          <source src="/assets/videos/videoplayback.webm" type="video/webm" />
+          <source src="/assets/videos/videoplayback.mp4" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
       </div>

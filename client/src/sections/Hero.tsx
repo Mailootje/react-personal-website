@@ -17,7 +17,7 @@ export function Hero() {
   return (
     <section
       id="hero"
-      className="min-h-screen flex items-center pt-16 pb-20 px-6 bg-black/80"
+      className="min-h-screen flex items-center pt-16 pb-20 px-6 bg-black/70 backdrop-blur-sm"
     >
       <Container maxWidth="6xl">
         <div className="grid md:grid-cols-2 gap-12 items-center">

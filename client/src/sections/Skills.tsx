@@ -6,7 +6,7 @@ import { staggerContainer } from "@/lib/utils";
 
 export function Skills() {
   return (
-    <section id="skills" className="py-20 px-6 bg-black/70">
+    <section id="skills" className="py-20 px-6 bg-black/70 backdrop-blur-sm">
       <Container maxWidth="5xl">
         <SectionHeading subtitle="My Skills" title="Technical Expertise" isDark={true} />
         

@@ -7,7 +7,7 @@ import { staggerContainer } from "@/lib/utils";
 
 export function Resume() {
   return (
-    <section id="resume" className="py-20 px-6 bg-black/70">
+    <section id="resume" className="py-20 px-6 bg-black/70 backdrop-blur-sm">
       <Container maxWidth="5xl">
         <SectionHeading subtitle="My Resume" title="Experience & Education" isDark={true} />
         
