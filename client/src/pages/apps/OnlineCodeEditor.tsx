@@ -608,25 +608,8 @@ MIT
     }
   }, []);
   
-  // Initialize with a welcome file only if it's the first run
-  const [hasInitializedFileSystem, setHasInitializedFileSystem] = useState(false);
-  
-  // Setup event listeners for browser shortcuts
+  // Initialize with a welcome file
   useEffect(() => {
-    // Add event listener to prevent browser shortcuts
-    document.addEventListener('keydown', preventBrowserShortcuts);
-    
-    // Clean up event listener when component unmounts
-    return () => {
-      document.removeEventListener('keydown', preventBrowserShortcuts);
-    };
-  }, [preventBrowserShortcuts]);
-  
-  // Create welcome file only on first run (after checking for stored data)
-  const createWelcomeFile = useCallback(() => {
-    if (hasInitializedFileSystem) return;
-    
-    console.log("Creating welcome file for new workspace");
     const welcomeId = generateId();
     const initialFileSystem: FileSystemState = {
       items: {
@@ -661,8 +644,15 @@ console.log("Let's start coding with more storage!");`,
     }]);
     setCurrentContent(initialFileSystem.items[welcomeId].content || '');
     setCurrentLanguage('javascript');
-    setHasInitializedFileSystem(true);
-  }, [hasInitializedFileSystem]);
+    
+    // Add event listener to prevent browser shortcuts
+    document.addEventListener('keydown', preventBrowserShortcuts);
+    
+    // Clean up event listener when component unmounts
+    return () => {
+      document.removeEventListener('keydown', preventBrowserShortcuts);
+    };
+  }, [preventBrowserShortcuts]);
 
   // Handle file/folder tree rendering
   const renderFileSystemItem = (itemId: string, depth: number = 0) => {
@@ -2517,24 +2507,6 @@ console.log("Let's start coding with more storage!");`,
         // Create transaction to read data
         const transaction = db.transaction(['fileSystem', 'tabs', 'options', 'meta'], 'readonly');
         
-        // Get file system and tabs data together to ensure proper sync
-        let loadedFileSystem: FileSystemState | null = null;
-        let loadedTabs: EditorTab[] | null = null;
-
-        // Function to set current content once both fileSystem and tabs are loaded
-        const setContentFromActiveTab = () => {
-          if (loadedFileSystem && loadedTabs) {
-            console.log("Both fileSystem and tabs loaded, setting active content");
-            const activeTab = loadedTabs.find(tab => tab.isActive);
-            if (activeTab && loadedFileSystem.items[activeTab.fileId]) {
-              const file = loadedFileSystem.items[activeTab.fileId];
-              console.log("Setting content from file:", file.name, "content length:", file.content?.length || 0);
-              setCurrentContent(file.content || '');
-              setCurrentLanguage(file.language || 'plaintext');
-            }
-          }
-        };
-        
         // Get file system data
         const fileSystemRequest = transaction.objectStore('fileSystem').get(name);
         
@@ -2542,9 +2514,7 @@ console.log("Let's start coding with more storage!");`,
           const result = fileSystemRequest.result;
           if (result && result.data) {
             console.log("File system loaded from IndexedDB");
-            loadedFileSystem = result.data;
             setFileSystem(result.data);
-            setContentFromActiveTab(); // Try to set content if tabs already loaded
           } else {
             console.log("No file system data found in IndexedDB for", name);
             
@@ -2552,9 +2522,7 @@ console.log("Let's start coding with more storage!");`,
             const savedFileSystem = localStorage.getItem(`codeEditor_fileSystem_${name}`);
             if (savedFileSystem) {
               console.log("Using file system data from localStorage instead");
-              loadedFileSystem = JSON.parse(savedFileSystem);
-              setFileSystem(loadedFileSystem);
-              setContentFromActiveTab(); // Try to set content if tabs already loaded
+              setFileSystem(JSON.parse(savedFileSystem));
             }
           }
         };
@@ -2566,9 +2534,25 @@ console.log("Let's start coding with more storage!");`,
           const result = tabsRequest.result;
           if (result && result.data) {
             console.log("Tabs loaded from IndexedDB");
-            loadedTabs = result.data;
-            setTabs(loadedTabs);
-            setContentFromActiveTab(); // Try to set content if fileSystem already loaded
+            const parsedTabs = result.data;
+            setTabs(parsedTabs);
+            
+            // Set the content for the active tab
+            const activeTab = parsedTabs.find((tab: EditorTab) => tab.isActive);
+            if (activeTab) {
+              // Wait for file system to be loaded first
+              fileSystemRequest.onsuccess = (event) => {
+                const fsResult = fileSystemRequest.result;
+                if (fsResult && fsResult.data) {
+                  const fileSystem = fsResult.data;
+                  const file = fileSystem.items[activeTab.fileId];
+                  if (file) {
+                    setCurrentContent(file.content || '');
+                    setCurrentLanguage(file.language || 'plaintext');
+                  }
+                }
+              };
+            }
           } else {
             console.log("No tabs data found in IndexedDB for", name);
             
@@ -2576,9 +2560,22 @@ console.log("Let's start coding with more storage!");`,
             const savedTabs = localStorage.getItem(`codeEditor_tabs_${name}`);
             if (savedTabs) {
               console.log("Using tabs data from localStorage instead");
-              loadedTabs = JSON.parse(savedTabs);
-              setTabs(loadedTabs);
-              setContentFromActiveTab(); // Try to set content if fileSystem already loaded
+              const parsedTabs = JSON.parse(savedTabs);
+              setTabs(parsedTabs);
+              
+              // Set the content for the active tab
+              const activeTab = parsedTabs.find((tab: EditorTab) => tab.isActive);
+              if (activeTab) {
+                const savedFileSystem = localStorage.getItem(`codeEditor_fileSystem_${name}`);
+                if (savedFileSystem) {
+                  const fileSystem = JSON.parse(savedFileSystem);
+                  const file = fileSystem.items[activeTab.fileId];
+                  if (file) {
+                    setCurrentContent(file.content || '');
+                    setCurrentLanguage(file.language || 'plaintext');
+                  }
+                }
+              }
             }
           }
         };
@@ -3201,10 +3198,8 @@ console.log("Starting fresh with partial cleanup!");`,
                 console.log("Automatically loading migrated workspace");
                 loadFromLocalStorage('default');
               } else {
-                console.log("No existing workspaces found, creating welcome file");
-                // Create welcome file for initial state
-                createWelcomeFile();
-                // Then save current state to ensure it's initialized properly
+                console.log("No existing workspaces found, saving initial state");
+                // Force save current state to ensure it's initialized properly
                 setTimeout(() => {
                   saveToLocalStorage('default');
                 }, 1000);
@@ -3276,16 +3271,14 @@ console.log("Starting fresh with partial cleanup!");`,
         console.log("Automatically loading migrated workspace");
         loadFromLocalStorage('default');
       } else {
-        console.log("No existing workspaces found, creating welcome file");
-        // Create welcome file for initial state
-        createWelcomeFile();
-        // Then save current state to ensure it's initialized properly
+        console.log("No existing workspaces found, saving initial state");
+        // Force save current state to ensure it's initialized properly
         setTimeout(() => {
           saveToLocalStorage('default');
         }, 1000);
       }
     }
-  }, [createWelcomeFile, loadFromLocalStorage, saveToLocalStorage]);
+  }, []);
 
   // Export the entire workspace as a ZIP file
   const exportWorkspace = async () => {
