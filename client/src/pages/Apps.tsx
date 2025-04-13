@@ -46,6 +46,13 @@ export default function Apps() {
       description: "Check current weather conditions and forecasts for any location",
       icon: "🌤️",
       tags: ["Weather", "Utility"]
+    },
+    {
+      id: "online-code-editor",
+      title: "Online Code Editor",
+      description: "Full-featured code editor that runs in your browser with syntax highlighting and file management",
+      icon: "👨‍💻",
+      tags: ["Development", "Productivity"]
     }
     // Add more apps as needed
   ]);
