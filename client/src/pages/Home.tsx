@@ -10,17 +10,13 @@ import { Contact } from "@/sections/Contact";
 import { scrollToElement } from "@/lib/utils";
 
 export default function Home() {
-  console.log("Home: Rendering Home component");
-  
   useEffect(() => {
-    console.log("Home: Home component mounted");
     // Add smooth scrolling behavior
     document.documentElement.style.scrollBehavior = "smooth";
     
     // Check for hash in URL and scroll to that section
     const handleHashInUrl = () => {
       const hash = window.location.hash;
-      console.log("Home: Checking hash:", hash);
       if (hash) {
         // Remove the # symbol and scroll to the element with that ID
         const elementId = hash.replace("#", "");

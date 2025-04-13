@@ -27,13 +27,6 @@ interface AppInfo {
 export default function Apps() {
   const [apps] = useState<AppInfo[]>([
     {
-      id: "video-chat",
-      title: "Video Chat",
-      description: "Secure video and voice calls with private room codes",
-      icon: "📹",
-      tags: ["Communication", "Privacy"],
-    },
-    {
       id: "password-generator",
       title: "Password Generator",
       description: "Create secure and customizable passwords for your accounts",
