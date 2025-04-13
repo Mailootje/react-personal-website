@@ -238,7 +238,7 @@ export default function EuroTruckSimulator2() {
                   </div>
                   
                   <TabsContent value="all" className="mt-0">
-                    <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-7 gap-6">
                       <div className="lg:col-span-3">
                         <div className="grid grid-cols-1 gap-6">
                           {downloadFiles.map(file => (
@@ -246,16 +246,16 @@ export default function EuroTruckSimulator2() {
                           ))}
                         </div>
                       </div>
-                      <div className={`lg:col-span-2 ${!showLoadOrder ? 'hidden lg:block' : ''}`}>
+                      <div className={`lg:col-span-4 ${!showLoadOrder ? 'hidden lg:block' : ''}`}>
                         <Card className="shadow-sm mb-6">
                           <CardHeader>
                             <CardTitle className="text-xl">Recommended Load Order</CardTitle>
                             <CardDescription>For optimal compatibility with ProMods and other map mods</CardDescription>
                           </CardHeader>
                           <CardContent>
-                            <div className="rounded-md bg-muted p-4 font-mono text-sm">
-                              <p className="font-semibold mb-2">↑ Top of mod manager</p>
-                              <ul className="space-y-1 text-muted-foreground">
+                            <div className="rounded-md bg-muted p-5 font-mono text-base">
+                              <p className="font-semibold mb-3 text-lg">↑ Top of mod manager</p>
+                              <ul className="space-y-1.5 text-muted-foreground">
                                 <li>• ProMods Background Map (Pick one):</li>
                                 <li className="ml-4">- ProMods High Quality Background Map 1.9</li>
                                 <li className="ml-4">- ProMods High Quality Afroeurasia Background Map 2.5</li>
@@ -283,12 +283,12 @@ export default function EuroTruckSimulator2() {
                                 <li>• ProMods The Great Steppe 1.2.2 Def + Map</li>
                                 <li>• ProMods The Great Steppe 1.2.2 Asset</li>
                               </ul>
-                              <p className="font-semibold mt-2">↓ Bottom of mod manager</p>
+                              <p className="font-semibold mt-3 text-lg">↓ Bottom of mod manager</p>
                             </div>
-                            <div className="mt-4 text-sm text-muted-foreground">
-                              <p className="flex items-center mb-2">
-                                <AlertCircle className="h-4 w-4 mr-2 text-amber-500" />
-                                <span>This is not a guarantee for bug-free gameplay!</span>
+                            <div className="mt-5 text-base text-muted-foreground">
+                              <p className="flex items-center mb-3">
+                                <AlertCircle className="h-5 w-5 mr-2 text-amber-500" />
+                                <span className="font-medium">This is not a guarantee for bug-free gameplay!</span>
                               </p>
                               <p>If you encounter problems, please check on a clean profile with only ProMods enabled. Some maps may not be compatible with the latest game version.</p>
                             </div>
@@ -300,7 +300,7 @@ export default function EuroTruckSimulator2() {
                   
                   {categories.map(category => (
                     <TabsContent key={category} value={category} className="mt-0">
-                      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                      <div className="grid grid-cols-1 lg:grid-cols-7 gap-6">
                         <div className="lg:col-span-3">
                           <div className="grid grid-cols-1 gap-6">
                             {downloadFiles
@@ -311,16 +311,16 @@ export default function EuroTruckSimulator2() {
                             }
                           </div>
                         </div>
-                        <div className={`lg:col-span-2 ${!showLoadOrder ? 'hidden lg:block' : ''}`}>
+                        <div className={`lg:col-span-4 ${!showLoadOrder ? 'hidden lg:block' : ''}`}>
                           <Card className="shadow-sm mb-6">
                             <CardHeader>
                               <CardTitle className="text-xl">Recommended Load Order</CardTitle>
                               <CardDescription>For optimal compatibility with ProMods and other map mods</CardDescription>
                             </CardHeader>
                             <CardContent>
-                              <div className="rounded-md bg-muted p-4 font-mono text-sm">
-                                <p className="font-semibold mb-2">↑ Top of mod manager</p>
-                                <ul className="space-y-1 text-muted-foreground">
+                              <div className="rounded-md bg-muted p-5 font-mono text-base">
+                                <p className="font-semibold mb-3 text-lg">↑ Top of mod manager</p>
+                                <ul className="space-y-1.5 text-muted-foreground">
                                   <li>• ProMods Background Map (Pick one):</li>
                                   <li className="ml-4">- ProMods High Quality Background Map 1.9</li>
                                   <li className="ml-4">- ProMods High Quality Afroeurasia Background Map 2.5</li>
@@ -348,12 +348,12 @@ export default function EuroTruckSimulator2() {
                                   <li>• ProMods The Great Steppe 1.2.2 Def + Map</li>
                                   <li>• ProMods The Great Steppe 1.2.2 Asset</li>
                                 </ul>
-                                <p className="font-semibold mt-2">↓ Bottom of mod manager</p>
+                                <p className="font-semibold mt-3 text-lg">↓ Bottom of mod manager</p>
                               </div>
-                              <div className="mt-4 text-sm text-muted-foreground">
-                                <p className="flex items-center mb-2">
-                                  <AlertCircle className="h-4 w-4 mr-2 text-amber-500" />
-                                  <span>This is not a guarantee for bug-free gameplay!</span>
+                              <div className="mt-5 text-base text-muted-foreground">
+                                <p className="flex items-center mb-3">
+                                  <AlertCircle className="h-5 w-5 mr-2 text-amber-500" />
+                                  <span className="font-medium">This is not a guarantee for bug-free gameplay!</span>
                                 </p>
                                 <p>If you encounter problems, please check on a clean profile with only ProMods enabled. Some maps may not be compatible with the latest game version.</p>
                               </div>

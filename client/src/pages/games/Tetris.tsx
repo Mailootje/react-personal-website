@@ -321,47 +321,49 @@ export default function Tetris() {
         }
       }
     }
+  }, [grid, currentTetromino, gameState, isColliding]);
+  
+  // Draw the current tetromino on the game board
+  const drawCurrentTetromino = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !currentTetromino) return;
     
-    // Draw current tetromino
-    if (currentTetromino) {
-      const { shape, color, position } = currentTetromino;
-      
-      console.log("Drawing current tetromino:", JSON.stringify(currentTetromino));
-      
-      // Set the fill color
-      ctx.fillStyle = color;
-      
-      for (let y = 0; y < shape.length; y++) {
-        for (let x = 0; x < shape[y].length; x++) {
-          if (shape[y][x] === 1) { // Explicitly check for 1 (active cell)
-            const drawX = (position.x + x) * CELL_SIZE;
-            const drawY = (position.y + y) * CELL_SIZE;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    const { shape, color, position } = currentTetromino;
+    
+    // Set the fill color
+    ctx.fillStyle = color;
+    
+    for (let y = 0; y < shape.length; y++) {
+      for (let x = 0; x < shape[y].length; x++) {
+        if (shape[y][x] === 1) { // Explicitly check for 1 (active cell)
+          const drawX = (position.x + x) * CELL_SIZE;
+          const drawY = (position.y + y) * CELL_SIZE;
+          
+          // Only draw if within visible part of the grid
+          if (position.y + y >= 0) {
+            // Fill the cell with the tetromino color
+            ctx.fillRect(drawX, drawY, CELL_SIZE, CELL_SIZE);
             
-            console.log(`Drawing block at grid: [${position.x + x}, ${position.y + y}], pixel: [${drawX}, ${drawY}]`);
+            // Draw cell border with a more visible outline
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(drawX, drawY, CELL_SIZE, CELL_SIZE);
             
-            // Only draw if within visible part of the grid
-            if (position.y + y >= 0) {
-              // Fill the cell with the tetromino color
-              ctx.fillRect(drawX, drawY, CELL_SIZE, CELL_SIZE);
-              
-              // Draw cell border with a more visible outline
-              ctx.strokeStyle = '#000000';
-              ctx.lineWidth = 1.5;
-              ctx.strokeRect(drawX, drawY, CELL_SIZE, CELL_SIZE);
-              
-              // Add a highlight effect to make the pieces look better
-              ctx.fillStyle = 'rgba(255,255,255,0.2)';
-              ctx.fillRect(drawX + 1, drawY + 1, CELL_SIZE - 10, CELL_SIZE - 10);
-              
-              // Restore the color for the next block
-              ctx.fillStyle = color;
-            }
+            // Add a highlight effect to make the pieces look better
+            ctx.fillStyle = 'rgba(255,255,255,0.3)';
+            ctx.fillRect(drawX + 1, drawY + 1, CELL_SIZE - 10, CELL_SIZE - 10);
+            
+            // Restore the color for the next block
+            ctx.fillStyle = color;
           }
         }
       }
     }
-  }, [grid, currentTetromino, gameState, isColliding]);
-  
+  }, [currentTetromino]);
+
   // Draw the next piece preview
   const drawPreview = useCallback(() => {
     const canvas = previewCanvasRef.current;
@@ -407,15 +409,11 @@ export default function Tetris() {
     
     ctx.fillStyle = color;
     
-    console.log("Drawing preview for tetromino:", JSON.stringify(nextTetromino));
-    
     for (let y = 0; y < shape.length; y++) {
       for (let x = 0; x < shape[y].length; x++) {
         if (shape[y][x] === 1) { // Explicitly check for 1 (active cell)
           const drawX = (offsetX + x) * PREVIEW_CELL_SIZE;
           const drawY = (offsetY + y) * PREVIEW_CELL_SIZE;
-          
-          console.log(`Drawing preview block at cell: [${x}, ${y}], pixel: [${drawX}, ${drawY}]`);
           
           // Draw the block
           ctx.fillRect(drawX, drawY, PREVIEW_CELL_SIZE, PREVIEW_CELL_SIZE);
@@ -426,7 +424,7 @@ export default function Tetris() {
           ctx.strokeRect(drawX, drawY, PREVIEW_CELL_SIZE, PREVIEW_CELL_SIZE);
           
           // Add a highlight effect
-          ctx.fillStyle = 'rgba(255,255,255,0.2)';
+          ctx.fillStyle = 'rgba(255,255,255,0.3)';
           ctx.fillRect(drawX + 1, drawY + 1, PREVIEW_CELL_SIZE - 10, PREVIEW_CELL_SIZE - 10);
           
           // Restore the color for the next block
@@ -704,6 +702,7 @@ export default function Tetris() {
     // Start the rendering immediately
     const renderLoop = () => {
       drawBoard();
+      drawCurrentTetromino();
       drawPreview();
       gameLoopRef.current = requestAnimationFrame(renderLoop);
     };
@@ -730,7 +729,7 @@ export default function Tetris() {
       scheduleDrop();
     }, 300);
     
-  }, [drawBoard, drawPreview, dropTetromino, gameState]);
+  }, [drawBoard, drawCurrentTetromino, drawPreview, dropTetromino, gameState]);
   
   // Create a recursive drop scheduler for reuse
   const createScheduleDrop = useCallback(() => {
