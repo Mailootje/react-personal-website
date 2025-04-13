@@ -1,82 +1,14 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Container } from "@/components/ui/container";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Button } from '@/components/ui/button';
+import { Container } from '@/components/ui/container';
+import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
 
-// Constants
+// Game constants
 const GRID_WIDTH = 10;
 const GRID_HEIGHT = 20;
 const CELL_SIZE = 30;
-const PREVIEW_CELL_SIZE = 20;
-
-// Tetromino shapes represented as 4x4 grid with 1s where the shape is
-const TETROMINOS = {
-  I: {
-    shape: [
-      [0, 0, 0, 0],
-      [1, 1, 1, 1],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0]
-    ],
-    color: "#00DFFC" // Cyan
-  },
-  J: {
-    shape: [
-      [1, 0, 0, 0],
-      [1, 1, 1, 0],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0]
-    ],
-    color: "#0341AE" // Blue
-  },
-  L: {
-    shape: [
-      [0, 0, 1, 0],
-      [1, 1, 1, 0],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0]
-    ],
-    color: "#FF971C" // Orange
-  },
-  O: {
-    shape: [
-      [1, 1, 0, 0],
-      [1, 1, 0, 0],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0]
-    ],
-    color: "#FFD500" // Yellow
-  },
-  S: {
-    shape: [
-      [0, 1, 1, 0],
-      [1, 1, 0, 0],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0]
-    ],
-    color: "#59B101" // Green
-  },
-  T: {
-    shape: [
-      [0, 1, 0, 0],
-      [1, 1, 1, 0],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0]
-    ],
-    color: "#9900FA" // Purple
-  },
-  Z: {
-    shape: [
-      [1, 1, 0, 0],
-      [0, 1, 1, 0],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0]
-    ],
-    color: "#FF2128" // Red
-  }
-};
+const PREVIEW_CELL_SIZE = 25;
 
 // Game states
 enum GameState {
@@ -86,7 +18,74 @@ enum GameState {
   GAME_OVER = "GAME_OVER"
 }
 
-// Tetromino type definition
+// Tetromino shapes
+const TETROMINOES = [
+  {
+    // I-piece (cyan)
+    shape: [
+      [0, 0, 0, 0],
+      [1, 1, 1, 1],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0]
+    ],
+    color: '#00FFFF'
+  },
+  {
+    // J-piece (blue)
+    shape: [
+      [1, 0, 0],
+      [1, 1, 1],
+      [0, 0, 0]
+    ],
+    color: '#0000FF'
+  },
+  {
+    // L-piece (orange)
+    shape: [
+      [0, 0, 1],
+      [1, 1, 1],
+      [0, 0, 0]
+    ],
+    color: '#FF8000'
+  },
+  {
+    // O-piece (yellow)
+    shape: [
+      [1, 1],
+      [1, 1]
+    ],
+    color: '#FFFF00'
+  },
+  {
+    // S-piece (green)
+    shape: [
+      [0, 1, 1],
+      [1, 1, 0],
+      [0, 0, 0]
+    ],
+    color: '#00FF00'
+  },
+  {
+    // T-piece (purple)
+    shape: [
+      [0, 1, 0],
+      [1, 1, 1],
+      [0, 0, 0]
+    ],
+    color: '#800080'
+  },
+  {
+    // Z-piece (red)
+    shape: [
+      [1, 1, 0],
+      [0, 1, 1],
+      [0, 0, 0]
+    ],
+    color: '#FF0000'
+  }
+];
+
+// Type definitions
 interface Tetromino {
   shape: number[][];
   color: string;
@@ -94,242 +93,80 @@ interface Tetromino {
   rotation: number;
 }
 
-// Helper functions for grid manipulation
-// Type for grid cells - can be null or a color string
 type GridCell = string | null;
 
-const createEmptyGrid = (): GridCell[][] => 
-  Array.from({ length: GRID_HEIGHT }, () => 
-    Array.from({ length: GRID_WIDTH }, () => null)
-  );
-
-const createEmptyPreviewGrid = () => 
-  Array.from({ length: 4 }, () => 
-    Array.from({ length: 4 }, () => null)
-  );
-
-const rotateMatrix = (matrix: number[][]) => {
-  const N = matrix.length;
-  const result = Array.from({ length: N }, () => Array(N).fill(0));
-  
-  for (let i = 0; i < N; i++) {
-    for (let j = 0; j < N; j++) {
-      result[j][N - 1 - i] = matrix[i][j];
-    }
-  }
-  
-  return result;
-};
-
+// Helper functions
 const randomTetromino = (): Tetromino => {
-  const tetrominoNames = Object.keys(TETROMINOS) as Array<keyof typeof TETROMINOS>;
-  const randomName = tetrominoNames[Math.floor(Math.random() * tetrominoNames.length)];
-  const tetromino = TETROMINOS[randomName];
+  const randIndex = Math.floor(Math.random() * TETROMINOES.length);
+  const { shape, color } = TETROMINOES[randIndex];
   
   return {
-    shape: [...tetromino.shape], // Clone the shape
-    color: tetromino.color,
-    position: { x: Math.floor(GRID_WIDTH / 2) - 2, y: 0 },
+    shape: [...shape],
+    color,
+    position: { x: Math.floor(GRID_WIDTH / 2) - Math.floor(shape[0].length / 2), y: 0 },
     rotation: 0
   };
 };
 
-export default function Tetris() {
-  // Canvas refs
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const previewCanvasRef = useRef<HTMLCanvasElement>(null);
+const createEmptyGrid = (): GridCell[][] => {
+  return Array(GRID_HEIGHT).fill(null).map(() => Array(GRID_WIDTH).fill(null));
+};
+
+const rotateMatrix = (matrix: number[][]): number[][] => {
+  const N = matrix.length;
+  const rotated = Array(N).fill(0).map(() => Array(N).fill(0));
   
+  for (let y = 0; y < N; y++) {
+    for (let x = 0; x < N; x++) {
+      rotated[x][N - 1 - y] = matrix[y][x];
+    }
+  }
+  
+  return rotated;
+};
+
+export default function Tetris() {
   // Game state
   const [gameState, setGameState] = useState<GameState>(GameState.READY);
-  const [score, setScore] = useState(0);
-  const [highScore, setHighScore] = useState(0);
-  const [level, setLevel] = useState(1);
-  const [lines, setLines] = useState(0);
+  const [grid, setGrid] = useState<GridCell[][]>(createEmptyGrid());
+  const [score, setScore] = useState<number>(0);
+  const [highScore, setHighScore] = useState<number>(0);
+  const [level, setLevel] = useState<number>(1);
+  const [lines, setLines] = useState<number>(0);
   
-  // Game elements
-  const [grid, setGrid] = useState(() => createEmptyGrid());
+  // Tetromino state
   const [currentTetromino, setCurrentTetromino] = useState<Tetromino | null>(null);
   const [nextTetromino, setNextTetromino] = useState<Tetromino | null>(null);
   
-  // Game loop ref
+  // Canvas references
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const previewCanvasRef = useRef<HTMLCanvasElement>(null);
+  
+  // Game loop and timing references
   const gameLoopRef = useRef<number | null>(null);
   const dropIntervalRef = useRef<number | null>(null);
+  const dropTimeRef = useRef<number>(1000);
   const lastTimeRef = useRef<number>(0);
-  const dropTimeRef = useRef<number>(1000); // Initial drop time in ms
   
-  // Draw the game board
-  const drawBoard = useCallback(() => {
-    const canvas = canvasRef.current;
-    const context = canvas?.getContext('2d');
+  // Check if a tetromino is colliding with walls, floor, or locked cells
+  const isColliding = useCallback((tetromino: Tetromino): boolean => {
+    if (!tetromino) return false;
     
-    if (!canvas || !context) return;
-    
-    // Clear the canvas
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Draw grid lines
-    context.strokeStyle = '#ddd';
-    context.lineWidth = 0.5;
-    
-    // Vertical lines
-    for (let i = 0; i <= GRID_WIDTH; i++) {
-      context.beginPath();
-      context.moveTo(i * CELL_SIZE, 0);
-      context.lineTo(i * CELL_SIZE, GRID_HEIGHT * CELL_SIZE);
-      context.stroke();
-    }
-    
-    // Horizontal lines
-    for (let i = 0; i <= GRID_HEIGHT; i++) {
-      context.beginPath();
-      context.moveTo(0, i * CELL_SIZE);
-      context.lineTo(GRID_WIDTH * CELL_SIZE, i * CELL_SIZE);
-      context.stroke();
-    }
-    
-    // Draw the settled blocks
-    for (let y = 0; y < GRID_HEIGHT; y++) {
-      for (let x = 0; x < GRID_WIDTH; x++) {
-        const cellColor = grid[y][x];
-        if (cellColor) {
-          context.fillStyle = cellColor;
-          context.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
-          
-          // Draw block border
-          context.strokeStyle = '#000';
-          context.lineWidth = 1;
-          context.strokeRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
-          
-          // Draw inner highlight
-          context.strokeStyle = '#fff';
-          context.lineWidth = 1;
-          context.beginPath();
-          context.moveTo(x * CELL_SIZE + 1, y * CELL_SIZE + CELL_SIZE - 1);
-          context.lineTo(x * CELL_SIZE + 1, y * CELL_SIZE + 1);
-          context.lineTo(x * CELL_SIZE + CELL_SIZE - 1, y * CELL_SIZE + 1);
-          context.stroke();
-        }
-      }
-    }
-    
-    // Draw the current tetromino
-    if (currentTetromino) {
-      const { shape, color, position } = currentTetromino;
-      
-      for (let y = 0; y < shape.length; y++) {
-        for (let x = 0; x < shape[y].length; x++) {
-          if (shape[y][x]) {
-            const posX = (position.x + x) * CELL_SIZE;
-            const posY = (position.y + y) * CELL_SIZE;
-            
-            context.fillStyle = color;
-            context.fillRect(posX, posY, CELL_SIZE, CELL_SIZE);
-            
-            // Draw block border
-            context.strokeStyle = '#000';
-            context.lineWidth = 1;
-            context.strokeRect(posX, posY, CELL_SIZE, CELL_SIZE);
-            
-            // Draw inner highlight
-            context.strokeStyle = '#fff';
-            context.lineWidth = 1;
-            context.beginPath();
-            context.moveTo(posX + 1, posY + CELL_SIZE - 1);
-            context.lineTo(posX + 1, posY + 1);
-            context.lineTo(posX + CELL_SIZE - 1, posY + 1);
-            context.stroke();
-          }
-        }
-      }
-    }
-  }, [grid, currentTetromino]);
-  
-  // Draw the next tetromino preview
-  const drawPreview = useCallback(() => {
-    const canvas = previewCanvasRef.current;
-    const context = canvas?.getContext('2d');
-    
-    if (!canvas || !context || !nextTetromino) return;
-    
-    // Clear the canvas
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Draw background
-    context.fillStyle = '#f8f9fa';
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    
-    // Draw grid lines
-    context.strokeStyle = '#ddd';
-    context.lineWidth = 0.5;
-    
-    // Vertical lines
-    for (let i = 0; i <= 4; i++) {
-      context.beginPath();
-      context.moveTo(i * PREVIEW_CELL_SIZE, 0);
-      context.lineTo(i * PREVIEW_CELL_SIZE, 4 * PREVIEW_CELL_SIZE);
-      context.stroke();
-    }
-    
-    // Horizontal lines
-    for (let i = 0; i <= 4; i++) {
-      context.beginPath();
-      context.moveTo(0, i * PREVIEW_CELL_SIZE);
-      context.lineTo(4 * PREVIEW_CELL_SIZE, i * PREVIEW_CELL_SIZE);
-      context.stroke();
-    }
-    
-    // Draw the next tetromino
-    const { shape, color } = nextTetromino;
+    const { shape, position } = tetromino;
     
     for (let y = 0; y < shape.length; y++) {
       for (let x = 0; x < shape[y].length; x++) {
         if (shape[y][x]) {
-          const posX = x * PREVIEW_CELL_SIZE;
-          const posY = y * PREVIEW_CELL_SIZE;
-          
-          context.fillStyle = color;
-          context.fillRect(posX, posY, PREVIEW_CELL_SIZE, PREVIEW_CELL_SIZE);
-          
-          // Draw block border
-          context.strokeStyle = '#000';
-          context.lineWidth = 1;
-          context.strokeRect(posX, posY, PREVIEW_CELL_SIZE, PREVIEW_CELL_SIZE);
-          
-          // Draw inner highlight
-          context.strokeStyle = '#fff';
-          context.lineWidth = 1;
-          context.beginPath();
-          context.moveTo(posX + 1, posY + PREVIEW_CELL_SIZE - 1);
-          context.lineTo(posX + 1, posY + 1);
-          context.lineTo(posX + PREVIEW_CELL_SIZE - 1, posY + 1);
-          context.stroke();
-        }
-      }
-    }
-  }, [nextTetromino]);
-  
-  // Check for collisions
-  const isColliding = useCallback((tetromino: Tetromino, position = { x: 0, y: 0 }) => {
-    const { shape } = tetromino;
-    const { x: posX, y: posY } = tetromino.position;
-    
-    for (let y = 0; y < shape.length; y++) {
-      for (let x = 0; x < shape[y].length; x++) {
-        if (shape[y][x]) {
-          const newX = posX + x + position.x;
-          const newY = posY + y + position.y;
+          const gridY = position.y + y;
+          const gridX = position.x + x;
           
           // Check if out of bounds
-          if (
-            newX < 0 || 
-            newX >= GRID_WIDTH || 
-            newY >= GRID_HEIGHT
-          ) {
+          if (gridY >= GRID_HEIGHT || gridX < 0 || gridX >= GRID_WIDTH) {
             return true;
           }
           
-          // Check if colliding with settled blocks
-          if (newY >= 0 && grid[newY][newX]) {
+          // Check if colliding with locked cells
+          if (gridY >= 0 && grid[gridY][gridX] !== null) {
             return true;
           }
         }
@@ -339,9 +176,167 @@ export default function Tetris() {
     return false;
   }, [grid]);
   
-  // Rotate tetromino
+  // Draw the game board
+  const drawBoard = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Draw grid
+    ctx.strokeStyle = '#DDDDDD';
+    ctx.lineWidth = 0.5;
+    
+    // Draw vertical lines
+    for (let x = 0; x <= GRID_WIDTH; x++) {
+      ctx.beginPath();
+      ctx.moveTo(x * CELL_SIZE, 0);
+      ctx.lineTo(x * CELL_SIZE, GRID_HEIGHT * CELL_SIZE);
+      ctx.stroke();
+    }
+    
+    // Draw horizontal lines
+    for (let y = 0; y <= GRID_HEIGHT; y++) {
+      ctx.beginPath();
+      ctx.moveTo(0, y * CELL_SIZE);
+      ctx.lineTo(GRID_WIDTH * CELL_SIZE, y * CELL_SIZE);
+      ctx.stroke();
+    }
+    
+    // Draw locked cells
+    for (let y = 0; y < GRID_HEIGHT; y++) {
+      for (let x = 0; x < GRID_WIDTH; x++) {
+        if (grid[y][x] !== null) {
+          ctx.fillStyle = grid[y][x] as string;
+          ctx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+          
+          // Draw cell border
+          ctx.strokeStyle = '#000000';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+        }
+      }
+    }
+    
+    // Draw current tetromino
+    if (currentTetromino) {
+      const { shape, color, position } = currentTetromino;
+      
+      ctx.fillStyle = color;
+      
+      for (let y = 0; y < shape.length; y++) {
+        for (let x = 0; x < shape[y].length; x++) {
+          if (shape[y][x] && position.y + y >= 0) {
+            ctx.fillRect(
+              (position.x + x) * CELL_SIZE,
+              (position.y + y) * CELL_SIZE,
+              CELL_SIZE,
+              CELL_SIZE
+            );
+            
+            // Draw cell border
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(
+              (position.x + x) * CELL_SIZE,
+              (position.y + y) * CELL_SIZE,
+              CELL_SIZE,
+              CELL_SIZE
+            );
+          }
+        }
+      }
+    }
+  }, [grid, currentTetromino]);
+  
+  // Draw the next piece preview
+  const drawPreview = useCallback(() => {
+    const canvas = previewCanvasRef.current;
+    if (!canvas || !nextTetromino) return;
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Draw grid
+    ctx.strokeStyle = '#DDDDDD';
+    ctx.lineWidth = 0.5;
+    
+    for (let x = 0; x <= 4; x++) {
+      ctx.beginPath();
+      ctx.moveTo(x * PREVIEW_CELL_SIZE, 0);
+      ctx.lineTo(x * PREVIEW_CELL_SIZE, 4 * PREVIEW_CELL_SIZE);
+      ctx.stroke();
+    }
+    
+    for (let y = 0; y <= 4; y++) {
+      ctx.beginPath();
+      ctx.moveTo(0, y * PREVIEW_CELL_SIZE);
+      ctx.lineTo(4 * PREVIEW_CELL_SIZE, y * PREVIEW_CELL_SIZE);
+      ctx.stroke();
+    }
+    
+    // Draw next tetromino
+    const { shape, color } = nextTetromino;
+    const offsetX = (4 - shape[0].length) / 2;
+    const offsetY = (4 - shape.length) / 2;
+    
+    ctx.fillStyle = color;
+    
+    for (let y = 0; y < shape.length; y++) {
+      for (let x = 0; x < shape[y].length; x++) {
+        if (shape[y][x]) {
+          ctx.fillRect(
+            (offsetX + x) * PREVIEW_CELL_SIZE,
+            (offsetY + y) * PREVIEW_CELL_SIZE,
+            PREVIEW_CELL_SIZE,
+            PREVIEW_CELL_SIZE
+          );
+          
+          // Draw cell border
+          ctx.strokeStyle = '#000000';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(
+            (offsetX + x) * PREVIEW_CELL_SIZE,
+            (offsetY + y) * PREVIEW_CELL_SIZE,
+            PREVIEW_CELL_SIZE,
+            PREVIEW_CELL_SIZE
+          );
+        }
+      }
+    }
+  }, [nextTetromino]);
+  
+  // Move the tetromino left, right, or down
+  const moveTetromino = useCallback((direction: 'left' | 'right') => {
+    if (!currentTetromino || gameState !== GameState.PLAYING) return;
+    
+    const deltaX = direction === 'left' ? -1 : 1;
+    
+    const newPosition = {
+      ...currentTetromino.position,
+      x: currentTetromino.position.x + deltaX
+    };
+    
+    const newTetromino = {
+      ...currentTetromino,
+      position: newPosition
+    };
+    
+    if (!isColliding(newTetromino)) {
+      setCurrentTetromino(newTetromino);
+    }
+  }, [currentTetromino, gameState, isColliding]);
+  
+  // Rotate the tetromino
   const rotateTetromino = useCallback(() => {
-    if (!currentTetromino) return;
+    if (!currentTetromino || gameState !== GameState.PLAYING) return;
     
     const rotatedShape = rotateMatrix(currentTetromino.shape);
     const newTetromino = {
@@ -350,99 +345,44 @@ export default function Tetris() {
       rotation: (currentTetromino.rotation + 1) % 4
     };
     
-    // Check if the rotation causes a collision
+    // Try to rotate in place
     if (!isColliding(newTetromino)) {
       setCurrentTetromino(newTetromino);
-    } else {
-      // Try wall kick (move left or right if necessary)
-      const wallKickOffsets = [
-        { x: 1, y: 0 },
-        { x: -1, y: 0 },
-        { x: 2, y: 0 },
-        { x: -2, y: 0 }
-      ];
-      
-      for (const offset of wallKickOffsets) {
-        const kickedTetromino = {
-          ...newTetromino,
-          position: {
-            x: newTetromino.position.x + offset.x,
-            y: newTetromino.position.y
-          }
-        };
-        
-        if (!isColliding(kickedTetromino)) {
-          setCurrentTetromino(kickedTetromino);
-          return;
+      return;
+    }
+    
+    // Wall kick - try shifting the tetromino to fit after rotation
+    for (let offset of [-1, 1, -2, 2]) {
+      const kickedTetromino = {
+        ...newTetromino,
+        position: {
+          ...newTetromino.position,
+          x: newTetromino.position.x + offset
         }
+      };
+      
+      if (!isColliding(kickedTetromino)) {
+        setCurrentTetromino(kickedTetromino);
+        return;
       }
     }
-  }, [currentTetromino, isColliding]);
-  
-  // Move tetromino horizontally
-  const moveTetromino = useCallback((direction: 'left' | 'right') => {
-    if (!currentTetromino || gameState !== GameState.PLAYING) return;
-    
-    const positionChange = direction === 'left' ? -1 : 1;
-    const newPosition = {
-      ...currentTetromino.position,
-      x: currentTetromino.position.x + positionChange
-    };
-    
-    const newTetromino = {
-      ...currentTetromino,
-      position: newPosition
-    };
-    
-    if (!isColliding(newTetromino)) {
-      setCurrentTetromino(newTetromino);
-    }
   }, [currentTetromino, gameState, isColliding]);
   
-  // Drop tetromino by one cell
-  const dropTetromino = useCallback(() => {
-    if (!currentTetromino || gameState !== GameState.PLAYING) return;
-    
-    const newPosition = {
-      ...currentTetromino.position,
-      y: currentTetromino.position.y + 1
-    };
-    
-    const newTetromino = {
-      ...currentTetromino,
-      position: newPosition
-    };
-    
-    if (!isColliding(newTetromino)) {
-      setCurrentTetromino(newTetromino);
+  // Spawn a new tetromino
+  const spawnTetromino = useCallback(() => {
+    // Use the next tetromino as the current one
+    if (nextTetromino) {
+      setCurrentTetromino({
+        ...nextTetromino,
+        position: { x: Math.floor(GRID_WIDTH / 2) - Math.floor(nextTetromino.shape[0].length / 2), y: 0 }
+      });
     } else {
-      // The tetromino cannot move down further, so lock it in place
-      settleBlock();
-    }
-  }, [currentTetromino, gameState, isColliding]);
-  
-  // Hard drop (instantly drop to bottom)
-  const hardDrop = useCallback(() => {
-    if (!currentTetromino || gameState !== GameState.PLAYING) return;
-    
-    let newY = currentTetromino.position.y;
-    
-    // Find the lowest position without collision
-    while (!isColliding({
-      ...currentTetromino,
-      position: { ...currentTetromino.position, y: newY + 1 }
-    })) {
-      newY++;
+      setCurrentTetromino(randomTetromino());
     }
     
-    setCurrentTetromino({
-      ...currentTetromino,
-      position: { ...currentTetromino.position, y: newY }
-    });
-    
-    // Immediately settle the block
-    settleBlock();
-  }, [currentTetromino, gameState, isColliding]);
+    // Generate a new next tetromino
+    setNextTetromino(randomTetromino());
+  }, [nextTetromino]);
   
   // Lock the current tetromino in place
   const settleBlock = useCallback(() => {
@@ -506,32 +446,62 @@ export default function Tetris() {
     
     setGrid(newGrid);
     spawnTetromino();
-  }, [currentTetromino, grid, score, lines, level, highScore]);
+  }, [currentTetromino, grid, score, lines, level, highScore, spawnTetromino]);
   
-  // Spawn a new tetromino
-  const spawnTetromino = useCallback(() => {
-    // Use the next tetromino as the current one
-    if (nextTetromino) {
-      setCurrentTetromino({
-        ...nextTetromino,
-        position: { x: Math.floor(GRID_WIDTH / 2) - 2, y: 0 }
-      });
+  // Drop tetromino by one cell
+  const dropTetromino = useCallback(() => {
+    if (!currentTetromino || gameState !== GameState.PLAYING) return;
+    
+    const newPosition = {
+      ...currentTetromino.position,
+      y: currentTetromino.position.y + 1
+    };
+    
+    const newTetromino = {
+      ...currentTetromino,
+      position: newPosition
+    };
+    
+    if (!isColliding(newTetromino)) {
+      setCurrentTetromino(newTetromino);
     } else {
-      setCurrentTetromino(randomTetromino());
+      // The tetromino cannot move down further, so lock it in place
+      settleBlock();
+    }
+  }, [currentTetromino, gameState, isColliding, settleBlock]);
+  
+  // Hard drop (instantly drop to bottom)
+  const hardDrop = useCallback(() => {
+    if (!currentTetromino || gameState !== GameState.PLAYING) return;
+    
+    let newY = currentTetromino.position.y;
+    
+    // Find the lowest position without collision
+    while (!isColliding({
+      ...currentTetromino,
+      position: { ...currentTetromino.position, y: newY + 1 }
+    })) {
+      newY++;
     }
     
-    // Generate a new next tetromino
-    setNextTetromino(randomTetromino());
-  }, [nextTetromino]);
+    setCurrentTetromino({
+      ...currentTetromino,
+      position: { ...currentTetromino.position, y: newY }
+    });
+    
+    // Immediately settle the block
+    settleBlock();
+  }, [currentTetromino, gameState, isColliding, settleBlock]);
   
   // Initialize the game
   const initGame = useCallback(() => {
+    console.log("Initializing game...");
+    
     // Reset game state
     setGrid(createEmptyGrid());
     setScore(0);
     setLines(0);
     setLevel(1);
-    setGameState(GameState.PLAYING);
     
     // Spawn initial tetrominos
     const initialTetromino = randomTetromino();
@@ -544,21 +514,21 @@ export default function Tetris() {
     dropTimeRef.current = 1000;
     lastTimeRef.current = 0;
     
-    // Start the game loop
+    // Clean up any existing game loops
     if (gameLoopRef.current) {
       cancelAnimationFrame(gameLoopRef.current);
+      gameLoopRef.current = null;
     }
     
     if (dropIntervalRef.current) {
       clearInterval(dropIntervalRef.current);
+      dropIntervalRef.current = null;
     }
     
-    // Set up auto-drop interval - using a closure to capture current state
-    // We don't need to check gameState here since we just set it and 
-    // the interval will be cleared when the game state changes
-    dropIntervalRef.current = window.setInterval(dropTetromino, dropTimeRef.current);
+    // Change the game state to PLAYING
+    setGameState(GameState.PLAYING);
     
-    // Start the render loop
+    // Start the render loop first
     const renderLoop = () => {
       drawBoard();
       drawPreview();
@@ -566,7 +536,18 @@ export default function Tetris() {
     };
     
     gameLoopRef.current = requestAnimationFrame(renderLoop);
-  }, [drawBoard, drawPreview, dropTetromino, gameState]);
+    
+    // Add a slight delay before starting the drop interval to ensure state is updated
+    setTimeout(() => {
+      // Set up auto-drop interval
+      console.log("Setting up drop interval...");
+      dropIntervalRef.current = window.setInterval(() => {
+        console.log("Dropping tetromino...");
+        dropTetromino();
+      }, dropTimeRef.current);
+    }, 100);
+    
+  }, [drawBoard, drawPreview, dropTetromino]);
   
   // Pause the game
   const pauseGame = useCallback(() => {
@@ -938,34 +919,15 @@ export default function Tetris() {
                     </div>
                     
                     <div>
-                      <Badge variant="outline" className="mr-2">Keyboard Controls</Badge>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="bg-gray-50 p-3 rounded border">
-                        <div className="font-medium">Move Left</div>
-                        <div className="text-sm text-gray-500">Arrow Left / A</div>
-                      </div>
-                      <div className="bg-gray-50 p-3 rounded border">
-                        <div className="font-medium">Move Right</div>
-                        <div className="text-sm text-gray-500">Arrow Right / D</div>
-                      </div>
-                      <div className="bg-gray-50 p-3 rounded border">
-                        <div className="font-medium">Move Down</div>
-                        <div className="text-sm text-gray-500">Arrow Down / S</div>
-                      </div>
-                      <div className="bg-gray-50 p-3 rounded border">
-                        <div className="font-medium">Rotate</div>
-                        <div className="text-sm text-gray-500">Arrow Up / W</div>
-                      </div>
-                      <div className="bg-gray-50 p-3 rounded border">
-                        <div className="font-medium">Hard Drop</div>
-                        <div className="text-sm text-gray-500">Spacebar</div>
-                      </div>
-                      <div className="bg-gray-50 p-3 rounded border">
-                        <div className="font-medium">Pause/Resume</div>
-                        <div className="text-sm text-gray-500">Escape Key</div>
-                      </div>
+                      <h4 className="font-semibold mb-2">Controls</h4>
+                      <ul className="list-disc pl-5 space-y-1">
+                        <li>Arrow Left / A: Move tetromino left</li>
+                        <li>Arrow Right / D: Move tetromino right</li>
+                        <li>Arrow Down / S: Drop tetromino by one row</li>
+                        <li>Arrow Up / W: Rotate tetromino</li>
+                        <li>Spacebar: Hard drop (instantly drop to bottom)</li>
+                        <li>Escape: Pause/Resume game</li>
+                      </ul>
                     </div>
                   </div>
                 </div>
