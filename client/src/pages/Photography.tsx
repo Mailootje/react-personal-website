@@ -15,7 +15,6 @@ interface Photo {
 
 export default function Photography() {
   const [activeFilter, setActiveFilter] = useState("all");
-  const [filteredPhotos, setFilteredPhotos] = useState<Photo[]>([]);
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
 
   // Categories for the filter
@@ -32,11 +31,6 @@ export default function Photography() {
       return apiRequest<Photo[]>(endpoint);
     }
   });
-
-  // Update filtered photos when photos data changes
-  useEffect(() => {
-    setFilteredPhotos(photos);
-  }, [photos]);
 
   const openPhotoModal = (photo: Photo) => {
     setSelectedPhoto(photo);
@@ -116,7 +110,7 @@ export default function Photography() {
                   <p>There was an error loading the images. Please check if the image folders exist or try again later.</p>
                 </div>
               </div>
-            ) : filteredPhotos.length === 0 ? (
+            ) : photos.length === 0 ? (
               <div className="flex justify-center py-12">
                 <div className="text-center">
                   <p className="text-xl mb-2">No images found</p>
@@ -135,7 +129,7 @@ export default function Photography() {
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
               >
-                {filteredPhotos.map((photo) => (
+                {photos.map((photo) => (
                   <motion.div
                     key={photo.id}
                     className="overflow-hidden rounded-lg shadow-md cursor-pointer h-64 md:h-80"
