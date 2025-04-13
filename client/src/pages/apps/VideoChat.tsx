@@ -75,17 +75,14 @@ export default function VideoChat() {
   // Connect to socket server
   useEffect(() => {
     try {
-      // Get protocol and host for Socket.IO connection
-      const protocol = window.location.protocol;
-      const host = window.location.host;
+      console.log('Connecting to Socket.IO server on the same port as the app');
       
-      console.log(`Connecting to Socket.IO server at ${protocol}//${host}`);
-      
-      // Connect to Socket.IO server with explicit URL - using same port as the app
+      // Connect to Socket.IO server (same origin, same port)
       socketRef.current = io({
         path: '/socket.io',
         reconnectionAttempts: 5,
         reconnectionDelay: 1000,
+        transports: ['websocket', 'polling'], // Try both transport methods
         timeout: 20000
       });
       
