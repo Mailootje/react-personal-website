@@ -11,32 +11,32 @@ import {
 } from "./types";
 
 export const personalInfo: PersonalInfo = {
-  name: "John Doe",
-  email: "contact@johndoe.com",
-  location: "San Francisco, CA",
+  name: "Mail Obedo",
+  email: "info@mailobedo.nl",
+  location: "The Netherlands",
   experience: "5+ Years",
 };
 
 export const socialLinks: SocialLink[] = [
   {
     name: "GitHub",
-    url: "https://github.com",
+    url: "https://github.com/mailobedo",
     icon: "ri-github-fill",
   },
   {
     name: "LinkedIn",
-    url: "https://linkedin.com",
+    url: "https://www.linkedin.com/in/mail-obedo/",
     icon: "ri-linkedin-fill",
   },
   {
-    name: "Twitter",
-    url: "https://twitter.com",
-    icon: "ri-twitter-fill",
+    name: "Instagram",
+    url: "https://www.instagram.com/mailobedo/",
+    icon: "ri-instagram-fill",
   },
   {
-    name: "Dribbble",
-    url: "https://dribbble.com",
-    icon: "ri-dribbble-fill",
+    name: "Email",
+    url: "mailto:info@mailobedo.nl",
+    icon: "ri-mail-fill",
   },
 ];
 
@@ -49,18 +49,19 @@ export const navigationItems = [
 ];
 
 export const skills: Skill[] = [
-  { name: "JavaScript/TypeScript", percentage: 95 },
-  { name: "React & React Native", percentage: 90 },
-  { name: "Node.js & Express", percentage: 85 },
-  { name: "HTML5 & CSS3/SCSS", percentage: 92 },
-  { name: "GraphQL", percentage: 80 },
+  { name: "JavaScript", percentage: 95 },
+  { name: "Python", percentage: 90 },
+  { name: "React", percentage: 90 },
+  { name: "TailwindCSS", percentage: 85 },
+  { name: "NodeJS", percentage: 85 },
+  { name: "Docker", percentage: 75 },
 ];
 
 export const professionalSkills: ProfessionalSkill[] = [
   {
-    name: "Team Leadership",
-    description: "Experience leading development teams and coordinating projects",
-    icon: "ri-team-fill",
+    name: "Web Development",
+    description: "Building responsive, modern websites and web applications",
+    icon: "ri-code-s-slash-fill",
     color: "primary",
   },
   {
@@ -70,97 +71,97 @@ export const professionalSkills: ProfessionalSkill[] = [
     color: "secondary",
   },
   {
-    name: "Client Relations",
-    description: "Effective communication and understanding client needs",
-    icon: "ri-customer-service-2-fill",
+    name: "Problem Solving",
+    description: "Finding efficient solutions to complex technical challenges",
+    icon: "ri-lightbulb-fill",
     color: "accent",
   },
   {
-    name: "DevOps",
-    description: "Implementing CI/CD pipelines and infrastructure management",
-    icon: "ri-git-branch-fill",
-    color: "red",
+    name: "Continuous Learning",
+    description: "Constantly updating skills and staying current with new technologies",
+    icon: "ri-book-open-fill",
+    color: "green",
   },
 ];
 
 export const projects: Project[] = [
   {
-    title: "E-commerce Platform",
-    description: "A full-featured e-commerce solution with inventory management, payment processing, and analytics dashboard.",
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+    title: "Personal Website",
+    description: "My personal portfolio website showcasing my skills, projects, and experience. Built with modern web technologies for optimal performance.",
+    image: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
     type: "Web App",
     typeColor: "primary",
-    technologies: ["React", "Node.js", "MongoDB", "Stripe"],
-    detailsLink: "#",
-    githubLink: "https://github.com",
+    technologies: ["HTML", "CSS", "JavaScript", "Bootstrap"],
+    detailsLink: "https://mailobedo.nl",
+    githubLink: "https://github.com/mailobedo/mailobedo-website",
   },
   {
-    title: "Task Management App",
-    description: "A productivity app for teams with real-time collaboration, file sharing, and automated workflows.",
-    image: "https://images.unsplash.com/photo-1531403009284-440f080d1e12?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
-    type: "Mobile App",
+    title: "Weather Dashboard",
+    description: "A responsive web application that displays current weather and forecasts for any location. Features clean UI and intuitive user experience.",
+    image: "https://images.unsplash.com/photo-1561484930-998b6a7b22e8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+    type: "Web App",
     typeColor: "secondary",
-    technologies: ["React Native", "Firebase", "Redux"],
+    technologies: ["React", "OpenWeather API", "TailwindCSS"],
     detailsLink: "#",
-    githubLink: "https://github.com",
+    githubLink: "https://github.com/mailobedo/weather-app",
   },
   {
-    title: "AI Content Generator",
-    description: "An AI-powered platform that helps users create engaging blog posts, social media content, and marketing copy.",
-    image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
-    type: "SaaS",
+    title: "Recipe Finder",
+    description: "A web application that allows users to search for recipes based on ingredients they have on hand, helping reduce food waste and inspire cooking creativity.",
+    image: "https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+    type: "Web App",
     typeColor: "accent",
-    technologies: ["Next.js", "Python", "GPT-3", "AWS"],
+    technologies: ["JavaScript", "Node.js", "Express", "Recipe API"],
     detailsLink: "#",
-    githubLink: "https://github.com",
+    githubLink: "https://github.com/mailobedo/recipe-finder",
   },
 ];
 
 export const experiences: Experience[] = [
   {
-    title: "Senior Frontend Developer",
-    company: "Tech Innovations Inc.",
-    period: "2020 - Present",
-    description: "Led the development of multiple client projects, implementing modern JavaScript frameworks and optimizing application performance. Mentored junior developers and established best practices.",
-  },
-  {
-    title: "Full Stack Developer",
-    company: "Digital Solutions LLC",
-    period: "2018 - 2020",
-    description: "Developed and maintained web applications using React, Node.js, and MongoDB. Collaborated with designers to implement responsive UI components and improved API performance.",
-  },
-  {
     title: "Web Developer",
-    company: "Creative Agency Co.",
+    company: "Freelance",
+    period: "2020 - Present",
+    description: "Develop custom websites and web applications for various clients. Specialize in creating responsive, user-friendly interfaces using modern web technologies. Focus on clean code and performance optimization.",
+  },
+  {
+    title: "Front-End Developer",
+    company: "Tech Company",
+    period: "2018 - 2020",
+    description: "Built interactive user interfaces using React and modern JavaScript. Collaborated with designers and back-end developers to implement responsive and accessible web applications.",
+  },
+  {
+    title: "Junior Web Developer",
+    company: "Digital Agency",
     period: "2016 - 2018",
-    description: "Created responsive websites for clients across various industries. Implemented custom WordPress themes and plugins. Collaborated with the design team to create cohesive user experiences.",
+    description: "Created responsive websites for clients using HTML, CSS, and JavaScript. Worked with content management systems to deliver maintainable websites with easy content updates.",
   },
 ];
 
 export const educations: Education[] = [
   {
-    degree: "Master of Computer Science",
-    institution: "Stanford University",
-    period: "2014 - 2016",
-    description: "Specialized in Human-Computer Interaction and Machine Learning. Completed thesis on \"Improving User Experience through AI-driven Interfaces.\" GPA: 3.9/4.0",
+    degree: "Bachelor's in Computer Science",
+    institution: "University of Amsterdam",
+    period: "2012 - 2016",
+    description: "Focused on software development and web technologies. Participated in various coding competitions and hackathons. Completed coursework in algorithms, data structures, and web development.",
   },
   {
-    degree: "Bachelor of Science in Computer Science",
-    institution: "University of California, Berkeley",
-    period: "2010 - 2014",
-    description: "Completed with honors. Member of the Computer Science Honor Society. Participated in multiple hackathons and coding competitions.",
+    degree: "Web Development Bootcamp",
+    institution: "Coding Academy",
+    period: "2016",
+    description: "Intensive program covering front-end and back-end technologies. Developed multiple projects using modern frameworks and best practices in web development.",
   },
 ];
 
 export const certifications: Certification[] = [
-  { name: "AWS Certified Developer" },
-  { name: "Google Cloud Professional Developer" },
-  { name: "Certified Scrum Master" },
-  { name: "MongoDB Certified Developer" },
+  { name: "React Developer Certification" },
+  { name: "JavaScript Advanced Concepts" },
+  { name: "Python Programming" },
+  { name: "TailwindCSS Mastery" },
 ];
 
 export const contactInfo: ContactInfo = {
-  location: "San Francisco, CA 94105, United States",
-  email: "contact@johndoe.com",
-  phone: "(+1) 123-456-7890",
+  location: "Amsterdam, The Netherlands",
+  email: "info@mailobedo.nl",
+  phone: "+31 6 12345678",
 };
