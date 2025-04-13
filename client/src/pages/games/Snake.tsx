@@ -90,6 +90,31 @@ export default function Snake() {
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
+    // Draw background grid
+    ctx.strokeStyle = "#e5e7eb"; // Light gray grid
+    ctx.lineWidth = 0.5;
+    
+    // Draw vertical grid lines
+    for (let x = 0; x <= GRID_SIZE; x++) {
+      ctx.beginPath();
+      ctx.moveTo(x * CELL_SIZE, 0);
+      ctx.lineTo(x * CELL_SIZE, GRID_SIZE * CELL_SIZE);
+      ctx.stroke();
+    }
+    
+    // Draw horizontal grid lines
+    for (let y = 0; y <= GRID_SIZE; y++) {
+      ctx.beginPath();
+      ctx.moveTo(0, y * CELL_SIZE);
+      ctx.lineTo(GRID_SIZE * CELL_SIZE, y * CELL_SIZE);
+      ctx.stroke();
+    }
+    
+    // Draw a border around the game area
+    ctx.strokeStyle = "#9ca3af"; // Medium gray border
+    ctx.lineWidth = 2;
+    ctx.strokeRect(0, 0, GRID_SIZE * CELL_SIZE, GRID_SIZE * CELL_SIZE);
+    
     // Draw snake
     ctx.fillStyle = "#4F46E5"; // Primary color
     snake.current.forEach((segment, index) => {
@@ -102,22 +127,29 @@ export default function Snake() {
         ctx.fillStyle = `rgba(79, 70, 229, ${alpha})`;
       }
       
-      ctx.fillRect(
-        segment.x * CELL_SIZE,
-        segment.y * CELL_SIZE,
-        CELL_SIZE,
-        CELL_SIZE
-      );
+      // Draw segment with slightly rounded corners
+      const x = segment.x * CELL_SIZE;
+      const y = segment.y * CELL_SIZE;
+      const size = CELL_SIZE - 1; // Slightly smaller to see grid
+      const radius = 3; // Rounded corner radius
       
-      // Add border to cells
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + size - radius, y);
+      ctx.arcTo(x + size, y, x + size, y + radius, radius);
+      ctx.lineTo(x + size, y + size - radius);
+      ctx.arcTo(x + size, y + size, x + size - radius, y + size, radius);
+      ctx.lineTo(x + radius, y + size);
+      ctx.arcTo(x, y + size, x, y + size - radius, radius);
+      ctx.lineTo(x, y + radius);
+      ctx.arcTo(x, y, x + radius, y, radius);
+      ctx.closePath();
+      ctx.fill();
+      
+      // Add border to segments
       ctx.strokeStyle = "#ffffff";
       ctx.lineWidth = 1;
-      ctx.strokeRect(
-        segment.x * CELL_SIZE,
-        segment.y * CELL_SIZE,
-        CELL_SIZE,
-        CELL_SIZE
-      );
+      ctx.stroke();
     });
     
     // Draw food
@@ -126,7 +158,7 @@ export default function Snake() {
     ctx.arc(
       food.current.x * CELL_SIZE + CELL_SIZE / 2,
       food.current.y * CELL_SIZE + CELL_SIZE / 2,
-      CELL_SIZE / 2,
+      CELL_SIZE / 2 - 1, // Slightly smaller to see grid
       0,
       Math.PI * 2
     );
@@ -506,12 +538,15 @@ export default function Snake() {
                 </div>
                 
                 <div className="relative border-2 border-gray-200 rounded-md overflow-hidden mb-6">
-                  <canvas
-                    ref={canvasRef}
-                    width={GRID_SIZE * CELL_SIZE}
-                    height={GRID_SIZE * CELL_SIZE}
-                    className="bg-gray-50"
-                  />
+                  {/* Game canvas with responsive container */}
+                  <div className="w-full aspect-square max-w-[400px] mx-auto">
+                    <canvas
+                      ref={canvasRef}
+                      width={GRID_SIZE * CELL_SIZE}
+                      height={GRID_SIZE * CELL_SIZE}
+                      className="bg-gray-50 w-full h-full"
+                    />
+                  </div>
                   
                   {gameState === GameState.READY && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black/70 text-white">
