@@ -509,7 +509,7 @@ MIT
     }
   ];
 
-  // Prevent browser shortcuts
+  // Prevent browser shortcuts and handle specific keyboard events
   const preventBrowserShortcuts = (e: KeyboardEvent) => {
     // Keys we want to prevent browser behavior for
     const editorShortcuts = [
@@ -562,6 +562,13 @@ MIT
       e.altKey === shortcut.alt &&
       e.shiftKey === shortcut.shift
     );
+    
+    // Special handling for Ctrl+S
+    if (e.ctrlKey && e.key.toLowerCase() === 's' && !e.altKey && !e.shiftKey) {
+      e.preventDefault();
+      saveCurrentFile();
+      return;
+    }
     
     // If it's one of our editor shortcuts, prevent the browser from handling it
     if (isEditorShortcut) {
@@ -1624,7 +1631,7 @@ console.log("Let's start coding!");`,
   };
 
   // Save to localStorage
-  const saveToLocalStorage = (name: string = workspaceName) => {
+  const saveToLocalStorage = (name: string = workspaceName, showNotification: boolean = true) => {
     try {
       // Save current workspace state
       localStorage.setItem(`codeEditor_fileSystem_${name}`, JSON.stringify(fileSystem));
@@ -1638,14 +1645,18 @@ console.log("Let's start coding!");`,
         localStorage.setItem('codeEditor_workspaceList', JSON.stringify(updatedWorkspaces));
       }
       
+      // Show notification if requested
+      if (showNotification) {
+        toast({
+          title: "Changes saved",
+          description: `All changes saved to "${name}" workspace`,
+          duration: 2000
+        });
+      }
+      
       // Set as current workspace
       setWorkspaceName(name);
       localStorage.setItem('codeEditor_currentWorkspace', name);
-      
-      toast({
-        title: "Workspace Saved",
-        description: `Workspace "${name}" has been saved to browser storage`
-      });
     } catch (error) {
       toast({
         title: "Save Failed",
