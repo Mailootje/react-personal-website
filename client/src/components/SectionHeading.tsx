@@ -6,6 +6,7 @@ interface SectionHeadingProps {
   title: string;
   center?: boolean;
   className?: string;
+  isDark?: boolean;
 }
 
 export default function SectionHeading({
@@ -13,11 +14,12 @@ export default function SectionHeading({
   title,
   center = true,
   className,
+  isDark = false,
 }: SectionHeadingProps) {
   return (
     <div className={cn("mb-16", center && "text-center", className)}>
       <motion.h6 
-        className="text-accent font-medium mb-2"
+        className={cn("font-medium mb-2", isDark ? "text-green-400" : "text-accent")}
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
@@ -27,7 +29,7 @@ export default function SectionHeading({
       </motion.h6>
       
       <motion.h2 
-        className="text-3xl md:text-4xl font-bold mb-4"
+        className={cn("text-3xl md:text-4xl font-bold mb-4", isDark && "text-white")}
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}

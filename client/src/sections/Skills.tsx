@@ -1,5 +1,6 @@
 import { Container } from "@/components/ui/container";
 import SectionHeading from "@/components/SectionHeading";
+import { VideoBackground } from "@/components/VideoBackground";
 import { skills, professionalSkills } from "@/lib/data";
 import { motion } from "framer-motion";
 import { staggerContainer } from "@/lib/utils";
