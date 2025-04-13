@@ -46,6 +46,8 @@ interface FileSystemItem {
   parent: string | null;
   children?: string[];
   isOpen?: boolean;
+  isImage?: boolean;
+  mimeType?: string;
 }
 
 interface FileSystemState {
@@ -73,6 +75,29 @@ interface ContextMenuState {
 // Function to check if a file is a ZIP file
 const isZipFile = (filename: string): boolean => {
   return filename.toLowerCase().endsWith('.zip');
+};
+
+// Function to check if a file is an image
+const isImageFile = (filename: string): boolean => {
+  const extension = filename.split('.').pop()?.toLowerCase() || '';
+  const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg', 'ico'];
+  return imageExtensions.includes(extension);
+};
+
+// Get MIME type by file extension
+const getMimeType = (filename: string): string => {
+  const extension = filename.split('.').pop()?.toLowerCase() || '';
+  const mimeMap: Record<string, string> = {
+    'jpg': 'image/jpeg',
+    'jpeg': 'image/jpeg',
+    'png': 'image/png',
+    'gif': 'image/gif',
+    'bmp': 'image/bmp',
+    'webp': 'image/webp',
+    'svg': 'image/svg+xml',
+    'ico': 'image/x-icon'
+  };
+  return mimeMap[extension] || 'application/octet-stream';
 };
 
 // Language detection by file extension
@@ -1266,6 +1291,15 @@ console.log("Let's start coding with more storage!");`,
   // Process a single file upload
   const processSingleFile = (file: File) => {
     const reader = new FileReader();
+    const isImage = isImageFile(file.name);
+    
+    if (isImage) {
+      // For image files, use readAsDataURL to get a base64 string
+      reader.readAsDataURL(file);
+    } else {
+      // For text files, use readAsText
+      reader.readAsText(file);
+    }
     
     reader.onload = (e) => {
       const content = e.target?.result as string;
@@ -1273,6 +1307,7 @@ console.log("Let's start coding with more storage!");`,
       // Create a new file in the root
       const newFileId = generateId();
       const language = getLanguageByFilename(file.name);
+      const mimeType = isImage ? getMimeType(file.name) : 'text/plain';
       
       // Update the file system
       setFileSystem(prev => {
@@ -1286,7 +1321,9 @@ console.log("Let's start coding with more storage!");`,
             type: 'file',
             content: content,
             language: language,
-            parent: null
+            parent: null,
+            isImage: isImage,
+            mimeType: mimeType
           }
         };
         
@@ -1315,8 +1352,6 @@ console.log("Let's start coding with more storage!");`,
         description: `${file.name} has been added to your workspace`,
       });
     };
-    
-    reader.readAsText(file);
   };
 
   // Process a ZIP file upload
@@ -4129,17 +4164,39 @@ console.log("Starting fresh with partial cleanup!");`,
                   })}
                 </div>
 
-                {/* Monaco Editor */}
+                {/* Image Viewer or Monaco Editor */}
                 <div className="flex-grow">
-                  <Editor
-                    height="100%"
-                    language={currentLanguage}
-                    theme={editorTheme}
-                    value={currentContent}
-                    onChange={handleEditorChange}
-                    onMount={handleEditorDidMount}
-                    options={editorOptions}
-                  />
+                  {(() => {
+                    const activeTab = tabs.find(tab => tab.isActive);
+                    if (!activeTab) return null;
+                    
+                    const activeFile = fileSystem.items[activeTab.fileId];
+                    if (activeFile && activeFile.isImage) {
+                      // Render image viewer for image files
+                      return (
+                        <div className="h-full w-full flex items-center justify-center bg-gray-900 overflow-auto p-4">
+                          <img 
+                            src={activeFile.content} 
+                            alt={activeFile.name}
+                            className="max-w-full max-h-[calc(100vh-180px)] object-contain"
+                          />
+                        </div>
+                      );
+                    }
+                    
+                    // Render Monaco editor for text files
+                    return (
+                      <Editor
+                        height="100%"
+                        language={currentLanguage}
+                        theme={editorTheme}
+                        value={currentContent}
+                        onChange={handleEditorChange}
+                        onMount={handleEditorDidMount}
+                        options={editorOptions}
+                      />
+                    );
+                  })()}
                 </div>
               </div>
             </Split>
