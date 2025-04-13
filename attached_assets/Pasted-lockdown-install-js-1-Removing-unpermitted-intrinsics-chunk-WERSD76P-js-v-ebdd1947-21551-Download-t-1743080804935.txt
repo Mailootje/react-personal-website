@@ -1,0 +1,1007 @@
+lockdown-install.js:1 Removing unpermitted intrinsics
+chunk-WERSD76P.js?v=ebdd1947:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+Tetris.tsx:1001 Start button clicked
+Tetris.tsx:681 Initializing game...
+Tetris.tsx:113 Creating tetromino with index 2, color: #FF8000
+Tetris.tsx:114 Shape: [[0,0,1],[1,1,1],[0,0,0]]
+Tetris.tsx:113 Creating tetromino with index 3, color: #FFFF00
+Tetris.tsx:114 Shape: [[1,1],[1,1]]
+Tetris.tsx:695 Created initial tetromino: {shape: Array(3), color: '#FF8000', position: {…}, rotation: 0}
+Tetris.tsx:696 Created initial next tetromino: {shape: Array(2), color: '#FFFF00', position: {…}, rotation: 0}
+Tetris.tsx:948 Level changed to 1, drop time adjusted to 1000ms
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:718 Setting initial tetrominos...
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:722 Setting next tetromino...
+Tetris.tsx:186 Checking collision for tetromino at {x: 4, y: 0}
+Tetris.tsx:209 No collision detected
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:767 Starting game loop...
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:755 Auto drop scheduled
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+Tetris.tsx:730 Current tetromino in render loop: null
+Tetris.tsx:729 Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
+ Render loop called, gameState: READY
+ Current tetromino in render loop: null
