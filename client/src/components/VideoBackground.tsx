@@ -1,4 +1,7 @@
 import React, { useEffect, useRef } from "react";
+// Import videos directly
+import webmVideo from "@assets/videoplayback.webm";
+import mp4Video from "@assets/videoplayback.mp4";
 
 interface VideoBackgroundProps {
   opacity?: number;
@@ -17,6 +20,10 @@ export function VideoBackground({
     // Ensure video is muted to allow autoplay
     if (videoRef.current) {
       videoRef.current.muted = true;
+      // Force video to play
+      videoRef.current.play().catch(err => {
+        console.error("Error playing video:", err);
+      });
     }
   }, []);
 
@@ -33,8 +40,8 @@ export function VideoBackground({
           className="absolute inset-0 object-cover w-full h-full"
           style={{ opacity }}
         >
-          <source src="/assets/videos/videoplayback.webm" type="video/webm" />
-          <source src="/assets/videos/videoplayback.mp4" type="video/mp4" />
+          <source src={webmVideo} type="video/webm" />
+          <source src={mp4Video} type="video/mp4" />
           Your browser does not support the video tag.
         </video>
       </div>
