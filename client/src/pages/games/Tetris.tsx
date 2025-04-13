@@ -460,16 +460,39 @@ export default function Tetris() {
   
   // Move the tetromino left, right, or down
   const moveTetromino = useCallback((direction: 'left' | 'right') => {
-    if (!currentTetromino || gameState !== GameState.PLAYING) return;
+    console.log(`🎮 moveTetromino called, direction: ${direction}`);
+    
+    if (!currentTetromino) {
+      console.error("❌ Cannot move: currentTetromino is null or undefined");
+      return;
+    }
+    
+    if (gameState !== GameState.PLAYING) {
+      console.error(`❌ Cannot move: game state is ${gameState}, not PLAYING`);
+      return;
+    }
     
     const deltaX = direction === 'left' ? -1 : 1;
+    console.log(`🎮 Moving ${direction}, delta: ${deltaX}`);
+    console.log(`🎮 Current position: x=${currentTetromino.position.x}, y=${currentTetromino.position.y}`);
     
-    // Create a deep copy of the tetromino with new position
-    const newTetromino = cloneTetromino(currentTetromino);
-    newTetromino.position.x += deltaX;
-    
-    if (!isColliding(newTetromino)) {
-      setCurrentTetromino(newTetromino);
+    try {
+      // Create a deep copy of the tetromino with new position
+      const newTetromino = cloneTetromino(currentTetromino);
+      newTetromino.position.x += deltaX;
+      console.log(`🎮 New position: x=${newTetromino.position.x}, y=${newTetromino.position.y}`);
+      
+      const collision = isColliding(newTetromino);
+      console.log(`🎮 Collision check: ${collision}`);
+      
+      if (!collision) {
+        console.log("🎮 No collision, updating tetromino position");
+        setCurrentTetromino(newTetromino);
+      } else {
+        console.log("🎮 Collision detected, cannot move");
+      }
+    } catch (error) {
+      console.error("❌ Error in moveTetromino:", error);
     }
   }, [currentTetromino, gameState, isColliding]);
   
@@ -631,31 +654,37 @@ export default function Tetris() {
     console.log("Current tetromino:", currentTetromino);
     
     if (!currentTetromino) {
-      console.log("No current tetromino, cannot drop");
+      console.error("⚠️ No current tetromino, cannot drop");
       return;
     }
     
     if (gameState !== GameState.PLAYING) {
-      console.log("Game not in PLAYING state, cannot drop");
+      console.error("⚠️ Game not in PLAYING state, cannot drop, state is:", gameState);
       return;
     }
     
     console.log("Trying to drop tetromino from", currentTetromino.position);
     
-    // Create a deep copy of the tetromino with new position
-    const newTetromino = cloneTetromino(currentTetromino);
-    newTetromino.position.y += 1;
-    
-    const collision = isColliding(newTetromino);
-    console.log("Collision?", collision);
-    
-    if (!collision) {
-      console.log("Moving tetromino down to", newTetromino.position);
-      setCurrentTetromino(newTetromino);
-    } else {
-      console.log("Collision detected, settling block");
-      // The tetromino cannot move down further, so lock it in place
-      settleBlock();
+    try {
+      // Create a deep copy of the tetromino with new position
+      const newTetromino = cloneTetromino(currentTetromino);
+      newTetromino.position.y += 1;
+      
+      const collision = isColliding(newTetromino);
+      console.log("Collision?", collision);
+      
+      if (!collision) {
+        console.log("Moving tetromino down to", newTetromino.position);
+        console.log("Before update, current tetromino:", currentTetromino);
+        setCurrentTetromino(newTetromino);
+        console.log("After update, setting to:", newTetromino);
+      } else {
+        console.log("Collision detected, settling block");
+        // The tetromino cannot move down further, so lock it in place
+        settleBlock();
+      }
+    } catch (error) {
+      console.error("Error in dropTetromino:", error);
     }
   }, [currentTetromino, gameState, isColliding, settleBlock]);
   
@@ -724,20 +753,28 @@ export default function Tetris() {
     
     // Create new render loop instance - this ensures we capture the latest state
     const newRenderLoop = () => {
-      // Get the current state directly from React state
-      console.log("Render loop called, gameState:", GameState.PLAYING);
-      console.log("Current tetromino in render loop:", initialTetromino);
+      // Log the actual current state from React state
+      console.log("Render loop called, gameState:", gameState);
+      console.log("Current tetromino in render loop:", currentTetromino);
       
       // Always draw the board
       drawBoard();
       
-      // Always draw the current tetromino since we know it exists (we just created it)
-      // Pass the initial tetromino directly to ensure it's drawn even if React state hasn't updated yet
-      drawCurrentTetromino(initialTetromino);
+      // Draw the current tetromino - on the first frame use initialTetromino,
+      // but then use the React state as it updates
+      if (currentTetromino) {
+        drawCurrentTetromino(currentTetromino);
+      } else {
+        // Fallback to initialTetromino only on first render
+        drawCurrentTetromino(initialTetromino);
+      }
       
-      // Draw preview if it exists
-      // Pass the initial next tetromino directly
-      drawPreview(initialNextTetromino);
+      // Draw preview similarly
+      if (nextTetromino) {
+        drawPreview(nextTetromino);
+      } else {
+        drawPreview(initialNextTetromino);
+      }
       
       // Continue animation loop
       gameLoopRef.current = requestAnimationFrame(newRenderLoop);
@@ -754,12 +791,18 @@ export default function Tetris() {
     // This ensures that each drop operation completes before scheduling the next one
     const scheduleDrop = () => {
       dropIntervalRef.current = window.setTimeout(() => {
-        console.log("Auto drop scheduled");
-        // Only drop if the game is still playing
-        if (gameState === GameState.PLAYING) {
+        // Get the current game state directly, avoid capturing old state in closure
+        const currentGameState = GameState.PLAYING; // Force it to be playing for this first drop
+        console.log("Auto drop scheduled, current game state:", currentGameState);
+        
+        // Check game state before dropping
+        if (currentGameState === GameState.PLAYING) {
+          console.log("Dropping tetromino in auto drop");
           dropTetromino();
           // Schedule the next drop after this one completes
           scheduleDrop();
+        } else {
+          console.log("Not dropping tetromino, game state is not PLAYING");
         }
       }, dropTimeRef.current);
     };
@@ -834,38 +877,46 @@ export default function Tetris() {
   
   // Handle keyboard input
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
+    console.log("🎮 Key pressed:", event.key, "GameState:", gameState);
+    
     if (gameState === GameState.PLAYING) {
       switch (event.key) {
         case 'ArrowLeft':
         case 'a':
         case 'A':
           event.preventDefault();
+          console.log("🎮 Moving LEFT");
           moveTetromino('left');
           break;
         case 'ArrowRight':
         case 'd':
         case 'D':
           event.preventDefault();
+          console.log("🎮 Moving RIGHT");
           moveTetromino('right');
           break;
         case 'ArrowDown':
         case 's':
         case 'S':
           event.preventDefault();
+          console.log("🎮 Moving DOWN");
           dropTetromino();
           break;
         case 'ArrowUp':
         case 'w':
         case 'W':
           event.preventDefault();
+          console.log("🎮 ROTATING");
           rotateTetromino();
           break;
         case ' ':
           event.preventDefault();
+          console.log("🎮 HARD DROP");
           hardDrop();
           break;
         case 'Escape':
           event.preventDefault();
+          console.log("🎮 PAUSE/RESUME");
           if (gameState === GameState.PLAYING) {
             pauseGame();
           } else if (gameState === GameState.PAUSED) {
@@ -874,6 +925,7 @@ export default function Tetris() {
           break;
       }
     } else if (gameState === GameState.PAUSED && event.key === 'Escape') {
+      console.log("🎮 RESUMING from paused state");
       resumeGame();
     }
   }, [gameState, moveTetromino, dropTetromino, rotateTetromino, hardDrop, pauseGame, resumeGame]);
