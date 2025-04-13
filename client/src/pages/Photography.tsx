@@ -3,9 +3,11 @@ import { Footer } from "@/components/Footer";
 import { Container } from "@/components/ui/container";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 
 interface Photo {
-  id: number;
+  id: string;
   url: string;
   title: string;
   category: string;
@@ -13,75 +15,34 @@ interface Photo {
 
 export default function Photography() {
   const [activeFilter, setActiveFilter] = useState("all");
-  const [photos, setPhotos] = useState<Photo[]>([
-    {
-      id: 1,
-      url: "https://images.unsplash.com/photo-1682686580433-2af05ee670ad?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3",
-      title: "Urban Scene",
-      category: "urban",
-    },
-    {
-      id: 2,
-      url: "https://images.unsplash.com/photo-1682687220923-c58b9a4592ea?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3",
-      title: "Mountain View",
-      category: "nature",
-    },
-    {
-      id: 3,
-      url: "https://images.unsplash.com/photo-1682687220945-616c768269f9?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3",
-      title: "Portrait",
-      category: "people",
-    },
-    {
-      id: 4,
-      url: "https://images.unsplash.com/photo-1682687220208-22d7a2543e88?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3",
-      title: "City Lights",
-      category: "urban",
-    },
-    {
-      id: 5,
-      url: "https://images.unsplash.com/photo-1695653420507-b1b4cdd3e272?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3",
-      title: "Ocean View",
-      category: "nature",
-    },
-    {
-      id: 6,
-      url: "https://images.unsplash.com/photo-1682687220199-76c6e2a71bd7?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3",
-      title: "Street Life",
-      category: "people",
-    },
-    {
-      id: 7,
-      url: "https://images.unsplash.com/photo-1711282493063-e29ab9850c24?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3",
-      title: "Architectural Details",
-      category: "urban",
-    },
-    {
-      id: 8,
-      url: "https://images.unsplash.com/photo-1695653244652-26494a57775e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3",
-      title: "Sunset",
-      category: "nature",
-    },
-    {
-      id: 9,
-      url: "https://images.unsplash.com/photo-1682687220945-616c768269f9?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3",
-      title: "Travel Portraits",
-      category: "people",
-    },
-  ]);
-  const [filteredPhotos, setFilteredPhotos] = useState<Photo[]>(photos);
+  const [filteredPhotos, setFilteredPhotos] = useState<Photo[]>([]);
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Categories for the filter
   const categories = ["all", "urban", "nature", "people"];
 
+  // Fetch photos using React Query
+  const { data: photos, isError } = useQuery({
+    queryKey: ['photos', activeFilter],
+    queryFn: async () => {
+      const endpoint = activeFilter === 'all' 
+        ? '/api/photos' 
+        : `/api/photos?category=${activeFilter}`;
+        
+      const response = await apiRequest<Photo[]>(endpoint);
+      return response || [];
+    }
+  });
+
   useEffect(() => {
-    if (activeFilter === "all") {
+    if (photos) {
       setFilteredPhotos(photos);
     } else {
-      setFilteredPhotos(photos.filter(photo => photo.category === activeFilter));
+      setFilteredPhotos([]);
     }
-  }, [activeFilter, photos]);
+    setIsLoading(false);
+  }, [photos]);
 
   const openPhotoModal = (photo: Photo) => {
     setSelectedPhoto(photo);
@@ -147,33 +108,65 @@ export default function Photography() {
               ))}
             </motion.div>
 
-            <motion.div 
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              {filteredPhotos.map((photo) => (
-                <motion.div
-                  key={photo.id}
-                  className="overflow-hidden rounded-lg shadow-md cursor-pointer h-64 md:h-80"
-                  onClick={() => openPhotoModal(photo)}
-                  whileHover={{ 
-                    scale: 1.03,
-                    transition: { duration: 0.3 } 
-                  }}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <img
-                    src={photo.url}
-                    alt={photo.title}
-                    className="w-full h-full object-cover transition-transform duration-500"
-                  />
-                </motion.div>
-              ))}
-            </motion.div>
+            {isLoading ? (
+              <div className="flex justify-center py-12">
+                <div className="flex flex-col items-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                  <p className="mt-4 text-muted-foreground">Loading images...</p>
+                </div>
+              </div>
+            ) : isError ? (
+              <div className="flex justify-center py-12">
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative" role="alert">
+                  <p className="font-bold">Error</p>
+                  <p>There was an error loading the images. Please check if the image folders exist or try again later.</p>
+                </div>
+              </div>
+            ) : filteredPhotos.length === 0 ? (
+              <div className="flex justify-center py-12">
+                <div className="text-center">
+                  <p className="text-xl mb-2">No images found</p>
+                  <p className="text-muted-foreground">
+                    {activeFilter !== "all" 
+                      ? `No images found in the ${activeFilter} category. Try selecting a different category.`
+                      : "No images found. Add some images to your photography folders to get started."
+                    }
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <motion.div 
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+              >
+                {filteredPhotos.map((photo) => (
+                  <motion.div
+                    key={photo.id}
+                    className="overflow-hidden rounded-lg shadow-md cursor-pointer h-64 md:h-80"
+                    onClick={() => openPhotoModal(photo)}
+                    whileHover={{ 
+                      scale: 1.03,
+                      transition: { duration: 0.3 } 
+                    }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <img
+                      src={photo.url}
+                      alt={photo.title}
+                      className="w-full h-full object-cover transition-transform duration-500"
+                      onError={(e) => {
+                        // If image fails to load, replace with placeholder
+                        (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x300?text=Image+Not+Found';
+                      }}
+                    />
+                  </motion.div>
+                ))}
+              </motion.div>
+            )}
           </Container>
         </section>
 

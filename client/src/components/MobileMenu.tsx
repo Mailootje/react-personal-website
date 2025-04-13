@@ -59,7 +59,7 @@ export function MobileMenu({ isOpen, onClose, items }: MobileMenuProps) {
                 </motion.a>
               ) : (
                 <Link key={item.name} href={item.href}>
-                  <motion.a
+                  <motion.div
                     className="text-text hover:text-primary transition-colors font-medium py-2 cursor-pointer"
                     onClick={onClose}
                     initial={{ x: -20, opacity: 0 }}
@@ -67,7 +67,7 @@ export function MobileMenu({ isOpen, onClose, items }: MobileMenuProps) {
                     transition={{ duration: 0.3 }}
                   >
                     {item.name}
-                  </motion.a>
+                  </motion.div>
                 </Link>
               )
             ))}
