@@ -32,6 +32,13 @@ export default function Apps() {
       icon: "🔗",
       tags: ["Utility", "Sharing"]
     },
+    {
+      id: "qr-code-generator",
+      title: "QR Code Generator",
+      description: "Create customizable QR codes for links, contact info, WiFi and more",
+      icon: "📱",
+      tags: ["Utility", "Sharing"]
+    }
     // Add more apps as needed
   ]);
 

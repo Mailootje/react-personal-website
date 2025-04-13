@@ -8,6 +8,7 @@ import Photography from "@/pages/Photography";
 import Apps from "@/pages/Apps";
 import PasswordGenerator from "@/pages/apps/PasswordGenerator";
 import LinkShortener from "@/pages/apps/LinkShortener";
+import QRCodeGenerator from "@/pages/apps/QRCodeGenerator";
 
 function Router() {
   return (
@@ -17,6 +18,7 @@ function Router() {
       <Route path="/apps" component={Apps}/>
       <Route path="/apps/password-generator" component={PasswordGenerator}/>
       <Route path="/apps/link-shortener" component={LinkShortener}/>
+      <Route path="/apps/qr-code-generator" component={QRCodeGenerator}/>
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>

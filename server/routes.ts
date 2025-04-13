@@ -6,6 +6,7 @@ import fs from "fs";
 import { z } from "zod";
 import { insertShortenedLinkSchema, ShortenedLink } from "@shared/schema";
 import { log } from "./vite";
+import QRCode from 'qrcode';
 
 interface PhotoItem {
   id: string;
@@ -237,6 +238,82 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       log(`Error redirecting shortened link: ${error}`, "routes");
       res.redirect('/not-found');
+    }
+  });
+
+  // Generate QR Code API
+  app.post("/api/generate-qrcode", async (req, res) => {
+    try {
+      const { content, type, options } = req.body;
+      
+      if (!content) {
+        return res.status(400).json({ message: "Content is required" });
+      }
+
+      let finalContent = content;
+
+      // Format content based on type
+      if (type) {
+        switch (type) {
+          case 'email':
+            finalContent = `mailto:${content}`;
+            break;
+          case 'tel':
+            finalContent = `tel:${content}`;
+            break;
+          case 'sms':
+            finalContent = `sms:${content}`;
+            break;
+          case 'whatsapp':
+            // Remove any non-digit characters for WhatsApp
+            const cleanNumber = content.replace(/\D/g, '');
+            finalContent = `https://wa.me/${cleanNumber}`;
+            break;
+          case 'wifi':
+            // Expected format: {ssid, password, encryption}
+            if (content.ssid) {
+              const encryption = content.encryption || 'WPA';
+              finalContent = `WIFI:S:${content.ssid};T:${encryption};${content.password ? `P:${content.password};` : ''};;`;
+            }
+            break;
+          case 'vcard':
+            // Basic vCard format
+            if (content.name) {
+              finalContent = `BEGIN:VCARD\nVERSION:3.0\nN:${content.name}\n`;
+              if (content.phone) finalContent += `TEL:${content.phone}\n`;
+              if (content.email) finalContent += `EMAIL:${content.email}\n`;
+              if (content.url) finalContent += `URL:${content.url}\n`;
+              if (content.company) finalContent += `ORG:${content.company}\n`;
+              finalContent += 'END:VCARD';
+            }
+            break;
+          default:
+            // For URLs and other types, use as is
+            break;
+        }
+      }
+
+      // Generate QR code as data URL
+      const qrOptions = {
+        errorCorrectionLevel: 'M',
+        margin: 4,
+        width: 300,
+        color: {
+          dark: '#000000',
+          light: '#ffffff'
+        },
+        ...options
+      };
+
+      const dataUrl = await QRCode.toDataURL(finalContent, qrOptions);
+      
+      res.json({ 
+        qrcode: dataUrl,
+        content: finalContent 
+      });
+    } catch (error) {
+      log(`Error generating QR code: ${error}`, "routes");
+      res.status(500).json({ message: "Failed to generate QR code" });
     }
   });
 
