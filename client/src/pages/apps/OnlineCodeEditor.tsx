@@ -2600,10 +2600,10 @@ console.log("Starting fresh!");`,
     console.log("Has workspace data:", !!hasWorkspaceData);
     
     if (hasWorkspaceData) {
-      // We have saved data, show the workspace restore dialog
+      // We have saved data, automatically load workspace without prompting
+      console.log("Found workspace data, automatically loading workspace:", currentWorkspace);
       setWorkspaceToRestore(currentWorkspace);
-      setIsWorkspaceMigrated(false);
-      setIsWorkspaceRestoreOpen(true);
+      loadFromLocalStorage(currentWorkspace);
     }
     // If we have old format data, migrate it to the new format
     else if (localStorage.getItem('codeEditor_fileSystem')) {
@@ -2622,10 +2622,9 @@ console.log("Starting fresh!");`,
       localStorage.removeItem('codeEditor_tabs');
       localStorage.removeItem('codeEditor_options');
       
-      // Show the workspace restore dialog for the migrated workspace
-      setWorkspaceToRestore('default');
-      setIsWorkspaceMigrated(true);
-      setIsWorkspaceRestoreOpen(true);
+      // Automatically load the migrated workspace without prompting
+      console.log("Automatically loading migrated workspace");
+      loadFromLocalStorage('default');
     } else {
       console.log("No existing workspaces found, saving initial state");
       // Force save current state to ensure it's initialized properly
@@ -3821,49 +3820,18 @@ console.log("Starting fresh!");`,
         </DialogContent>
       </Dialog>
       
-      {/* Workspace Restore Dialog */}
-      <Dialog open={isWorkspaceRestoreOpen} onOpenChange={(open) => {
-        setIsWorkspaceRestoreOpen(open);
-        if (!open) {
-          // If dialog is closed without choosing an option, default to NOT restoring
-          console.log("Workspace restore dialog closed without choice, using default");
-          setTimeout(() => {
-            saveToLocalStorage(workspaceToRestore);
-          }, 1000);
-        }
-      }}>
+      {/* Workspace Restore Dialog - Hidden but kept for backward compatibility */}
+      <Dialog open={false} onOpenChange={setIsWorkspaceRestoreOpen}>
         <DialogContent className="sm:max-w-md bg-gray-900 text-white border-gray-700">
           <DialogHeader>
-            <DialogTitle>Restore Workspace</DialogTitle>
+            <DialogTitle>Workspace Loaded</DialogTitle>
             <DialogDescription className="text-gray-400">
-              {isWorkspaceMigrated ? 
-                "We found a previously saved workspace. Would you like to restore it?" :
-                `Would you like to restore your previous workspace "${workspaceToRestore}"?`
-              }
+              Your workspace has been automatically loaded.
             </DialogDescription>
           </DialogHeader>
-          <div className="flex space-x-4 justify-end">
-            <Button 
-              variant="outline" 
-              onClick={() => {
-                console.log("User declined loading workspace, using default");
-                // Force save current state to ensure it's initialized properly
-                setTimeout(() => {
-                  saveToLocalStorage(workspaceToRestore);
-                }, 1000);
-                setIsWorkspaceRestoreOpen(false);
-              }}
-            >
-              No, Start Fresh
-            </Button>
-            <Button 
-              onClick={() => {
-                console.log(`User confirmed loading ${isWorkspaceMigrated ? 'migrated' : ''} workspace:`, workspaceToRestore);
-                loadFromLocalStorage(workspaceToRestore);
-                setIsWorkspaceRestoreOpen(false);
-              }}
-            >
-              Yes, Restore
+          <div className="flex justify-end">
+            <Button onClick={() => setIsWorkspaceRestoreOpen(false)}>
+              OK
             </Button>
           </div>
         </DialogContent>
