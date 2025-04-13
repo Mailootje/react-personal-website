@@ -26,6 +26,8 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { VideoBackground } from '@/components/VideoBackground';
 import { useToast } from '@/hooks/use-toast';
 import { Header } from '@/components/Header';
@@ -137,6 +139,9 @@ const OnlineCodeEditor: React.FC = () => {
   const [autoSaveEnabled, setAutoSaveEnabled] = useState<boolean>(true);
   const [autoSaveInterval, setAutoSaveInterval] = useState<number>(30); // seconds
   const [lastSaveTime, setLastSaveTime] = useState<Date | null>(null);
+  const [workspaceName, setWorkspaceName] = useState<string>('default');
+  const [savedWorkspaces, setSavedWorkspaces] = useState<string[]>([]);
+  const [isWorkspaceManagerOpen, setIsWorkspaceManagerOpen] = useState<boolean>(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const editorRef = useRef<any>(null);
@@ -1243,7 +1248,7 @@ console.log("Let's start coding!");`,
       const fileId = activeTab.fileId;
       const file = prev.items[fileId];
       
-      return {
+      const newFileSystem = {
         ...prev,
         items: {
           ...prev.items,
@@ -1253,6 +1258,17 @@ console.log("Let's start coding!");`,
           }
         }
       };
+      
+      // Save to localStorage after updating state
+      try {
+        localStorage.setItem('codeEditor_fileSystem', JSON.stringify(newFileSystem));
+        localStorage.setItem('codeEditor_tabs', JSON.stringify(tabs));
+        setLastSaveTime(new Date());
+      } catch (err) {
+        console.error('Failed to auto-save to localStorage:', err);
+      }
+      
+      return newFileSystem;
     });
     
     toast({
@@ -1526,16 +1542,44 @@ console.log("Let's start coding!");`,
     });
   };
 
-  // Save to localStorage
-  const saveToLocalStorage = () => {
+  // Load available workspaces from localStorage
+  const loadWorkspaceList = () => {
     try {
-      localStorage.setItem('codeEditor_fileSystem', JSON.stringify(fileSystem));
-      localStorage.setItem('codeEditor_tabs', JSON.stringify(tabs));
-      localStorage.setItem('codeEditor_options', JSON.stringify(editorOptions));
+      const workspaceList = localStorage.getItem('codeEditor_workspaceList');
+      if (workspaceList) {
+        setSavedWorkspaces(JSON.parse(workspaceList));
+      } else {
+        // Initialize with default workspace if none exist
+        setSavedWorkspaces(['default']);
+        localStorage.setItem('codeEditor_workspaceList', JSON.stringify(['default']));
+      }
+    } catch (error) {
+      console.error('Failed to load workspace list:', error);
+    }
+  };
+
+  // Save to localStorage
+  const saveToLocalStorage = (name: string = workspaceName) => {
+    try {
+      // Save current workspace state
+      localStorage.setItem(`codeEditor_fileSystem_${name}`, JSON.stringify(fileSystem));
+      localStorage.setItem(`codeEditor_tabs_${name}`, JSON.stringify(tabs));
+      localStorage.setItem(`codeEditor_options_${name}`, JSON.stringify(editorOptions));
+      
+      // Update workspace list if this is a new workspace
+      if (!savedWorkspaces.includes(name)) {
+        const updatedWorkspaces = [...savedWorkspaces, name];
+        setSavedWorkspaces(updatedWorkspaces);
+        localStorage.setItem('codeEditor_workspaceList', JSON.stringify(updatedWorkspaces));
+      }
+      
+      // Set as current workspace
+      setWorkspaceName(name);
+      localStorage.setItem('codeEditor_currentWorkspace', name);
       
       toast({
         title: "Workspace Saved",
-        description: "Your workspace has been saved to browser storage"
+        description: `Workspace "${name}" has been saved to browser storage`
       });
     } catch (error) {
       toast({
@@ -1547,11 +1591,11 @@ console.log("Let's start coding!");`,
   };
 
   // Load from localStorage
-  const loadFromLocalStorage = () => {
+  const loadFromLocalStorage = (name: string = workspaceName) => {
     try {
-      const savedFileSystem = localStorage.getItem('codeEditor_fileSystem');
-      const savedTabs = localStorage.getItem('codeEditor_tabs');
-      const savedOptions = localStorage.getItem('codeEditor_options');
+      const savedFileSystem = localStorage.getItem(`codeEditor_fileSystem_${name}`);
+      const savedTabs = localStorage.getItem(`codeEditor_tabs_${name}`);
+      const savedOptions = localStorage.getItem(`codeEditor_options_${name}`);
       
       if (savedFileSystem) {
         setFileSystem(JSON.parse(savedFileSystem));
@@ -1577,9 +1621,13 @@ console.log("Let's start coding!");`,
         setEditorOptions(JSON.parse(savedOptions));
       }
       
+      // Set as current workspace
+      setWorkspaceName(name);
+      localStorage.setItem('codeEditor_currentWorkspace', name);
+      
       toast({
         title: "Workspace Loaded",
-        description: "Your saved workspace has been loaded from browser storage"
+        description: `Workspace "${name}" has been loaded from browser storage`
       });
     } catch (error) {
       toast({
@@ -1588,6 +1636,96 @@ console.log("Let's start coding!");`,
         variant: "destructive"
       });
     }
+  };
+  
+  // Create a new workspace
+  const createNewWorkspace = (name: string) => {
+    if (!name.trim()) {
+      toast({
+        title: "Invalid Workspace Name",
+        description: "Please enter a valid workspace name",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (savedWorkspaces.includes(name)) {
+      toast({
+        title: "Workspace Exists",
+        description: "A workspace with this name already exists",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Reset to a new empty workspace
+    const welcomeId = generateId();
+    const initialFileSystem: FileSystemState = {
+      items: {
+        [welcomeId]: {
+          id: welcomeId,
+          name: 'welcome.js',
+          type: 'file',
+          content: `// Welcome to your new workspace: ${name}
+// This editor runs completely in your browser
+// You can:
+// - Create and edit files and folders
+// - Upload files and even entire folders (as ZIP)
+// - Download your files
+// - Switch between different workspaces
+// - Syntax highlighting for many languages
+
+console.log("Let's start coding in workspace ${name}!");`,
+          language: 'javascript',
+          parent: null
+        }
+      },
+      rootItems: [welcomeId]
+    };
+    
+    setFileSystem(initialFileSystem);
+    setTabs([{
+      id: generateId(),
+      fileId: welcomeId,
+      isActive: true
+    }]);
+    setCurrentContent(initialFileSystem.items[welcomeId].content || '');
+    setCurrentLanguage('javascript');
+    
+    // Save the new workspace
+    saveToLocalStorage(name);
+  };
+  
+  // Delete a workspace
+  const deleteWorkspace = (name: string) => {
+    if (name === 'default') {
+      toast({
+        title: "Cannot Delete Default",
+        description: "The default workspace cannot be deleted",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Remove workspace data from localStorage
+    localStorage.removeItem(`codeEditor_fileSystem_${name}`);
+    localStorage.removeItem(`codeEditor_tabs_${name}`);
+    localStorage.removeItem(`codeEditor_options_${name}`);
+    
+    // Update workspace list
+    const updatedWorkspaces = savedWorkspaces.filter(ws => ws !== name);
+    setSavedWorkspaces(updatedWorkspaces);
+    localStorage.setItem('codeEditor_workspaceList', JSON.stringify(updatedWorkspaces));
+    
+    // If we're deleting the current workspace, switch to default
+    if (name === workspaceName) {
+      loadFromLocalStorage('default');
+    }
+    
+    toast({
+      title: "Workspace Deleted",
+      description: `Workspace "${name}" has been deleted`
+    });
   };
 
   // Auto-save effect
@@ -1606,11 +1744,40 @@ console.log("Let's start coding!");`,
 
   // Check for localStorage data on first load
   useEffect(() => {
-    if (localStorage.getItem('codeEditor_fileSystem')) {
+    // Load list of available workspaces
+    loadWorkspaceList();
+    
+    // Get the current workspace name (if any)
+    const currentWorkspace = localStorage.getItem('codeEditor_currentWorkspace') || 'default';
+    
+    // Check if there's saved data for the current workspace
+    if (localStorage.getItem(`codeEditor_fileSystem_${currentWorkspace}`)) {
       // We have saved data, ask the user if they want to load it
+      const shouldLoad = window.confirm(`Would you like to restore your previous workspace "${currentWorkspace}"?`);
+      if (shouldLoad) {
+        loadFromLocalStorage(currentWorkspace);
+      }
+    }
+    // If we have old format data, migrate it to the new format
+    else if (localStorage.getItem('codeEditor_fileSystem')) {
+      // Migrate old data to default workspace
+      const oldFileSystem = localStorage.getItem('codeEditor_fileSystem');
+      const oldTabs = localStorage.getItem('codeEditor_tabs');
+      const oldOptions = localStorage.getItem('codeEditor_options');
+      
+      if (oldFileSystem) localStorage.setItem('codeEditor_fileSystem_default', oldFileSystem);
+      if (oldTabs) localStorage.setItem('codeEditor_tabs_default', oldTabs);
+      if (oldOptions) localStorage.setItem('codeEditor_options_default', oldOptions);
+      
+      // Clean up old format
+      localStorage.removeItem('codeEditor_fileSystem');
+      localStorage.removeItem('codeEditor_tabs');
+      localStorage.removeItem('codeEditor_options');
+      
+      // Ask the user if they want to load it
       const shouldLoad = window.confirm('Would you like to restore your previous workspace?');
       if (shouldLoad) {
-        loadFromLocalStorage();
+        loadFromLocalStorage('default');
       }
     }
   }, []);
@@ -1876,6 +2043,28 @@ console.log("Let's start coding!");`,
                     </TooltipTrigger>
                     <TooltipContent>
                       <p>Insert code snippets</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                
+                <Separator orientation="vertical" className="h-6 bg-gray-700" />
+                
+                {/* Workspace Manager */}
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        className="h-7 px-1.5"
+                        onClick={() => setIsWorkspaceManagerOpen(true)}
+                      >
+                        <FaFolderOpen size={14} />
+                        <span className="ml-1">Workspaces</span>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Manage workspaces</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -2332,6 +2521,96 @@ console.log("Let's start coding!");`,
               </div>
             ))}
           </div>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Workspace Manager Dialog */}
+      <Dialog open={isWorkspaceManagerOpen} onOpenChange={setIsWorkspaceManagerOpen}>
+        <DialogContent className="sm:max-w-md bg-gray-900 text-white border-gray-700">
+          <DialogHeader>
+            <DialogTitle>Workspace Manager</DialogTitle>
+            <DialogDescription className="text-gray-400">
+              Create, switch between, and manage your workspaces.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-2">
+            <div>
+              <h3 className="text-sm font-medium mb-1">Current Workspace</h3>
+              <Badge variant="secondary" className="font-mono text-white bg-gray-700">{workspaceName}</Badge>
+            </div>
+            
+            <div>
+              <h3 className="text-sm font-medium mb-1">Create New Workspace</h3>
+              <div className="flex space-x-2">
+                <Input 
+                  placeholder="Workspace name" 
+                  className="bg-gray-800 border-gray-700"
+                  value={newItemName}
+                  onChange={(e) => setNewItemName(e.target.value)}
+                />
+                <Button 
+                  variant="secondary" 
+                  onClick={() => {
+                    createNewWorkspace(newItemName);
+                    setNewItemName('');
+                  }}
+                  disabled={!newItemName.trim()}
+                >
+                  Create
+                </Button>
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="text-sm font-medium mb-1">Available Workspaces</h3>
+              <ScrollArea className="h-[140px] rounded-md border border-gray-700">
+                <div className="p-2">
+                  {savedWorkspaces.length === 0 ? (
+                    <div className="text-gray-400 text-sm py-2">No saved workspaces</div>
+                  ) : (
+                    <div className="space-y-1">
+                      {savedWorkspaces.map((name) => (
+                        <div key={name} className="flex items-center justify-between py-1">
+                          <span className={workspaceName === name ? "font-medium text-blue-400" : ""}>
+                            {name}
+                          </span>
+                          <div className="flex space-x-1">
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-7 px-2"
+                              onClick={() => {
+                                loadFromLocalStorage(name);
+                                setIsWorkspaceManagerOpen(false);
+                              }}
+                            >
+                              <FaFolderOpen size={12} className="mr-1" />
+                              Open
+                            </Button>
+                            {name !== 'default' && (
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-7 px-2 text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                                onClick={() => deleteWorkspace(name)}
+                              >
+                                <FaTrash size={12} />
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </ScrollArea>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsWorkspaceManagerOpen(false)}>Close</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
