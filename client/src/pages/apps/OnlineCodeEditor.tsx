@@ -510,7 +510,7 @@ MIT
   ];
 
   // Prevent browser shortcuts and handle specific keyboard events
-  const preventBrowserShortcuts = (e: KeyboardEvent) => {
+  const preventBrowserShortcuts = useCallback((e: KeyboardEvent) => {
     // Keys we want to prevent browser behavior for
     const editorShortcuts = [
       // Ctrl+F (Find/Search)
@@ -563,18 +563,11 @@ MIT
       e.shiftKey === shortcut.shift
     );
     
-    // Special handling for Ctrl+S
-    if (e.ctrlKey && e.key.toLowerCase() === 's' && !e.altKey && !e.shiftKey) {
-      e.preventDefault();
-      saveCurrentFile();
-      return;
-    }
-    
     // If it's one of our editor shortcuts, prevent the browser from handling it
     if (isEditorShortcut) {
       e.preventDefault();
     }
-  };
+  }, []);
   
   // Initialize with a welcome file
   useEffect(() => {
@@ -618,7 +611,7 @@ console.log("Let's start coding!");`,
     return () => {
       document.removeEventListener('keydown', preventBrowserShortcuts);
     };
-  }, []);
+  }, [preventBrowserShortcuts]);
 
   // Handle file/folder tree rendering
   const renderFileSystemItem = (itemId: string, depth: number = 0) => {
@@ -1325,6 +1318,8 @@ console.log("Let's start coding!");`,
       const fileId = activeTab.fileId;
       const file = prev.items[fileId];
       
+      if (!file) return prev;
+      
       const newFileSystem = {
         ...prev,
         items: {
@@ -1343,6 +1338,7 @@ console.log("Let's start coding!");`,
     saveToLocalStorage(workspaceName);
     setLastSaveTime(new Date());
     
+    // Always show a toast notification on save
     toast({
       title: "File Saved",
       description: `File saved to "${workspaceName}" workspace`,
