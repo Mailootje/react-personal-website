@@ -28,19 +28,19 @@ export default function TetrisGame() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-1">
+      <main className="flex-1 bg-black">
         <section className="py-12">
           <Container>
             <div className="mb-8">
-              <h1 className="text-3xl font-bold mb-2">Tetris</h1>
-              <p className="text-gray-600">
+              <h1 className="text-3xl font-bold mb-2 text-white">Tetris</h1>
+              <p className="text-gray-400">
                 The classic block-stacking game. Arrange the falling tetrominos to create complete lines.
               </p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="md:col-span-2">
-                <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="bg-gray-900 rounded-lg shadow-md p-6 border border-gray-700 text-white">
                   <Tetris
                     keyboardControls={{
                       down: 'MOVE_DOWN',
@@ -69,29 +69,29 @@ export default function TetrisGame() {
                     }) => (
                       <div>
                         <div className="grid grid-cols-3 gap-4 mb-6">
-                          <div className="bg-gray-100 p-3 rounded-md text-center">
-                            <div className="text-sm text-gray-500 mb-1">Score</div>
-                            <div className="font-bold text-xl">{points * 100}</div>
+                          <div className="bg-gray-800 p-3 rounded-md text-center border border-gray-700">
+                            <div className="text-sm text-gray-400 mb-1">Score</div>
+                            <div className="font-bold text-xl text-white">{points * 100}</div>
                           </div>
-                          <div className="bg-gray-100 p-3 rounded-md text-center">
-                            <div className="text-sm text-gray-500 mb-1">Lines</div>
-                            <div className="font-bold text-xl">{linesCleared}</div>
+                          <div className="bg-gray-800 p-3 rounded-md text-center border border-gray-700">
+                            <div className="text-sm text-gray-400 mb-1">Lines</div>
+                            <div className="font-bold text-xl text-white">{linesCleared}</div>
                           </div>
-                          <div className="bg-gray-100 p-3 rounded-md text-center">
-                            <div className="text-sm text-gray-500 mb-1">Level</div>
-                            <div className="font-bold text-xl">{Math.floor(linesCleared / 10) + 1}</div>
+                          <div className="bg-gray-800 p-3 rounded-md text-center border border-gray-700">
+                            <div className="text-sm text-gray-400 mb-1">Level</div>
+                            <div className="font-bold text-xl text-white">{Math.floor(linesCleared / 10) + 1}</div>
                           </div>
                         </div>
                         
                         <div className="flex flex-col md:flex-row gap-6 items-start">
-                          <div className="relative border-2 border-gray-200 rounded-md overflow-hidden bg-gray-50">
+                          <div className="relative border-2 border-gray-700 rounded-md overflow-hidden bg-gray-800">
                             <Gameboard />
                           </div>
                           
                           <div className="flex flex-col gap-6 items-center md:items-start">
                             <div>
-                              <h3 className="font-bold text-lg mb-2">Next Piece</h3>
-                              <div className="border-2 border-gray-200 rounded-md overflow-hidden bg-gray-50">
+                              <h3 className="font-bold text-lg mb-2 text-white">Next Piece</h3>
+                              <div className="border-2 border-gray-700 rounded-md overflow-hidden bg-gray-800">
                                 <PieceQueue />
                               </div>
                             </div>
@@ -135,18 +135,18 @@ export default function TetrisGame() {
               </div>
               
               <div>
-                <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="bg-gray-900 rounded-lg shadow-md p-6 border border-gray-700 text-white">
                   <h3 className="font-bold text-lg mb-4">How to Play</h3>
                   
                   <div className="space-y-4">
-                    <p>
+                    <p className="text-gray-300">
                       Tetris is a classic tile-matching puzzle game. The goal is to manipulate falling
                       tetrominos to create complete horizontal lines, which then disappear and award points.
                     </p>
                     
                     <div>
-                      <h4 className="font-semibold mb-2">Controls</h4>
-                      <ul className="list-disc pl-5 space-y-1">
+                      <h4 className="font-semibold mb-2 text-gray-200">Controls</h4>
+                      <ul className="list-disc pl-5 space-y-1 text-gray-300">
                         <li>Arrow Left / A: Move tetromino left</li>
                         <li>Arrow Right / D: Move tetromino right</li>
                         <li>Arrow Down / S: Drop tetromino by one row</li>
@@ -158,16 +158,16 @@ export default function TetrisGame() {
                     </div>
                     
                     <div>
-                      <h4 className="font-semibold mb-2">Special Features</h4>
-                      <ul className="list-disc pl-5 space-y-1">
-                        <li><strong>Ghost Piece:</strong> Shows where your piece will land</li>
-                        <li><strong>Next Queue:</strong> See upcoming pieces</li>
+                      <h4 className="font-semibold mb-2 text-gray-200">Special Features</h4>
+                      <ul className="list-disc pl-5 space-y-1 text-gray-300">
+                        <li><strong className="text-white">Ghost Piece:</strong> Shows where your piece will land</li>
+                        <li><strong className="text-white">Next Queue:</strong> See upcoming pieces</li>
                       </ul>
                     </div>
                     
                     <div>
-                      <h4 className="font-semibold mb-2">Tips</h4>
-                      <ul className="list-disc pl-5 space-y-1">
+                      <h4 className="font-semibold mb-2 text-gray-200">Tips</h4>
+                      <ul className="list-disc pl-5 space-y-1 text-gray-300">
                         <li>Plan ahead using the next piece queue</li>
                         <li>Leave a column open for I-pieces (Tetris clears)</li>
                         <li>Keep the stack as low as possible</li>

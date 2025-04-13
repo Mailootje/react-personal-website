@@ -1025,38 +1025,38 @@ export default function PacmanGame() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-1">
+      <main className="flex-1 bg-black">
         <section className="py-12">
           <Container>
             <div className="mb-8">
-              <h1 className="text-3xl font-bold mb-2">Pac-Man</h1>
-              <p className="text-gray-600">
+              <h1 className="text-3xl font-bold mb-2 text-white">Pac-Man</h1>
+              <p className="text-gray-400">
                 The classic arcade game. Navigate the maze, eat all the dots, and avoid the ghosts!
               </p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="md:col-span-2">
-                <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="bg-gray-900 rounded-lg shadow-md p-6 border border-gray-700 text-white">
                   {/* Score and lives display */}
                   <div className="grid grid-cols-3 gap-4 mb-4">
-                    <div className="bg-gray-100 p-3 rounded-md text-center">
-                      <div className="text-sm text-gray-500 mb-1">Score</div>
-                      <div className="font-bold text-xl">{score}</div>
+                    <div className="bg-gray-800 p-3 rounded-md text-center border border-gray-700">
+                      <div className="text-sm text-gray-400 mb-1">Score</div>
+                      <div className="font-bold text-xl text-white">{score}</div>
                     </div>
-                    <div className="bg-gray-100 p-3 rounded-md text-center">
-                      <div className="text-sm text-gray-500 mb-1">Lives</div>
-                      <div className="font-bold text-xl">{lives}</div>
+                    <div className="bg-gray-800 p-3 rounded-md text-center border border-gray-700">
+                      <div className="text-sm text-gray-400 mb-1">Lives</div>
+                      <div className="font-bold text-xl text-white">{lives}</div>
                     </div>
-                    <div className="bg-gray-100 p-3 rounded-md text-center">
-                      <div className="text-sm text-gray-500 mb-1">High Score</div>
-                      <div className="font-bold text-xl">{highScore}</div>
+                    <div className="bg-gray-800 p-3 rounded-md text-center border border-gray-700">
+                      <div className="text-sm text-gray-400 mb-1">High Score</div>
+                      <div className="font-bold text-xl text-white">{highScore}</div>
                     </div>
                   </div>
                   
                   <div className="flex flex-col items-center">
                     {/* Game canvas */}
-                    <div className="relative border-2 border-gray-200 rounded-md overflow-hidden mb-6">
+                    <div className="relative border-2 border-gray-700 rounded-md overflow-hidden mb-6">
                       <canvas
                         ref={canvasRef}
                         width={CANVAS_WIDTH}
@@ -1097,7 +1097,7 @@ export default function PacmanGame() {
                       <div className="grid grid-cols-3 gap-2 max-w-xs mx-auto">
                         <div></div>
                         <button
-                          className="p-4 bg-gray-200 rounded-md active:bg-gray-300"
+                          className="p-4 bg-gray-800 rounded-md active:bg-gray-700 text-white border border-gray-700"
                           onClick={() => handleTouchControl(Direction.UP)}
                         >
                           <span className="text-xl">↑</span>
@@ -1105,21 +1105,21 @@ export default function PacmanGame() {
                         <div></div>
                         
                         <button
-                          className="p-4 bg-gray-200 rounded-md active:bg-gray-300"
+                          className="p-4 bg-gray-800 rounded-md active:bg-gray-700 text-white border border-gray-700"
                           onClick={() => handleTouchControl(Direction.LEFT)}
                         >
                           <span className="text-xl">←</span>
                         </button>
                         
                         <button
-                          className="p-4 bg-gray-200 rounded-md active:bg-gray-300"
+                          className="p-4 bg-gray-800 rounded-md active:bg-gray-700 text-white border border-gray-700"
                           onClick={() => handleTouchControl(Direction.DOWN)}
                         >
                           <span className="text-xl">↓</span>
                         </button>
                         
                         <button
-                          className="p-4 bg-gray-200 rounded-md active:bg-gray-300"
+                          className="p-4 bg-gray-800 rounded-md active:bg-gray-700 text-white border border-gray-700"
                           onClick={() => handleTouchControl(Direction.RIGHT)}
                         >
                           <span className="text-xl">→</span>
@@ -1131,18 +1131,18 @@ export default function PacmanGame() {
               </div>
               
               <div>
-                <div className="bg-white rounded-lg shadow-md p-6">
-                  <h3 className="font-bold text-lg mb-4">How to Play</h3>
+                <div className="bg-gray-900 rounded-lg shadow-md p-6 border border-gray-700 text-white">
+                  <h3 className="font-bold text-lg mb-4 text-white">How to Play</h3>
                   
                   <div className="space-y-4">
-                    <p>
+                    <p className="text-gray-300">
                       Pac-Man is one of the most iconic arcade games of all time. Navigate through the
                       maze, eat all the dots, and avoid the ghosts to clear each level.
                     </p>
                     
                     <div>
-                      <h4 className="font-semibold mb-2">Controls</h4>
-                      <ul className="list-disc pl-5 space-y-1">
+                      <h4 className="font-semibold mb-2 text-gray-200">Controls</h4>
+                      <ul className="list-disc pl-5 space-y-1 text-gray-300">
                         <li>Arrow Up / W: Move up</li>
                         <li>Arrow Right / D: Move right</li>
                         <li>Arrow Down / S: Move down</li>
@@ -1152,8 +1152,8 @@ export default function PacmanGame() {
                     </div>
                     
                     <div>
-                      <h4 className="font-semibold mb-2">Scoring</h4>
-                      <ul className="list-disc pl-5 space-y-1">
+                      <h4 className="font-semibold mb-2 text-gray-200">Scoring</h4>
+                      <ul className="list-disc pl-5 space-y-1 text-gray-300">
                         <li>Small Dot: 10 points</li>
                         <li>Power Pellet: 50 points</li>
                         <li>Ghost: 200 points</li>
@@ -1161,16 +1161,16 @@ export default function PacmanGame() {
                     </div>
                     
                     <div>
-                      <h4 className="font-semibold mb-2">Power Pellets</h4>
-                      <p>
+                      <h4 className="font-semibold mb-2 text-gray-200">Power Pellets</h4>
+                      <p className="text-gray-300">
                         Eating a power pellet allows Pac-Man to eat the ghosts for a limited time. 
                         Ghosts turn blue when they are vulnerable.
                       </p>
                     </div>
                     
                     <div>
-                      <h4 className="font-semibold mb-2">The Ghosts</h4>
-                      <ul className="list-disc pl-5 space-y-1">
+                      <h4 className="font-semibold mb-2 text-gray-200">The Ghosts</h4>
+                      <ul className="list-disc pl-5 space-y-1 text-gray-300">
                         <li><span className="text-red-500">Blinky (Red)</span>: Directly chases Pac-Man</li>
                         <li><span className="text-pink-300">Pinky (Pink)</span>: Tries to ambush Pac-Man</li>
                         <li><span className="text-cyan-400">Inky (Cyan)</span>: Unpredictable movement</li>

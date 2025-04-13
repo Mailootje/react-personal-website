@@ -87,11 +87,12 @@ export default function Snake() {
     canvas.width = GRID_SIZE * CELL_SIZE;
     canvas.height = GRID_SIZE * CELL_SIZE;
     
-    // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Clear canvas and fill with dark background
+    ctx.fillStyle = "#111111"; // Dark background
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     
     // Draw background grid
-    ctx.strokeStyle = "#e5e7eb"; // Light gray grid
+    ctx.strokeStyle = "#1F2937"; // Dark gray grid lines
     ctx.lineWidth = 0.5;
     
     // Draw vertical grid lines
@@ -111,7 +112,7 @@ export default function Snake() {
     }
     
     // Draw a border around the game area
-    ctx.strokeStyle = "#9ca3af"; // Medium gray border
+    ctx.strokeStyle = "#4B5563"; // Medium gray border
     ctx.lineWidth = 2;
     ctx.strokeRect(0, 0, GRID_SIZE * CELL_SIZE, GRID_SIZE * CELL_SIZE);
     
@@ -498,7 +499,7 @@ export default function Snake() {
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <Header />
       <main className="flex-grow">
-        <section className="py-16 bg-gray-50">
+        <section className="py-16 bg-black">
           <Container maxWidth="xl">
             <div className="mb-8">
               <Link href="/games">
@@ -513,38 +514,39 @@ export default function Snake() {
               subtitle="Classic Arcade" 
               title="Snake Game"
               center
+              isDark={true}
             />
             
             <div className="mt-8 flex flex-col items-center">
-              <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl">
+              <div className="bg-gray-900 p-6 rounded-lg shadow-md w-full max-w-2xl border border-gray-700">
                 <div className="flex justify-between items-center mb-4">
                   <div className="flex items-center space-x-4">
                     <div>
-                      <div className="text-sm text-gray-500">Score</div>
-                      <div className="text-2xl font-bold">{score}</div>
+                      <div className="text-sm text-gray-400">Score</div>
+                      <div className="text-2xl font-bold text-white">{score}</div>
                     </div>
                     <div>
-                      <div className="text-sm text-gray-500">High Score</div>
-                      <div className="text-2xl font-bold">{highScore}</div>
+                      <div className="text-sm text-gray-400">High Score</div>
+                      <div className="text-2xl font-bold text-white">{highScore}</div>
                     </div>
                   </div>
                   
                   <div>
-                    <div className="text-sm text-gray-500">Level</div>
-                    <Badge variant="outline" className="px-3 py-1">
+                    <div className="text-sm text-gray-400">Level</div>
+                    <Badge variant="outline" className="px-3 py-1 border-gray-600 text-white">
                       {level}
                     </Badge>
                   </div>
                 </div>
                 
-                <div className="relative border-2 border-gray-200 rounded-md overflow-hidden mb-6">
+                <div className="relative border-2 border-gray-700 rounded-md overflow-hidden mb-6">
                   {/* Game canvas with responsive container */}
                   <div className="w-full aspect-square max-w-[400px] mx-auto">
                     <canvas
                       ref={canvasRef}
                       width={GRID_SIZE * CELL_SIZE}
                       height={GRID_SIZE * CELL_SIZE}
-                      className="bg-gray-50 w-full h-full"
+                      className="bg-gray-900 w-full h-full border border-gray-700"
                     />
                   </div>
                   
@@ -592,7 +594,7 @@ export default function Snake() {
                   <div className="grid grid-cols-3 gap-2 max-w-xs mx-auto">
                     <div></div>
                     <button
-                      className="p-4 bg-gray-200 rounded-md active:bg-gray-300"
+                      className="p-4 bg-gray-800 rounded-md active:bg-gray-700 text-white border border-gray-700"
                       onClick={() => handleTouchInput(Direction.UP)}
                     >
                       <span className="text-xl">↑</span>
@@ -600,21 +602,21 @@ export default function Snake() {
                     <div></div>
                     
                     <button
-                      className="p-4 bg-gray-200 rounded-md active:bg-gray-300"
+                      className="p-4 bg-gray-800 rounded-md active:bg-gray-700 text-white border border-gray-700"
                       onClick={() => handleTouchInput(Direction.LEFT)}
                     >
                       <span className="text-xl">←</span>
                     </button>
                     
                     <button
-                      className="p-4 bg-gray-200 rounded-md active:bg-gray-300"
+                      className="p-4 bg-gray-800 rounded-md active:bg-gray-700 text-white border border-gray-700"
                       onClick={() => handleTouchInput(Direction.DOWN)}
                     >
                       <span className="text-xl">↓</span>
                     </button>
                     
                     <button
-                      className="p-4 bg-gray-200 rounded-md active:bg-gray-300"
+                      className="p-4 bg-gray-800 rounded-md active:bg-gray-700 text-white border border-gray-700"
                       onClick={() => handleTouchInput(Direction.RIGHT)}
                     >
                       <span className="text-xl">→</span>
@@ -623,29 +625,29 @@ export default function Snake() {
                 </div>
                 
                 <div className="mt-6">
-                  <h3 className="font-bold text-lg mb-2">Controls</h3>
+                  <h3 className="font-bold text-lg mb-2 text-white">Controls</h3>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="bg-gray-50 p-3 rounded border">
-                      <div className="font-medium">Move Up</div>
-                      <div className="text-sm text-gray-500">Arrow Up / W</div>
+                    <div className="bg-gray-800 p-3 rounded border border-gray-700">
+                      <div className="font-medium text-white">Move Up</div>
+                      <div className="text-sm text-gray-400">Arrow Up / W</div>
                     </div>
-                    <div className="bg-gray-50 p-3 rounded border">
-                      <div className="font-medium">Move Down</div>
-                      <div className="text-sm text-gray-500">Arrow Down / S</div>
+                    <div className="bg-gray-800 p-3 rounded border border-gray-700">
+                      <div className="font-medium text-white">Move Down</div>
+                      <div className="text-sm text-gray-400">Arrow Down / S</div>
                     </div>
-                    <div className="bg-gray-50 p-3 rounded border">
-                      <div className="font-medium">Move Left</div>
-                      <div className="text-sm text-gray-500">Arrow Left / A</div>
+                    <div className="bg-gray-800 p-3 rounded border border-gray-700">
+                      <div className="font-medium text-white">Move Left</div>
+                      <div className="text-sm text-gray-400">Arrow Left / A</div>
                     </div>
-                    <div className="bg-gray-50 p-3 rounded border">
-                      <div className="font-medium">Move Right</div>
-                      <div className="text-sm text-gray-500">Arrow Right / D</div>
+                    <div className="bg-gray-800 p-3 rounded border border-gray-700">
+                      <div className="font-medium text-white">Move Right</div>
+                      <div className="text-sm text-gray-400">Arrow Right / D</div>
                     </div>
                   </div>
                   
-                  <div className="mt-4 bg-gray-50 p-3 rounded border">
-                    <div className="font-medium">Pause/Resume</div>
-                    <div className="text-sm text-gray-500">Escape Key</div>
+                  <div className="mt-4 bg-gray-800 p-3 rounded border border-gray-700">
+                    <div className="font-medium text-white">Pause/Resume</div>
+                    <div className="text-sm text-gray-400">Escape Key</div>
                   </div>
                 </div>
               </div>
