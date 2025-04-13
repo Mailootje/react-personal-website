@@ -19,28 +19,27 @@ function getProxiedImageUrl(originalUrl: string): string {
 }
 
 export default function Photography() {
-  const [activeFilter, setActiveFilter] = useState("all");
+  const [activeFilter, setActiveFilter] = useState("root");
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
 
-  // Categories for the filter
-  const categories = ["all", "urban", "nature", "people"];
+  // Categories for the filter (now using countries)
+  const categories = ["root", "Belgium", "Germany", "Netherlands", "Spain"];
   
   // Category display names
   const categoryDisplayNames = {
-    "all": "All Photos",
-    "urban": "Urban",
-    "nature": "Nature/Belgium",
-    "people": "People"
+    "root": "Featured",
+    "Belgium": "Belgium",
+    "Germany": "Germany",
+    "Netherlands": "Netherlands",
+    "Spain": "Spain"
   };
 
   // Fetch photos using React Query
   const { data: photos = [], isError, isLoading } = useQuery({
     queryKey: ['photos', activeFilter],
     queryFn: async () => {
-      const endpoint = activeFilter === 'all' 
-        ? '/api/photos' 
-        : `/api/photos?category=${activeFilter}`;
-        
+      // Always pass the category parameter (root being the default category)
+      const endpoint = `/api/photos?category=${activeFilter}`;
       return apiRequest<Photo[]>(endpoint);
     }
   });
@@ -128,10 +127,7 @@ export default function Photography() {
                 <div className="text-center">
                   <p className="text-xl mb-2">No images found</p>
                   <p className="text-muted-foreground">
-                    {activeFilter !== "all" 
-                      ? `No images found in the ${activeFilter} category. Try selecting a different category.`
-                      : "No images found. Add some images to your photography folders to get started."
-                    }
+                    {`No images found in the ${categoryDisplayNames[activeFilter as keyof typeof categoryDisplayNames]} category. Try selecting a different category.`}
                   </p>
                 </div>
               </div>

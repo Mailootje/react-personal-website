@@ -51,7 +51,7 @@ const downloadStats: Map<string, DownloadStat> = new Map();
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Image proxy API for handling CORS issues with external images
-  app.get("/api/image-proxy", (req, res) => {
+  app.get("/api/image-proxy", async (req, res) => {
     try {
       const url = req.query.url as string;
       
@@ -64,25 +64,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid URL protocol" });
       }
       
-      // Handle the proxy request using https module
-      const proxyRequest = https.get(url, (proxyRes) => {
-        // Set the content-type header from the proxied response
-        res.setHeader('Content-Type', proxyRes.headers['content-type'] || 'image/jpeg');
-        
-        // Pipe the response data to our response
-        proxyRes.pipe(res);
-      });
+      // Use fetch API instead of https module for better handling
+      const response = await fetch(url);
       
-      proxyRequest.on('error', (e) => {
-        console.error('Image proxy error:', e);
-        res.status(500).json({ message: 'Failed to fetch image' });
-      });
+      if (!response.ok) {
+        return res.status(response.status).json({ 
+          message: `Failed to fetch image: ${response.statusText}` 
+        });
+      }
       
-      // Set a timeout for the proxy request
-      proxyRequest.setTimeout(10000, () => {
-        proxyRequest.destroy();
-        res.status(504).json({ message: 'Image request timed out' });
-      });
+      // Get content type from response headers and set it in our response
+      const contentType = response.headers.get('content-type') || 'image/jpeg';
+      res.setHeader('Content-Type', contentType);
+      
+      // Get binary data directly
+      const imageBuffer = await response.arrayBuffer();
+      
+      // Send the image data
+      res.send(Buffer.from(imageBuffer));
       
     } catch (error) {
       console.error("Error in image proxy:", error);
@@ -328,10 +327,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Photography API - Get all photos or by category
+  // Photography API - Get photos by country category
   app.get("/api/photos", async (req, res) => {
     try {
-      const category = req.query.category as string | undefined;
+      const category = req.query.category as string || "root";
       const photos: PhotoItem[] = [];
       
       // Fetch the gallery JSON from mailobedo.nl
@@ -342,60 +341,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const galleryData = await response.json();
       
-      // Map of categories we want to display
-      const categoryMap: Record<string, string> = {
-        "urban": "Urban",
-        "nature": "Belgium", // Using "Belgium" folder for nature category
-        "people": "People"
-      };
+      // Valid categories that match directly with the JSON response
+      const validCategories = ["root", "Belgium", "Germany", "Netherlands", "Spain"];
       
-      // Process the photos
-      if (category && category !== "all") {
-        // Get specific category
-        const mappedCategory = categoryMap[category];
-        if (mappedCategory && galleryData[mappedCategory]) {
-          galleryData[mappedCategory].forEach((photo: any, index: number) => {
-            if (photo.url && photo.name && photo.url.match(/\.(jpg|jpeg|png|gif)$/i)) {
+      if (validCategories.includes(category)) {
+        // Make sure the category exists in the gallery data
+        if (galleryData[category] && Array.isArray(galleryData[category])) {
+          // Process photos from the selected category
+          galleryData[category].forEach((photo: any, index: number) => {
+            if (photo.url && photo.name && photo.url.match(/\.(jpg|jpeg|png|gif)$/i) && photo.name !== "Thumbs.db") {
               photos.push({
-                id: `${category}-${index}`,
+                id: `${category.toLowerCase()}-${index}`,
                 url: photo.url,
                 title: formatTitle(photo.name),
-                category
+                category: category
               });
             }
           });
         }
       } else {
-        // Get all images from all mapped categories
-        Object.entries(categoryMap).forEach(([cat, mappedCat]) => {
-          if (galleryData[mappedCat]) {
-            galleryData[mappedCat].forEach((photo: any, index: number) => {
-              if (photo.url && photo.name && photo.url.match(/\.(jpg|jpeg|png|gif)$/i)) {
-                photos.push({
-                  id: `${cat}-${index}`,
-                  url: photo.url,
-                  title: formatTitle(photo.name),
-                  category: cat
-                });
-              }
-            });
-          }
-        });
-        
-        // Add some photos from the root category
-        if (galleryData.root) {
+        // Fallback to root category if the requested category doesn't exist
+        if (galleryData.root && Array.isArray(galleryData.root)) {
           galleryData.root.forEach((photo: any, index: number) => {
             if (photo.url && photo.name && photo.url.match(/\.(jpg|jpeg|png|gif)$/i) && photo.name !== "Thumbs.db") {
               photos.push({
-                id: `general-${index}`,
+                id: `root-${index}`,
                 url: photo.url,
                 title: formatTitle(photo.name),
-                category: "urban" // Assigning root photos to the urban category
+                category: "root"
               });
             }
           });
         }
       }
+      
+      // Sort photos by filename for consistent ordering
+      photos.sort((a, b) => a.title.localeCompare(b.title));
       
       // Limit to 50 photos maximum to avoid overwhelming the UI
       const limitedPhotos = photos.slice(0, 50);
