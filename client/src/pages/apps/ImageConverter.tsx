@@ -1,6 +1,13 @@
-import { useState, useRef, useCallback } from 'react';
-import { FaUpload, FaDownload, FaFileArchive, FaTrash, FaSyncAlt } from 'react-icons/fa';
+import { useState, useRef, useCallback, useEffect } from 'react';
+import { FaUpload, FaDownload, FaFileArchive, FaTrash, FaSyncAlt, FaMicrochip } from 'react-icons/fa';
 import JSZip from 'jszip';
+
+// Ensure WebGL context type is available
+declare global {
+  interface Window {
+    WebGLRenderingContext: typeof WebGLRenderingContext;
+  }
+}
 import {
   Card,
   CardContent,
@@ -77,10 +84,37 @@ interface ImageItem {
 export default function ImageConverter() {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const webglCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const [images, setImages] = useState<ImageItem[]>([]);
   const [options, setOptions] = useState<ImageOptions>(DEFAULT_OPTIONS);
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingProgress, setProcessingProgress] = useState(0);
+  const [useHardwareAcceleration, setUseHardwareAcceleration] = useState(true);
+  const [isHardwareAccelerationSupported, setIsHardwareAccelerationSupported] = useState(false);
+  
+  // Check if hardware acceleration (WebGL) is supported
+  useEffect(() => {
+    try {
+      // Create temporary canvas to check WebGL support
+      const canvas = document.createElement('canvas');
+      const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+      
+      if (gl) {
+        // WebGL is supported
+        setIsHardwareAccelerationSupported(true);
+        webglCanvasRef.current = canvas;
+        console.log('Hardware acceleration enabled (WebGL supported)');
+      } else {
+        console.log('WebGL not supported, falling back to standard canvas');
+        setUseHardwareAcceleration(false);
+        setIsHardwareAccelerationSupported(false);
+      }
+    } catch (e) {
+      console.error('Error initializing WebGL:', e);
+      setUseHardwareAcceleration(false);
+      setIsHardwareAccelerationSupported(false);
+    }
+  }, []);
 
   // Handler for file selection
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -134,31 +168,236 @@ export default function ImageConverter() {
     setImages([]);
   };
 
-  // Convert image to the selected format
-  const convertImage = async (imgItem: ImageItem, options: ImageOptions): Promise<Blob | null> => {
+  // Hardware-accelerated processing using WebGL
+  const convertImageWithWebGL = async (imgItem: ImageItem, options: ImageOptions): Promise<Blob | null> => {
     return new Promise((resolve) => {
       try {
-        // Handle SVG format specially, as it requires different processing
-        if (options.format === 'svg+xml') {
-          // For SVG output, we would need server-side processing or a specialized library
-          // Instead, show a message that browser-side conversion to SVG is limited
-          toast({
-            title: "SVG Conversion Limited",
-            description: "Browser-based conversion to SVG is not fully supported. Results may vary."
-          });
+        // Check if WebGL is available
+        if (!webglCanvasRef.current) {
+          console.warn('WebGL canvas not available, falling back to standard processing');
+          // Fallback to regular canvas processing
+          const result = convertImageWithCanvas(imgItem, options);
+          resolve(result);
+          return;
+        }
+
+        const img = new Image();
+        img.onload = () => {
+          // Determine dimensions
+          let width = img.width;
+          let height = img.height;
           
-          // Attempt a basic conversion to SVG using canvas
-          // This won't produce ideal SVGs but provides basic functionality
-        }
+          if (options.resize) {
+            if (options.maintainAspectRatio) {
+              // Calculate new dimensions while maintaining aspect ratio
+              const aspectRatio = img.width / img.height;
+              if (options.width / options.height > aspectRatio) {
+                height = options.height;
+                width = height * aspectRatio;
+              } else {
+                width = options.width;
+                height = width / aspectRatio;
+              }
+            } else {
+              // Use exact dimensions
+              width = options.width;
+              height = options.height;
+            }
+          }
+          
+          // Set canvas dimensions
+          const canvas = webglCanvasRef.current as HTMLCanvasElement;
+          canvas.width = width;
+          canvas.height = height;
+          
+          // Get WebGL context
+          // Use type assertion to handle WebGL specific methods
+          const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+          if (!gl) {
+            console.warn('WebGL context not available, falling back to standard processing');
+            // Fallback to regular canvas processing
+            const result = convertImageWithCanvas(imgItem, options);
+            resolve(result);
+            return;
+          }
+          
+          // Explicitly type the WebGL context to fix the TypeScript errors
+          const webgl = gl as WebGLRenderingContext;
+          
+          // Set up WebGL for image processing
+          // Create vertex shader
+          const vertexShader = webgl.createShader(webgl.VERTEX_SHADER);
+          if (!vertexShader) {
+            resolve(null);
+            return;
+          }
+          
+          webgl.shaderSource(vertexShader, `
+            attribute vec2 a_position;
+            attribute vec2 a_texCoord;
+            varying vec2 v_texCoord;
+            void main() {
+              gl_Position = vec4(a_position, 0, 1);
+              v_texCoord = a_texCoord;
+            }
+          `);
+          webgl.compileShader(vertexShader);
+          
+          // Create fragment shader
+          const fragmentShader = webgl.createShader(webgl.FRAGMENT_SHADER);
+          if (!fragmentShader) {
+            resolve(null);
+            return;
+          }
+          
+          // Apply adjustments based on format
+          const hasTransparency = ['png', 'ico', 'tiff'].includes(options.format);
+          
+          webgl.shaderSource(fragmentShader, `
+            precision mediump float;
+            varying vec2 v_texCoord;
+            uniform sampler2D u_image;
+            void main() {
+              vec4 color = texture2D(u_image, v_texCoord);
+              ${!hasTransparency ? 'color.a = 1.0;' : ''} // Force opaque for formats that don't support transparency
+              gl_FragColor = color;
+            }
+          `);
+          webgl.compileShader(fragmentShader);
+          
+          // Create program and link shaders
+          const program = webgl.createProgram();
+          if (!program) {
+            resolve(null);
+            return;
+          }
+          
+          webgl.attachShader(program, vertexShader);
+          webgl.attachShader(program, fragmentShader);
+          webgl.linkProgram(program);
+          webgl.useProgram(program);
+          
+          // Set up geometry for drawing the image
+          const positionBuffer = webgl.createBuffer();
+          webgl.bindBuffer(webgl.ARRAY_BUFFER, positionBuffer);
+          webgl.bufferData(webgl.ARRAY_BUFFER, new Float32Array([
+            -1.0, -1.0,
+             1.0, -1.0,
+            -1.0,  1.0,
+            -1.0,  1.0,
+             1.0, -1.0,
+             1.0,  1.0
+          ]), webgl.STATIC_DRAW);
+          
+          // Set up texture coordinates
+          const texCoordBuffer = webgl.createBuffer();
+          webgl.bindBuffer(webgl.ARRAY_BUFFER, texCoordBuffer);
+          webgl.bufferData(webgl.ARRAY_BUFFER, new Float32Array([
+            0.0, 0.0,
+            1.0, 0.0,
+            0.0, 1.0,
+            0.0, 1.0,
+            1.0, 0.0,
+            1.0, 1.0
+          ]), webgl.STATIC_DRAW);
+          
+          // Create texture for the image
+          const texture = webgl.createTexture();
+          webgl.bindTexture(webgl.TEXTURE_2D, texture);
+          
+          // Set texture parameters
+          webgl.texParameteri(webgl.TEXTURE_2D, webgl.TEXTURE_WRAP_S, webgl.CLAMP_TO_EDGE);
+          webgl.texParameteri(webgl.TEXTURE_2D, webgl.TEXTURE_WRAP_T, webgl.CLAMP_TO_EDGE);
+          webgl.texParameteri(webgl.TEXTURE_2D, webgl.TEXTURE_MIN_FILTER, webgl.LINEAR);
+          webgl.texParameteri(webgl.TEXTURE_2D, webgl.TEXTURE_MAG_FILTER, webgl.LINEAR);
+          
+          // Upload image to texture
+          webgl.texImage2D(webgl.TEXTURE_2D, 0, webgl.RGBA, webgl.RGBA, webgl.UNSIGNED_BYTE, img);
+          
+          // Set up attributes
+          const positionLocation = webgl.getAttribLocation(program, "a_position");
+          const texCoordLocation = webgl.getAttribLocation(program, "a_texCoord");
+          
+          webgl.enableVertexAttribArray(positionLocation);
+          webgl.bindBuffer(webgl.ARRAY_BUFFER, positionBuffer);
+          webgl.vertexAttribPointer(positionLocation, 2, webgl.FLOAT, false, 0, 0);
+          
+          webgl.enableVertexAttribArray(texCoordLocation);
+          webgl.bindBuffer(webgl.ARRAY_BUFFER, texCoordBuffer);
+          webgl.vertexAttribPointer(texCoordLocation, 2, webgl.FLOAT, false, 0, 0);
+          
+          // Draw the image using WebGL
+          webgl.viewport(0, 0, width, height);
+          webgl.clearColor(1, 1, 1, 1); // White background
+          webgl.clear(webgl.COLOR_BUFFER_BIT);
+          webgl.drawArrays(webgl.TRIANGLES, 0, 6);
+          
+          // Read back the result and convert to blob
+          // Special handling for different formats
+          let mimeType = `image/${options.format}`;
+          
+          // Special case for SVG
+          if (options.format === 'svg+xml') {
+            mimeType = 'image/svg+xml';
+          }
+          
+          // For ICO format, use PNG as intermediate format since toBlob doesn't support ICO directly
+          if (options.format === 'ico') {
+            mimeType = 'image/png';
+          }
+          
+          // Convert WebGL canvas to regular canvas to use toBlob
+          const outputCanvas = document.createElement('canvas');
+          outputCanvas.width = width;
+          outputCanvas.height = height;
+          const outputCtx = outputCanvas.getContext('2d');
+          if (!outputCtx) {
+            resolve(null);
+            return;
+          }
+          
+          // Draw WebGL canvas to regular canvas
+          outputCtx.drawImage(canvas, 0, 0);
+          
+          // Convert to blob
+          const quality = options.quality / 100;
+          outputCanvas.toBlob(
+            (blob) => {
+              if (blob) {
+                // For special formats that need additional processing
+                if (options.format === 'ico') {
+                  const newBlob = new Blob([blob], { type: 'image/x-icon' });
+                  resolve(newBlob);
+                } else {
+                  resolve(blob);
+                }
+              } else {
+                resolve(null);
+              }
+            },
+            mimeType,
+            quality
+          );
+        };
         
-        // Handle HEIC format - browser support is limited, so provide a warning
-        if (options.format === 'heic') {
-          toast({
-            title: "HEIC Format Warning",
-            description: "HEIC format has limited browser support. The image may not display correctly in all browsers."
-          });
-        }
+        img.onerror = () => {
+          resolve(null);
+        };
         
+        img.src = imgItem.originalUrl;
+      } catch (error) {
+        console.error("Error in WebGL processing:", error);
+        // Fallback to regular canvas processing
+        const result = convertImageWithCanvas(imgItem, options);
+        resolve(result);
+      }
+    });
+  };
+
+  // Standard canvas-based processing (no hardware acceleration)
+  const convertImageWithCanvas = async (imgItem: ImageItem, options: ImageOptions): Promise<Blob | null> => {
+    return new Promise((resolve) => {
+      try {
         const img = new Image();
         img.onload = () => {
           // Create canvas for image manipulation
@@ -222,9 +461,6 @@ export default function ImageConverter() {
           // For ICO format, use PNG as intermediate format since toBlob doesn't support ICO directly
           if (options.format === 'ico') {
             mimeType = 'image/png';
-            
-            // After getting the PNG blob, we would convert to ICO
-            // (This is simplified - full ICO conversion requires additional processing)
           }
           
           canvas.toBlob(
@@ -254,10 +490,43 @@ export default function ImageConverter() {
         
         img.src = imgItem.originalUrl;
       } catch (error) {
-        console.error("Error converting image:", error);
+        console.error("Error converting image with canvas:", error);
         resolve(null);
       }
     });
+  };
+
+  // Convert image to the selected format - main conversion function
+  const convertImage = async (imgItem: ImageItem, options: ImageOptions): Promise<Blob | null> => {
+    try {
+      // Handle SVG format specially, as it requires different processing
+      if (options.format === 'svg+xml') {
+        // For SVG output, we would need server-side processing or a specialized library
+        // Instead, show a message that browser-side conversion to SVG is limited
+        toast({
+          title: "SVG Conversion Limited",
+          description: "Browser-based conversion to SVG is not fully supported. Results may vary."
+        });
+      }
+      
+      // Handle HEIC format - browser support is limited, so provide a warning
+      if (options.format === 'heic') {
+        toast({
+          title: "HEIC Format Warning",
+          description: "HEIC format has limited browser support. The image may not display correctly in all browsers."
+        });
+      }
+      
+      // Choose processing method based on hardware acceleration setting
+      if (useHardwareAcceleration && isHardwareAccelerationSupported) {
+        return await convertImageWithWebGL(imgItem, options);
+      } else {
+        return await convertImageWithCanvas(imgItem, options);
+      }
+    } catch (error) {
+      console.error("Error in image conversion:", error);
+      return null;
+    }
   };
 
   // Convert all images
@@ -533,6 +802,30 @@ export default function ImageConverter() {
                   </div>
                   
                   <Separator className="my-4 bg-gray-700" />
+                  
+                  {/* Hardware Acceleration Toggle */}
+                  {isHardwareAccelerationSupported && (
+                    <>
+                      <div className="flex items-center justify-between space-x-2 py-2">
+                        <div className="flex items-center space-x-2">
+                          <Switch 
+                            id="hardware-acceleration" 
+                            checked={useHardwareAcceleration}
+                            onCheckedChange={(checked) => setUseHardwareAcceleration(checked)}
+                            disabled={isProcessing || !isHardwareAccelerationSupported}
+                          />
+                          <Label htmlFor="hardware-acceleration" className="flex items-center">
+                            <FaMicrochip className="mr-2 text-blue-400" />
+                            Hardware Acceleration
+                          </Label>
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-400 ml-10 -mt-1">
+                        Uses your GPU for faster image processing. Great for batch conversions and larger images.
+                      </p>
+                      <Separator className="my-4 bg-gray-700" />
+                    </>
+                  )}
                   
                   <div className="flex items-center space-x-2 py-2">
                     <Switch 
