@@ -37,7 +37,7 @@ export function MobileMenu({ isOpen, onClose, items }: MobileMenuProps) {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="md:hidden bg-white border-t"
+          className="md:hidden bg-black border-t border-gray-800"
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: "auto", opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}

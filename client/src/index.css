@@ -10,4 +10,44 @@
   body {
     @apply font-sans antialiased bg-background text-foreground;
   }
+  
+  :root {
+    --background: 0 0% 0%;
+    --foreground: 210 40% 98%;
+    --card: 0 0% 5%;
+    --card-foreground: 210 40% 98%;
+    --popover: 0 0% 7%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 100% 60%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 15% 20%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 15% 15%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 217 15% 15%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 15% 15%;
+    --input: 217 15% 15%;
+    --ring: 210 100% 60%;
+  }
+}
+
+@layer components {
+  .dark-card {
+    @apply bg-black border border-gray-900 shadow-md;
+  }
+  
+  .dark-section {
+    @apply bg-black border-t border-b border-gray-900;
+  }
+  
+  .dark-input {
+    @apply bg-gray-900 border-gray-800 text-white placeholder:text-gray-500 focus:border-primary;
+  }
+  
+  .dark-button {
+    @apply bg-gray-900 text-white hover:bg-gray-800 border border-gray-800;
+  }
 }

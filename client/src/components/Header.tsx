@@ -43,7 +43,7 @@ export function Header() {
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? "bg-white/90 backdrop-blur-sm shadow-sm" : "bg-transparent"
+        isScrolled ? "bg-black/90 backdrop-blur-sm shadow-sm" : "bg-transparent"
       }`}
     >
       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
@@ -51,7 +51,7 @@ export function Header() {
           to="/"
           className="text-xl font-bold text-primary flex items-center space-x-2"
         >
-          <span className="w-8 h-8 rounded-full bg-white flex items-center justify-center overflow-hidden border-2 border-primary">
+          <span className="w-8 h-8 rounded-full bg-black flex items-center justify-center overflow-hidden border-2 border-primary">
             <img 
               src="/assets/images/profile/profile-photo.webp" 
               alt="Mailo Bedo" 

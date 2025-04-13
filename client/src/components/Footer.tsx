@@ -13,7 +13,7 @@ export function Footer() {
   };
 
   return (
-    <footer className="bg-[#111827] text-white py-12 px-6">
+    <footer className="bg-black text-white py-12 px-6 border-t border-gray-900">
       <Container maxWidth="6xl">
         <div className="grid md:grid-cols-4 gap-8">
           <div className="md:col-span-2">
@@ -22,7 +22,7 @@ export function Footer() {
               className="text-2xl font-bold text-white flex items-center space-x-2 mb-4"
               onClick={(e) => handleNavClick(e, "#hero")}
             >
-              <span className="w-10 h-10 rounded-full bg-white flex items-center justify-center overflow-hidden border-2 border-primary">
+              <span className="w-10 h-10 rounded-full bg-black flex items-center justify-center overflow-hidden border-2 border-primary">
                 <img 
                   src="/assets/images/profile/profile-photo.webp" 
                   alt="Mailo Bedo" 
@@ -85,7 +85,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+        <div className="border-t border-gray-900 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm">
             © {new Date().getFullYear()} Mailo Bedo. All rights reserved.
           </p>
