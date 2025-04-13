@@ -19,6 +19,12 @@ import ImageConverter from "@/pages/apps/ImageConverter";
 import HeaderChecker from "./pages/apps/HeaderChecker";
 import FaviconGenerator from "@/pages/apps/FaviconGenerator";
 import IpLocationLookup from "@/pages/apps/IpLocationLookup";
+import UnitConverter from "@/pages/apps/UnitConverter";
+import TimestampConverter from "@/pages/apps/TimestampConverter";
+import JsonFormatter from "@/pages/apps/JsonFormatter";
+import ColorPicker from "@/pages/apps/ColorPicker";
+import HashGenerator from "@/pages/apps/HashGenerator";
+import RandomGenerator from "@/pages/apps/RandomGenerator";
 import Snake from "@/pages/games/Snake";
 import Tetris from "@/pages/games/Tetris";
 import PacmanNew from "@/pages/games/PacmanNew";
@@ -43,6 +49,12 @@ function Router() {
       <Route path="/apps/header-checker" component={HeaderChecker}/>
       <Route path="/apps/favicon-generator" component={FaviconGenerator}/>
       <Route path="/apps/ip-location-lookup" component={IpLocationLookup}/>
+      <Route path="/apps/unit-converter" component={UnitConverter}/>
+      <Route path="/apps/timestamp-converter" component={TimestampConverter}/>
+      <Route path="/apps/json-formatter" component={JsonFormatter}/>
+      <Route path="/apps/color-picker" component={ColorPicker}/>
+      <Route path="/apps/hash-generator" component={HashGenerator}/>
+      <Route path="/apps/random-generator" component={RandomGenerator}/>
       <Route path="/downloads" component={Downloads}/>
       <Route path="/downloads/euro-truck-simulator-2" component={EuroTruckSimulator2}/>
       <Route path="/downloads/american-truck-simulator" component={AmericanTruckSimulator}/>
