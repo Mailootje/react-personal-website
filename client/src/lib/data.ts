@@ -49,6 +49,7 @@ export const navigationItems = [
   { name: "Photography", href: "/photography" },
   { name: "Apps", href: "/apps" },
   { name: "Downloads", href: "/downloads" },
+  { name: "Experience", href: "/experience" },
 ];
 
 export const skills: Skill[] = [
