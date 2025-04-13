@@ -17,7 +17,19 @@ export function formatDate(input: string | number | Date): string {
 export function scrollToElement(elementId: string) {
   const element = document.getElementById(elementId);
   if (element) {
-    element.scrollIntoView({ behavior: "smooth" });
+    // Add a slight delay to ensure DOM is ready
+    setTimeout(() => {
+      // Calculate position with offset for fixed header
+      const headerHeight = 80; // Approximate header height
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerHeight;
+      
+      // Scroll to the element with offset
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth"
+      });
+    }, 100);
   }
 }
 

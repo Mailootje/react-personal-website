@@ -7,11 +7,31 @@ import { Skills } from "@/sections/Skills";
 import { Projects } from "@/sections/Projects";
 import { Resume } from "@/sections/Resume";
 import { Contact } from "@/sections/Contact";
+import { scrollToElement } from "@/lib/utils";
 
 export default function Home() {
   useEffect(() => {
     // Add smooth scrolling behavior
     document.documentElement.style.scrollBehavior = "smooth";
+    
+    // Check for hash in URL and scroll to that section
+    const handleHashInUrl = () => {
+      const hash = window.location.hash;
+      if (hash) {
+        // Remove the # symbol and scroll to the element with that ID
+        const elementId = hash.replace("#", "");
+        // Use a short timeout to ensure the page is fully loaded
+        setTimeout(() => {
+          scrollToElement(elementId);
+        }, 500);
+      }
+    };
+    
+    // Call once when component mounts
+    handleHashInUrl();
+    
+    // Listen for hash changes
+    window.addEventListener("hashchange", handleHashInUrl);
     
     // Implement section reveal animation on scroll
     const observerCallback = (entries: IntersectionObserverEntry[]) => {
@@ -37,6 +57,7 @@ export default function Home() {
     
     return () => {
       // Clean up
+      window.removeEventListener("hashchange", handleHashInUrl);
       sections.forEach((section) => {
         observer.unobserve(section);
       });

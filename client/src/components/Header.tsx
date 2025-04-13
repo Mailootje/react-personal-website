@@ -28,7 +28,7 @@ export function Header() {
     e.preventDefault();
     
     if (location !== '/') {
-      // If we're not on the home page, navigate to home first
+      // If we're not on the home page, navigate to home first with the hash
       window.location.href = "/" + href;
     } else {
       // Otherwise just scroll to the element
