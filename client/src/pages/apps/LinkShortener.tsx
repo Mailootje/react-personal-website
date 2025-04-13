@@ -6,17 +6,70 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { ArrowLeft, Copy, Check, ExternalLink, AlertCircle } from "lucide-react";
+import { ArrowLeft, Copy, Check, ExternalLink, AlertCircle, LinkIcon, Clock, BarChart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { Link } from "wouter";
+
+// Define interfaces for API requests and responses
+interface ShortenLinkRequest {
+  url: string;
+}
+
+interface ShortenedLinkResponse {
+  id?: number;
+  shortCode: string;
+  originalUrl: string;
+  createdAt?: string;
+  expiresAt: string;
+  clicks?: number;
+  shortUrl: string;
+}
 
 export default function LinkShortener() {
   // States
   const [url, setUrl] = useState("");
   const [shortUrl, setShortUrl] = useState("");
   const [copied, setCopied] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
+  // Fetch recent links
+  const { data: recentLinks, isLoading: isLoadingLinks } = useQuery<ShortenedLinkResponse[]>({
+    queryKey: ['/api/links'],
+    staleTime: 30000, // 30 seconds
+  });
+  
+  // Create shorten link mutation
+  const shortenMutation = useMutation({
+    mutationFn: async (url: string) => {
+      const response = await apiRequest<ShortenedLinkResponse>('/api/shorten', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ url }),
+      });
+      return response;
+    },
+    onSuccess: (data) => {
+      setShortUrl(data.shortUrl);
+      queryClient.invalidateQueries({ queryKey: ['/api/links'] });
+      toast({
+        title: "URL shortened successfully",
+        description: "Your shortened link is ready to share",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error shortening URL",
+        description: error.message || "Something went wrong",
+        variant: "destructive",
+      });
+    },
+  });
 
   // Copy to clipboard function
   const copyToClipboard = () => {
@@ -52,8 +105,7 @@ export default function LinkShortener() {
     }
   };
 
-  // Generate short link - for demo purposes we'll use a mock function
-  // In a real application this would call an API
+  // Generate short link using the API
   const shortenUrl = () => {
     if (!url.trim()) {
       setError("Please enter a URL");
@@ -65,25 +117,8 @@ export default function LinkShortener() {
       return;
     }
 
-    setIsLoading(true);
     setError("");
-
-    // Mock API call with timeout to simulate network request
-    setTimeout(() => {
-      // For demo, create a short code based on timestamp and random string
-      const timestamp = Date.now().toString(36);
-      const randomStr = Math.random().toString(36).substring(2, 6);
-      const shortCode = `${timestamp.substring(timestamp.length - 3)}${randomStr}`;
-      
-      // In a real app, this would come from your backend
-      setShortUrl(`http://short.link/${shortCode}`);
-      setIsLoading(false);
-      
-      toast({
-        title: "URL shortened successfully",
-        description: "Your shortened link is ready to share",
-      });
-    }, 1500);
+    shortenMutation.mutate(url);
   };
 
   // Clear form function
@@ -106,13 +141,12 @@ export default function LinkShortener() {
         <section className="py-20 px-6">
           <Container maxWidth="lg">
             <div className="mb-8">
-              <div 
-                onClick={() => window.location.href = "/apps"}
+              <Link to="/apps" 
                 className="inline-flex items-center text-primary hover:text-primary/80 transition-colors cursor-pointer"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Apps
-              </div>
+              </Link>
             </div>
             
             <motion.div
@@ -173,11 +207,11 @@ export default function LinkShortener() {
                   {/* Action Button */}
                   <Button 
                     onClick={shortenUrl}
-                    disabled={isLoading || !url}
+                    disabled={shortenMutation.isPending || !url}
                     className="w-full h-12"
                     size="lg"
                   >
-                    {isLoading ? "Shortening..." : "Shorten URL"}
+                    {shortenMutation.isPending ? "Shortening..." : "Shorten URL"}
                   </Button>
 
                   {/* Result Section */}
@@ -217,6 +251,93 @@ export default function LinkShortener() {
               </Card>
             </motion.div>
 
+            {/* Recent Links Section */}
+            {recentLinks && recentLinks.length > 0 && (
+              <motion.div
+                className="max-w-2xl mx-auto mt-12"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+              >
+                <Card className="shadow-md">
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <BarChart className="h-5 w-5 mr-2 text-primary" />
+                      Recent Links
+                    </CardTitle>
+                    <CardDescription>
+                      Links will expire in 7 days from creation
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {isLoadingLinks ? (
+                        <div className="text-center py-4">Loading recent links...</div>
+                      ) : (
+                        recentLinks.map((link) => (
+                          <div 
+                            key={link.shortCode} 
+                            className="p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors"
+                          >
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                              <div className="flex-1 min-w-0 font-mono text-sm truncate" title={link.originalUrl}>
+                                {link.originalUrl}
+                              </div>
+                              <div className="flex items-center gap-2 shrink-0">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  className="h-8"
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(link.shortUrl);
+                                    toast({
+                                      title: "Link copied",
+                                      description: "Link copied to clipboard",
+                                    });
+                                  }}
+                                >
+                                  <Copy className="h-3 w-3 mr-1" />
+                                  Copy
+                                </Button>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  className="h-8"
+                                  onClick={() => window.open(link.shortUrl, '_blank')}
+                                >
+                                  <ExternalLink className="h-3 w-3 mr-1" />
+                                  Open
+                                </Button>
+                              </div>
+                            </div>
+                            <div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
+                              <div className="flex items-center">
+                                <LinkIcon className="h-3 w-3 mr-1" />
+                                <span className="font-medium">{link.shortUrl}</span>
+                              </div>
+                              <div className="flex gap-3">
+                                <div className="flex items-center">
+                                  <Clock className="h-3 w-3 mr-1" />
+                                  <span>Expires: {new Date(link.expiresAt).toLocaleDateString()}</span>
+                                </div>
+                                {link.clicks !== undefined && (
+                                  <div className="flex items-center">
+                                    <BarChart className="h-3 w-3 mr-1" />
+                                    <span>{link.clicks} {link.clicks === 1 ? 'click' : 'clicks'}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+
+            {/* Info Section */}
             <motion.div
               className="max-w-2xl mx-auto mt-12 bg-muted/50 p-6 rounded-lg"
               initial={{ opacity: 0 }}
@@ -235,7 +356,7 @@ export default function LinkShortener() {
                 </li>
                 <li className="flex items-start">
                   <span className="text-primary mr-2">•</span>
-                  Helps track clicks and engagement (with full implementation)
+                  Helps track clicks and engagement with built-in analytics
                 </li>
                 <li className="flex items-start">
                   <span className="text-primary mr-2">•</span>
