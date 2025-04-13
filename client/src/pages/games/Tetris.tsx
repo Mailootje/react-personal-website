@@ -325,13 +325,29 @@ export default function Tetris() {
   
   // Draw the current tetromino on the game board
   const drawCurrentTetromino = useCallback(() => {
+    console.log("drawCurrentTetromino called with tetromino:", currentTetromino);
+    
     const canvas = canvasRef.current;
-    if (!canvas || !currentTetromino) return;
+    if (!canvas || !currentTetromino) {
+      console.log("Cannot draw tetromino: canvas or tetromino is null");
+      return;
+    }
     
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      console.log("Cannot draw tetromino: ctx is null");
+      return;
+    }
     
     const { shape, color, position } = currentTetromino;
+    
+    console.log("Drawing tetromino:", {
+      shape,
+      color,
+      position,
+      canvasWidth: canvas.width,
+      canvasHeight: canvas.height
+    });
     
     // Set the fill color
     ctx.fillStyle = color;
@@ -341,6 +357,8 @@ export default function Tetris() {
         if (shape[y][x] === 1) { // Explicitly check for 1 (active cell)
           const drawX = (position.x + x) * CELL_SIZE;
           const drawY = (position.y + y) * CELL_SIZE;
+          
+          console.log(`Drawing block at (${drawX}, ${drawY})`);
           
           // Only draw if within visible part of the grid
           if (position.y + y >= 0) {
@@ -688,22 +706,43 @@ export default function Tetris() {
     }
     
     if (dropIntervalRef.current) {
-      clearInterval(dropIntervalRef.current);
+      clearTimeout(dropIntervalRef.current);
       dropIntervalRef.current = null;
     }
     
     // Set the game state first
     setGameState(GameState.PLAYING);
     
-    // Next, set the tetrominos in a sequence to ensure proper state updating
-    setCurrentTetromino(initialTetromino);
-    setNextTetromino(initialNextTetromino);
+    // Force synchronous setting of tetrominos
+    setTimeout(() => {
+      console.log("Setting initial tetrominos...");
+      setCurrentTetromino(initialTetromino);
+      
+      setTimeout(() => {
+        console.log("Setting next tetromino...");
+        setNextTetromino(initialNextTetromino);
+      }, 0);
+    }, 0);
     
     // Start the rendering immediately
     const renderLoop = () => {
+      console.log("Render loop called, gameState:", gameState);
+      console.log("Current tetromino in render loop:", currentTetromino);
+      
+      // Always draw the board
       drawBoard();
-      drawCurrentTetromino();
-      drawPreview();
+      
+      // Only draw tetromino if it exists
+      if (currentTetromino) {
+        drawCurrentTetromino();
+      }
+      
+      // Only draw preview if it exists
+      if (nextTetromino) {
+        drawPreview();
+      }
+      
+      // Continue animation loop
       gameLoopRef.current = requestAnimationFrame(renderLoop);
     };
     
