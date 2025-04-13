@@ -193,6 +193,11 @@ const OnlineCodeEditor: React.FC = () => {
   const [replaceTerm, setReplaceTerm] = useState<string>('');
   const [executeResults, setExecuteResults] = useState<string>('');
   const [isConsoleOpen, setIsConsoleOpen] = useState<boolean>(false);
+  
+  // Image viewer state
+  const [isViewingImage, setIsViewingImage] = useState<boolean>(false);
+  const [currentImageSrc, setCurrentImageSrc] = useState<string>('');
+  const [currentImageName, setCurrentImageName] = useState<string>('');
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState<boolean>(false);
   const [deleteConfirmInput, setDeleteConfirmInput] = useState<string>("");
@@ -987,9 +992,20 @@ console.log("Let's start coding with more storage!");`,
       ]);
     }
     
-    // Set the editor content and language
-    // Don't try to parse content for image files - the image viewer will handle displaying them
-    setCurrentContent(file.isImage ? '' : (file.content || ''));
+    // Check if it's an image file
+    if (file.isImage) {
+      setIsViewingImage(true);
+      setCurrentImageSrc(file.content || '');
+      setCurrentImageName(file.name);
+      setCurrentContent(''); // Don't load the image data in the text editor
+    } else {
+      // It's a text file
+      setIsViewingImage(false);
+      setCurrentImageSrc('');
+      setCurrentImageName('');
+      setCurrentContent(file.content || '');
+    }
+    
     setCurrentLanguage(file.language || 'plaintext');
   };
 
@@ -1036,7 +1052,21 @@ console.log("Let's start coding with more storage!");`,
     const activeTab = newTabs.find(tab => tab.isActive);
     if (activeTab) {
       const activeFile = fileSystem.items[activeTab.fileId];
-      setCurrentContent(activeFile.isImage ? '' : (activeFile.content || ''));
+      
+      // Handle image files differently
+      if (activeFile.isImage) {
+        setIsViewingImage(true);
+        setCurrentImageSrc(activeFile.content || '');
+        setCurrentImageName(activeFile.name);
+        setCurrentContent(''); // Don't load the image data in the text editor
+      } else {
+        // It's a text file
+        setIsViewingImage(false);
+        setCurrentImageSrc('');
+        setCurrentImageName('');
+        setCurrentContent(activeFile.content || '');
+      }
+      
       setCurrentLanguage(activeFile.language || 'plaintext');
     }
   };
@@ -4170,39 +4200,31 @@ console.log("Starting fresh with partial cleanup!");`,
                   })}
                 </div>
 
-                {/* Image Viewer or Monaco Editor */}
-                <div className="flex-grow">
-                  {(() => {
-                    const activeTab = tabs.find(tab => tab.isActive);
-                    if (!activeTab) return null;
-                    
-                    const activeFile = fileSystem.items[activeTab.fileId];
-                    if (activeFile && activeFile.isImage) {
-                      // Render image viewer for image files
-                      return (
-                        <div className="h-full w-full flex items-center justify-center bg-gray-900 overflow-auto p-4">
-                          <img 
-                            src={activeFile.content} 
-                            alt={activeFile.name}
-                            className="max-w-full max-h-[calc(100vh-180px)] object-contain"
-                          />
-                        </div>
-                      );
-                    }
-                    
-                    // Render Monaco editor for text files
-                    return (
-                      <Editor
-                        height="100%"
-                        language={currentLanguage}
-                        theme={editorTheme}
-                        value={currentContent}
-                        onChange={handleEditorChange}
-                        onMount={handleEditorDidMount}
-                        options={editorOptions}
+                {/* Editor Area - Either Monaco Editor or Image Viewer */}
+                <div className="flex-grow relative">
+                  {/* Monaco Editor (hidden when viewing images) */}
+                  <div className={`absolute inset-0 ${isViewingImage ? 'hidden' : ''}`}>
+                    <Editor
+                      height="100%"
+                      language={currentLanguage}
+                      theme={editorTheme}
+                      value={currentContent}
+                      onChange={handleEditorChange}
+                      onMount={handleEditorDidMount}
+                      options={editorOptions}
+                    />
+                  </div>
+                  
+                  {/* Image Viewer (shown only when viewing images) */}
+                  {isViewingImage && (
+                    <div className="absolute inset-0 h-full w-full flex items-center justify-center bg-gray-900 overflow-auto p-4">
+                      <img 
+                        src={currentImageSrc}
+                        alt={currentImageName}
+                        className="max-w-full max-h-[calc(100vh-180px)] object-contain"
                       />
-                    );
-                  })()}
+                    </div>
+                  )}
                 </div>
               </div>
             </Split>
