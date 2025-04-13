@@ -129,13 +129,6 @@ export default function Apps() {
       tags: ["Security", "Utility"],
     },
     {
-      id: "file-encryption",
-      title: "File Encryption Tool",
-      description: "Encrypt/decrypt files directly in the browser with a password",
-      icon: "🔐",
-      tags: ["Security", "Privacy"],
-    },
-    {
       id: "random-generator",
       title: "Random Generator",
       description: "Generate random names, numbers, passwords, etc.",
