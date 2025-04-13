@@ -24,6 +24,13 @@ export default function Downloads() {
       description: "Custom mods, maps, and vehicle enhancements for Euro Truck Simulator 2",
       icon: "🚚",
       tags: ["Game Mods", "Vehicles"]
+    },
+    {
+      id: "american-truck-simulator",
+      title: "American Truck Simulator",
+      description: "Custom mods, maps, and vehicle enhancements for American Truck Simulator",
+      icon: "🇺🇸",
+      tags: ["Game Mods", "Vehicles"]
     }
     // More download categories can be added here
   ]);

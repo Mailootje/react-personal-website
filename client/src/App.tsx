@@ -20,6 +20,7 @@ import PacmanNew from "@/pages/games/PacmanNew";
 import PacmanSimple from "@/pages/games/PacmanSimple";
 import PacmanBasic from "@/pages/games/PacmanBasic";
 import EuroTruckSimulator2 from "@/pages/downloads/EuroTruckSimulator2";
+import AmericanTruckSimulator from "@/pages/downloads/AmericanTruckSimulator";
 
 function Router() {
   return (
@@ -33,6 +34,7 @@ function Router() {
       <Route path="/apps/weather-dashboard" component={WeatherDashboard}/>
       <Route path="/downloads" component={Downloads}/>
       <Route path="/downloads/euro-truck-simulator-2" component={EuroTruckSimulator2}/>
+      <Route path="/downloads/american-truck-simulator" component={AmericanTruckSimulator}/>
       <Route path="/games" component={Games}/>
       <Route path="/games/snake" component={Snake}/>
       <Route path="/games/tetris" component={Tetris}/>
