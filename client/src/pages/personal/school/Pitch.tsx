@@ -6,6 +6,8 @@ import { Container } from "@/components/ui/container";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Separator } from "@/components/ui/separator";
 import { VideoBackground } from "@/components/VideoBackground";
 import { RiPresentationFill, RiArrowLeftLine, RiArrowRightLine } from "react-icons/ri";
 import { 
@@ -16,7 +18,9 @@ import {
   FaRocket, 
   FaCode, 
   FaChevronLeft, 
-  FaChevronRight 
+  FaChevronRight,
+  FaMagic,
+  FaRandom
 } from "react-icons/fa";
 
 // Define slide content
@@ -119,6 +123,7 @@ const slides = [
 export default function SchoolPitch() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [direction, setDirection] = useState(0);
+  const [selectedEffect, setSelectedEffect] = useState<number | null>(null);
 
   // Scroll to top on page load
   useEffect(() => {
@@ -153,20 +158,111 @@ export default function SchoolPitch() {
     }
   };
 
-  const slideVariants = {
-    enter: (direction: number) => ({
-      x: direction > 0 ? '100%' : '-100%',
-      opacity: 0
-    }),
-    center: {
-      x: 0,
-      opacity: 1
+  // Define different transition effects
+  const transitionEffects = [
+    // Slide horizontal
+    {
+      enter: (direction: number) => ({
+        x: direction > 0 ? '100%' : '-100%',
+        opacity: 0
+      }),
+      center: {
+        x: 0,
+        opacity: 1,
+        transition: { type: "spring", stiffness: 300, damping: 30, duration: 0.5 }
+      },
+      exit: (direction: number) => ({
+        x: direction < 0 ? '100%' : '-100%',
+        opacity: 0,
+        transition: { duration: 0.3 }
+      })
     },
-    exit: (direction: number) => ({
-      x: direction < 0 ? '100%' : '-100%',
-      opacity: 0
-    })
+    // Fade with scale
+    {
+      enter: () => ({
+        opacity: 0,
+        scale: 0.9
+      }),
+      center: {
+        opacity: 1,
+        scale: 1,
+        transition: { duration: 0.5 }
+      },
+      exit: () => ({
+        opacity: 0,
+        scale: 1.05,
+        transition: { duration: 0.3 }
+      })
+    },
+    // Slide vertical
+    {
+      enter: (direction: number) => ({
+        y: direction > 0 ? '50%' : '-50%',
+        opacity: 0
+      }),
+      center: {
+        y: 0,
+        opacity: 1,
+        transition: { type: "spring", stiffness: 200, damping: 25 }
+      },
+      exit: (direction: number) => ({
+        y: direction < 0 ? '30%' : '-30%',
+        opacity: 0,
+        transition: { duration: 0.4 }
+      })
+    },
+    // Rotate with fade
+    {
+      enter: (direction: number) => ({
+        opacity: 0,
+        rotate: direction > 0 ? 5 : -5,
+        scale: 0.95
+      }),
+      center: {
+        opacity: 1,
+        rotate: 0,
+        scale: 1,
+        transition: { type: "spring", stiffness: 300, damping: 25 }
+      },
+      exit: (direction: number) => ({
+        opacity: 0,
+        rotate: direction < 0 ? 5 : -5,
+        scale: 0.95,
+        transition: { duration: 0.4 }
+      })
+    },
+    // Flip effect
+    {
+      enter: (direction: number) => ({
+        opacity: 0,
+        rotateY: direction > 0 ? 45 : -45,
+        x: direction > 0 ? 100 : -100
+      }),
+      center: {
+        opacity: 1,
+        rotateY: 0,
+        x: 0,
+        transition: { type: "spring", stiffness: 200, damping: 25 }
+      },
+      exit: (direction: number) => ({
+        opacity: 0,
+        rotateY: direction < 0 ? 45 : -45,
+        x: direction < 0 ? 100 : -100,
+        transition: { duration: 0.4 }
+      })
+    }
+  ];
+  
+  // Get a random transition effect index based on current slide
+  const getTransitionEffectIndex = (slideIndex: number) => {
+    // Use a deterministic pattern based on the slide index
+    return slideIndex % transitionEffects.length;
   };
+  
+  // Current slide's transition effect - use selected effect if available, otherwise use the default pattern
+  const slideVariants = selectedEffect !== null 
+    ? transitionEffects[selectedEffect] 
+    : transitionEffects[getTransitionEffectIndex(currentSlide)];
 
   // Animation for list items
   const containerVariants = {
@@ -541,7 +637,7 @@ export default function SchoolPitch() {
             </div>
           </div>
           
-          <div className="flex-grow flex flex-col relative">
+          <div className="flex-grow flex flex-col relative" style={{ perspective: "1000px" }}>
             {/* Large Mobile Navigation Buttons (Absolute Positioned) */}
             <div className="absolute inset-y-0 left-0 z-20 flex items-center px-1">
               <Button 
@@ -567,7 +663,7 @@ export default function SchoolPitch() {
               </Button>
             </div>
             
-            {/* Slide Content */}
+            {/* Slide Content with dynamic transition effects */}
             <AnimatePresence initial={false} custom={direction} mode="wait">
               <motion.div
                 key={currentSlide}
@@ -576,11 +672,7 @@ export default function SchoolPitch() {
                 initial="enter"
                 animate="center"
                 exit="exit"
-                transition={{
-                  x: { type: "spring", stiffness: 300, damping: 30 },
-                  opacity: { duration: 0.2 }
-                }}
-                className="w-full h-full flex-grow"
+                className="w-full h-full flex-grow perspective-1000"
               >
                 <Card className="w-full h-full bg-gray-900/60 backdrop-blur-sm border-gray-800 overflow-auto">
                   <CardContent className="p-4 md:p-6 h-full flex flex-col md:flex-row md:items-center">
@@ -589,6 +681,58 @@ export default function SchoolPitch() {
                 </Card>
               </motion.div>
             </AnimatePresence>
+            
+            {/* Transition Effect Controls */}
+            <div className="absolute top-2 right-2 z-10 flex items-center space-x-2">
+              <Badge variant="outline" className="text-xs bg-black/50 border-gray-700 text-gray-400">
+                Effect: {selectedEffect !== null
+                  ? (selectedEffect === 0 ? "Slide" : 
+                    selectedEffect === 1 ? "Fade" : 
+                    selectedEffect === 2 ? "Vertical" : 
+                    selectedEffect === 3 ? "Rotate" : "Flip")
+                  : (getTransitionEffectIndex(currentSlide) === 0 ? "Slide" : 
+                    getTransitionEffectIndex(currentSlide) === 1 ? "Fade" : 
+                    getTransitionEffectIndex(currentSlide) === 2 ? "Vertical" : 
+                    getTransitionEffectIndex(currentSlide) === 3 ? "Rotate" : "Flip")}
+              </Badge>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm" className="h-6 px-2 bg-black/50 border-gray-700 hover:bg-gray-800 text-white text-xs">
+                    <FaMagic className="h-3 w-3 mr-1" /> Change
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-56 bg-gray-900 border-gray-700">
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-sm text-white mb-3">Select Transition Effect</h4>
+                    {transitionEffects.map((_, index) => (
+                      <Button
+                        key={index}
+                        variant={selectedEffect === index ? "default" : "outline"}
+                        size="sm"
+                        className={`w-full justify-start ${selectedEffect === index 
+                          ? 'bg-primary/90 hover:bg-primary' 
+                          : 'bg-gray-800/80 border-gray-700 hover:bg-gray-800'}`}
+                        onClick={() => setSelectedEffect(index)}
+                      >
+                        {index === 0 ? "Slide Horizontal" : 
+                         index === 1 ? "Fade with Scale" : 
+                         index === 2 ? "Slide Vertical" : 
+                         index === 3 ? "Rotate & Fade" : "3D Flip"}
+                      </Button>
+                    ))}
+                    <Separator className="my-2 bg-gray-700" />
+                    <Button
+                      variant="outline"
+                      size="sm" 
+                      className="w-full justify-start bg-gray-800/80 border-gray-700 hover:bg-gray-800"
+                      onClick={() => setSelectedEffect(null)}
+                    >
+                      <FaRandom className="h-3 w-3 mr-2" /> Auto (Pattern)
+                    </Button>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </div>
 
             {/* Mobile navigation indicators (bottom) */}
             <div className="md:hidden flex justify-center items-center mt-4 mb-2 px-4">
