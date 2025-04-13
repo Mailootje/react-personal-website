@@ -80,6 +80,13 @@ export default function Apps() {
       tags: ["Utility", "Calculation"],
     },
     {
+      id: "fuel-calculator",
+      title: "Fuel Calculator",
+      description: "Calculate fuel consumption and costs for trips using European or American units",
+      icon: "⛽",
+      tags: ["Utility", "Calculation", "Travel"],
+    },
+    {
       id: "timestamp-converter",
       title: "Timestamp Converter",
       description: "Convert Unix timestamps to human-readable formats and vice versa",

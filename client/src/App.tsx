@@ -20,6 +20,7 @@ import HeaderChecker from "./pages/apps/HeaderChecker";
 import FaviconGenerator from "@/pages/apps/FaviconGenerator";
 import IpLocationLookup from "@/pages/apps/IpLocationLookup";
 import UnitConverter from "@/pages/apps/UnitConverter";
+import FuelCalculator from "@/pages/apps/FuelCalculator";
 import TimestampConverter from "@/pages/apps/TimestampConverter";
 import JsonFormatter from "@/pages/apps/JsonFormatter";
 import ColorPicker from "@/pages/apps/ColorPicker";
@@ -50,6 +51,7 @@ function Router() {
       <Route path="/apps/favicon-generator" component={FaviconGenerator}/>
       <Route path="/apps/ip-location-lookup" component={IpLocationLookup}/>
       <Route path="/apps/unit-converter" component={UnitConverter}/>
+      <Route path="/apps/fuel-calculator" component={FuelCalculator}/>
       <Route path="/apps/timestamp-converter" component={TimestampConverter}/>
       <Route path="/apps/json-formatter" component={JsonFormatter}/>
       <Route path="/apps/color-picker" component={ColorPicker}/>
