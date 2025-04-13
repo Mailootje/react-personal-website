@@ -14,6 +14,7 @@ interface PhotoItem {
   url: string;
   title: string;
   category: string;
+  subcategory: string | null;
 }
 
 // Validation schema for creating a short link
@@ -327,10 +328,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Photography API - Get photos by country category
+  // Photography API - Get photos by country category and subcategory
   app.get("/api/photos", async (req, res) => {
     try {
       const category = req.query.category as string || "root";
+      const subcategory = req.query.subcategory as string || null;
       const photos: PhotoItem[] = [];
       
       // Fetch the gallery JSON from mailobedo.nl
@@ -350,12 +352,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Process photos from the selected category
           galleryData[category].forEach((photo: any, index: number) => {
             if (photo.url && photo.name && photo.url.match(/\.(jpg|jpeg|png|gif)$/i) && photo.name !== "Thumbs.db") {
-              photos.push({
-                id: `${category.toLowerCase()}-${index}`,
-                url: photo.url,
-                title: formatTitle(photo.name),
-                category: category
-              });
+              // Extract subcategory from URL if present
+              let photoSubcategory = null;
+              if (photo.url.includes(`/${category}/`)) {
+                const urlParts = photo.url.split(`/${category}/`)[1].split('/');
+                if (urlParts.length > 1) {
+                  photoSubcategory = urlParts[0]; // Capture the subcategory
+                }
+              }
+              
+              // Only add the photo if it matches the subcategory filter or if no subcategory filter is applied
+              if (!subcategory || (photoSubcategory && photoSubcategory === subcategory)) {
+                photos.push({
+                  id: `${category.toLowerCase()}-${index}`,
+                  url: photo.url,
+                  title: formatTitle(photo.name),
+                  category: category,
+                  subcategory: photoSubcategory
+                });
+              }
             }
           });
         }
@@ -368,7 +383,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 id: `root-${index}`,
                 url: photo.url,
                 title: formatTitle(photo.name),
-                category: "root"
+                category: "root",
+                subcategory: null
               });
             }
           });
@@ -384,6 +400,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(limitedPhotos);
     } catch (error) {
       console.error("Error fetching photos", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+  
+  // API endpoint to get available subcategories for a category
+  app.get("/api/photos/subcategories", async (req, res) => {
+    try {
+      const category = req.query.category as string;
+      
+      if (!category) {
+        return res.status(400).json({ error: "Category parameter is required" });
+      }
+      
+      // Fetch the gallery JSON from mailobedo.nl
+      const response = await fetch("https://mailobedo.nl/gallery/");
+      if (!response.ok) {
+        throw new Error(`Failed to fetch gallery: ${response.status} ${response.statusText}`);
+      }
+      
+      const galleryData = await response.json();
+      
+      // Valid categories that match directly with the JSON response
+      const validCategories = ["root", "Belgium", "Germany", "Netherlands", "Spain"];
+      
+      if (!validCategories.includes(category)) {
+        return res.status(400).json({ error: "Invalid category" });
+      }
+      
+      // Collect all subcategories from the selected category
+      const subcategories = new Set<string>();
+      
+      if (galleryData[category] && Array.isArray(galleryData[category])) {
+        galleryData[category].forEach((photo: any) => {
+          if (photo.url && photo.url.includes(`/${category}/`)) {
+            const urlParts = photo.url.split(`/${category}/`)[1].split('/');
+            if (urlParts.length > 1) {
+              subcategories.add(urlParts[0]);
+            }
+          }
+        });
+      }
+      
+      // Convert Set to Array and sort alphabetically
+      const sortedSubcategories = Array.from(subcategories).sort();
+      
+      res.json(sortedSubcategories);
+    } catch (error) {
+      console.error("Error fetching subcategories", error);
       res.status(500).json({ error: "Internal server error" });
     }
   });

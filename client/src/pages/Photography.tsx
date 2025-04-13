@@ -11,6 +11,7 @@ interface Photo {
   url: string;
   title: string;
   category: string;
+  subcategory: string | null;
 }
 
 // Function to get a proxied image URL
@@ -19,7 +20,8 @@ function getProxiedImageUrl(originalUrl: string): string {
 }
 
 export default function Photography() {
-  const [activeFilter, setActiveFilter] = useState("root");
+  const [activeCategory, setActiveCategory] = useState("root");
+  const [activeSubcategory, setActiveSubcategory] = useState<string | null>(null);
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
 
   // Categories for the filter (now using countries)
@@ -34,12 +36,33 @@ export default function Photography() {
     "Spain": "Spain"
   };
 
+  // Change category and reset subcategory
+  const handleCategoryChange = (category: string) => {
+    setActiveCategory(category);
+    setActiveSubcategory(null);
+  };
+
+  // Fetch subcategories for the selected category
+  const { data: subcategories = [], isLoading: isLoadingSubcategories } = useQuery({
+    queryKey: ['subcategories', activeCategory],
+    queryFn: async () => {
+      // Don't fetch subcategories for the root category
+      if (activeCategory === "root") return [];
+      
+      const endpoint = `/api/photos/subcategories?category=${activeCategory}`;
+      return apiRequest<string[]>(endpoint);
+    },
+    enabled: activeCategory !== "root" // Only run this query if not in root category
+  });
+
   // Fetch photos using React Query
   const { data: photos = [], isError, isLoading } = useQuery({
-    queryKey: ['photos', activeFilter],
+    queryKey: ['photos', activeCategory, activeSubcategory],
     queryFn: async () => {
-      // Always pass the category parameter (root being the default category)
-      const endpoint = `/api/photos?category=${activeFilter}`;
+      let endpoint = `/api/photos?category=${activeCategory}`;
+      if (activeSubcategory) {
+        endpoint += `&subcategory=${activeSubcategory}`;
+      }
       return apiRequest<Photo[]>(endpoint);
     }
   });
@@ -88,7 +111,7 @@ export default function Photography() {
             </motion.div>
 
             <motion.div 
-              className="flex justify-center mb-10 flex-wrap gap-2"
+              className="flex justify-center mb-6 flex-wrap gap-2"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
@@ -96,9 +119,9 @@ export default function Photography() {
               {categories.map((category) => (
                 <button
                   key={category}
-                  onClick={() => setActiveFilter(category)}
+                  onClick={() => handleCategoryChange(category)}
                   className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${
-                    activeFilter === category
+                    activeCategory === category
                       ? "bg-primary text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                   }`}
@@ -107,6 +130,47 @@ export default function Photography() {
                 </button>
               ))}
             </motion.div>
+            
+            {/* Subcategory Filter - Only shown when activeCategory is not root and subcategories are available */}
+            {activeCategory !== "root" && subcategories.length > 0 && (
+              <motion.div 
+                className="flex justify-center mb-10 flex-wrap gap-2"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+              >
+                <button
+                  onClick={() => setActiveSubcategory(null)}
+                  className={`px-4 py-1 rounded-full text-xs font-medium transition-colors ${
+                    activeSubcategory === null
+                      ? "bg-primary/80 text-white"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
+                >
+                  All
+                </button>
+                {subcategories.map((subcategory) => (
+                  <button
+                    key={subcategory}
+                    onClick={() => setActiveSubcategory(subcategory)}
+                    className={`px-4 py-1 rounded-full text-xs font-medium transition-colors ${
+                      activeSubcategory === subcategory
+                        ? "bg-primary/80 text-white"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
+                  >
+                    {subcategory}
+                  </button>
+                ))}
+              </motion.div>
+            )}
+            
+            {/* Loading indicator for subcategories */}
+            {activeCategory !== "root" && isLoadingSubcategories && subcategories.length === 0 && (
+              <div className="flex justify-center mb-8">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+              </div>
+            )}
 
             {isLoading ? (
               <div className="flex justify-center py-12">
@@ -127,7 +191,7 @@ export default function Photography() {
                 <div className="text-center">
                   <p className="text-xl mb-2">No images found</p>
                   <p className="text-muted-foreground">
-                    {`No images found in the ${categoryDisplayNames[activeFilter as keyof typeof categoryDisplayNames]} category. Try selecting a different category.`}
+                    {`No images found in the ${categoryDisplayNames[activeCategory as keyof typeof categoryDisplayNames]} category. Try selecting a different category.`}
                   </p>
                 </div>
               </div>
@@ -204,7 +268,15 @@ export default function Photography() {
               </button>
               <div className="bg-white p-4 absolute bottom-0 left-0 right-0 bg-opacity-90 backdrop-blur-sm">
                 <h3 className="font-bold text-lg">{selectedPhoto.title}</h3>
-                <p className="text-gray-600">Category: {categoryDisplayNames[selectedPhoto.category as keyof typeof categoryDisplayNames] || selectedPhoto.category}</p>
+                <div className="flex flex-wrap gap-2 text-gray-600 text-sm">
+                  <span>Category: {categoryDisplayNames[selectedPhoto.category as keyof typeof categoryDisplayNames] || selectedPhoto.category}</span>
+                  {selectedPhoto.subcategory && (
+                    <span className="flex items-center">
+                      <span className="mx-2 text-gray-400">•</span>
+                      <span>Location: {selectedPhoto.subcategory}</span>
+                    </span>
+                  )}
+                </div>
               </div>
             </motion.div>
           </div>
