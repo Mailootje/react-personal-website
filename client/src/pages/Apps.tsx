@@ -38,6 +38,13 @@ export default function Apps() {
       description: "Create customizable QR codes for links, contact info, WiFi and more",
       icon: "📱",
       tags: ["Utility", "Sharing"]
+    },
+    {
+      id: "weather-dashboard",
+      title: "Weather Dashboard",
+      description: "Check current weather conditions and forecasts for any location",
+      icon: "🌤️",
+      tags: ["Weather", "Utility"]
     }
     // Add more apps as needed
   ]);

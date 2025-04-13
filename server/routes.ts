@@ -643,6 +643,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Weather API endpoint
+  app.get("/api/weather", async (req: Request, res: Response) => {
+    try {
+      const { location, units = "metric" } = req.query;
+      
+      if (!location) {
+        return res.status(400).json({ message: "Location is required" });
+      }
+
+      if (!process.env.OPENWEATHER_API_KEY) {
+        return res.status(500).json({ message: "Weather API key is not configured" });
+      }
+
+      const params = {
+        q: location as string,
+        units: units as string,
+        appid: process.env.OPENWEATHER_API_KEY
+      };
+      
+      // Get current weather
+      const currentWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?${new URLSearchParams(params as any).toString()}`;
+      const currentWeatherResponse = await fetch(currentWeatherUrl);
+      
+      if (!currentWeatherResponse.ok) {
+        return res.status(currentWeatherResponse.status).json({ 
+          message: `Weather API error: ${currentWeatherResponse.statusText}` 
+        });
+      }
+      
+      const currentWeatherData = await currentWeatherResponse.json();
+      
+      // Get forecast data
+      const { q, ...otherParams } = params;
+      const forecastParams = {
+        ...otherParams,
+        lat: currentWeatherData.coord.lat,
+        lon: currentWeatherData.coord.lon,
+        exclude: 'minutely,alerts'
+      };
+      
+      const forecastUrl = `https://api.openweathermap.org/data/2.5/onecall?${new URLSearchParams(forecastParams as any).toString()}`;
+      const forecastResponse = await fetch(forecastUrl);
+      
+      if (!forecastResponse.ok) {
+        return res.status(forecastResponse.status).json({ 
+          message: `Weather forecast API error: ${forecastResponse.statusText}` 
+        });
+      }
+      
+      const forecastData = await forecastResponse.json();
+      
+      // Combine the data
+      res.json({
+        current: currentWeatherData,
+        forecast: forecastData
+      });
+    } catch (error) {
+      log(`Error fetching weather data: ${error}`, "routes");
+      res.status(500).json({ message: "Failed to fetch weather data" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;

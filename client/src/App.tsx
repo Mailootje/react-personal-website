@@ -11,6 +11,7 @@ import Games from "@/pages/Games";
 import PasswordGenerator from "@/pages/apps/PasswordGenerator";
 import LinkShortener from "@/pages/apps/LinkShortener";
 import QRCodeGenerator from "@/pages/apps/QRCodeGenerator";
+import WeatherDashboard from "@/pages/apps/WeatherDashboard";
 import Snake from "@/pages/games/Snake";
 import Tetris from "@/pages/games/Tetris";
 import EuroTruckSimulator2 from "@/pages/downloads/EuroTruckSimulator2";
@@ -24,6 +25,7 @@ function Router() {
       <Route path="/apps/password-generator" component={PasswordGenerator}/>
       <Route path="/apps/link-shortener" component={LinkShortener}/>
       <Route path="/apps/qr-code-generator" component={QRCodeGenerator}/>
+      <Route path="/apps/weather-dashboard" component={WeatherDashboard}/>
       <Route path="/downloads" component={Downloads}/>
       <Route path="/downloads/euro-truck-simulator-2" component={EuroTruckSimulator2}/>
       <Route path="/games" component={Games}/>
