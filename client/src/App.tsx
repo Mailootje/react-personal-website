@@ -21,6 +21,7 @@ import PacmanSimple from "@/pages/games/PacmanSimple";
 import PacmanBasic from "@/pages/games/PacmanBasic";
 import EuroTruckSimulator2 from "@/pages/downloads/EuroTruckSimulator2";
 import AmericanTruckSimulator from "@/pages/downloads/AmericanTruckSimulator";
+import SchoolPitch from "@/pages/personal/school/Pitch";
 
 function Router() {
   return (
@@ -40,6 +41,7 @@ function Router() {
       <Route path="/games/tetris" component={Tetris}/>
       <Route path="/games/pacman" component={PacmanBasic}/>
       <Route path="/games/pacman-simple" component={PacmanSimple}/>
+      <Route path="/personal/school/pitch" component={SchoolPitch}/>
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
