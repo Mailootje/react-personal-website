@@ -529,7 +529,7 @@ export default function ImageConverter() {
     }
   };
 
-  // Convert all images
+  // Process images in batches with parallel processing
   const convertAllImages = async () => {
     if (images.length === 0) {
       toast({
@@ -544,52 +544,102 @@ export default function ImageConverter() {
     setProcessingProgress(0);
     
     try {
+      // Create a copy of the images array to work with
       const updatedImages = [...images];
       
-      for (let i = 0; i < updatedImages.length; i++) {
-        // Update progress
-        setProcessingProgress(Math.floor((i / updatedImages.length) * 100));
+      // Identify images that need conversion (skip already converted ones)
+      const imagesToConvert = updatedImages
+        .map((img, index) => ({ img, index }))
+        .filter(({ img }) => !img.convertedBlob || img.isConverting);
+      
+      if (imagesToConvert.length === 0) {
+        // All images are already converted
+        setProcessingProgress(100);
+        toast({
+          title: "All Images Already Converted",
+          description: "No new conversions needed.",
+        });
+        setIsProcessing(false);
+        return;
+      }
+      
+      // Set converting flag for all images that need conversion
+      imagesToConvert.forEach(({ img, index }) => {
+        updatedImages[index] = { ...img, isConverting: true, error: null };
+      });
+      setImages([...updatedImages]);
+      
+      // Define a maximum number of concurrent conversions to prevent browser overload
+      // Use higher concurrency when hardware acceleration is enabled
+      const MAX_CONCURRENT = useHardwareAcceleration && isHardwareAccelerationSupported ? 6 : 3;
+      
+      // Create chunks of images to process in parallel batches
+      const chunks = [];
+      for (let i = 0; i < imagesToConvert.length; i += MAX_CONCURRENT) {
+        chunks.push(imagesToConvert.slice(i, i + MAX_CONCURRENT));
+      }
+      
+      let completedCount = 0;
+      const totalCount = imagesToConvert.length;
+      
+      // Process each chunk in sequence, but process images within each chunk in parallel
+      for (const chunk of chunks) {
+        // Process this chunk of images in parallel
+        const results = await Promise.all(
+          chunk.map(async ({ img, index }) => {
+            try {
+              // Convert the image
+              const result = await convertImage(img, options);
+              
+              // Return the result along with the index
+              return { result, index };
+            } catch (error) {
+              console.error(`Error converting image at index ${index}:`, error);
+              return { result: null, index };
+            }
+          })
+        );
         
-        // Skip already converted images with the same settings
-        if (updatedImages[i].convertedBlob && !updatedImages[i].isConverting) {
-          continue;
-        }
+        // Update the results for this chunk
+        results.forEach(({ result, index }) => {
+          completedCount++;
+          
+          // Update progress
+          const progress = Math.floor((completedCount / totalCount) * 100);
+          setProcessingProgress(progress);
+          
+          if (result) {
+            const url = URL.createObjectURL(result);
+            updatedImages[index] = {
+              ...updatedImages[index],
+              convertedUrl: url,
+              convertedBlob: result,
+              isConverting: false,
+              error: null
+            };
+          } else {
+            updatedImages[index] = {
+              ...updatedImages[index],
+              convertedUrl: null,
+              convertedBlob: null,
+              isConverting: false,
+              error: "Failed to convert image"
+            };
+          }
+        });
         
-        // Set converting flag
-        updatedImages[i] = { ...updatedImages[i], isConverting: true, error: null };
-        setImages(updatedImages);
-        
-        // Convert image
-        const result = await convertImage(updatedImages[i], options);
-        
-        // Update result
-        if (result) {
-          const url = URL.createObjectURL(result);
-          updatedImages[i] = {
-            ...updatedImages[i],
-            convertedUrl: url,
-            convertedBlob: result,
-            isConverting: false,
-            error: null
-          };
-        } else {
-          updatedImages[i] = {
-            ...updatedImages[i],
-            convertedUrl: null,
-            convertedBlob: null,
-            isConverting: false,
-            error: "Failed to convert image"
-          };
-        }
-        
+        // Update the state after each chunk is complete
         setImages([...updatedImages]);
       }
       
+      // Ensure progress shows 100% when complete
       setProcessingProgress(100);
       
+      // Show completion toast
+      const successCount = updatedImages.filter(img => img.convertedBlob).length;
       toast({
         title: "Conversion Complete",
-        description: `Successfully converted ${updatedImages.filter(img => img.convertedBlob).length} of ${updatedImages.length} images`,
+        description: `Successfully converted ${successCount} of ${updatedImages.length} images`,
       });
     } catch (error) {
       console.error("Error in batch conversion:", error);
@@ -746,7 +796,8 @@ export default function ImageConverter() {
               Image Converter
             </h1>
             <p className="text-lg text-gray-300 max-w-3xl mx-auto">
-              Convert your images between different formats instantly, right in your browser. 
+              Convert your images between different formats instantly, right in your browser.
+              Process multiple images simultaneously with hardware acceleration for maximum speed.
               No uploads to external servers - all processing happens locally.
             </p>
           </div>
@@ -821,7 +872,7 @@ export default function ImageConverter() {
                         </div>
                       </div>
                       <p className="text-xs text-gray-400 ml-10 -mt-1">
-                        Uses your GPU for faster image processing. Great for batch conversions and larger images.
+                        Uses your GPU for faster image processing. Enables parallel conversions of multiple images simultaneously.
                       </p>
                       <Separator className="my-4 bg-gray-700" />
                     </>
