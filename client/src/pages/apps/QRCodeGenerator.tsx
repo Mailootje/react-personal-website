@@ -324,10 +324,9 @@ export default function QRCodeGenerator() {
               </p>
             </motion.div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-7 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* QR Code Type Selection */}
               <motion.div 
-                className="lg:col-span-4"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.1 }}
@@ -340,11 +339,11 @@ export default function QRCodeGenerator() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-3 md:grid-cols-5 gap-4">
+                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
                       {qrTypes.map((type) => (
                         <button
                           key={type.id}
-                          className={`aspect-square flex flex-col items-center justify-center rounded-lg p-4 transition-colors 
+                          className={`aspect-square flex flex-col items-center justify-center rounded-lg p-3 transition-colors 
                                     ${qrType === type.id 
                                       ? 'bg-primary text-primary-foreground' 
                                       : 'bg-muted/50 hover:bg-muted text-foreground'}`}
@@ -365,8 +364,7 @@ export default function QRCodeGenerator() {
               </motion.div>
 
               {/* QR Code Result and Options */}
-              <motion.div 
-                className="lg:col-span-3"
+              <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
