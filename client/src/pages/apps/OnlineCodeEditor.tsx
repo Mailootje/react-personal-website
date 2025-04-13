@@ -5,7 +5,8 @@ import {
   FaFolder, FaFile, FaFolderOpen, FaChevronDown, FaChevronRight, FaPlus, 
   FaUpload, FaSave, FaTrash, FaTimes, FaSearch, FaExchangeAlt, FaCode, 
   FaMinus, FaPlus as FaPlusIcon, FaList, FaMap, FaPlay, FaInfoCircle,
-  FaKeyboard, FaClock, FaCheck, FaSun, FaMoon
+  FaKeyboard, FaClock, FaCheck, FaSun, FaMoon, FaCut, FaCopy, FaPaste,
+  FaEdit, FaRedo, FaUndo, FaFileExport, FaDownload, FaPen, FaFileImport
 } from 'react-icons/fa';
 import { Button } from '@/components/ui/button';
 import { Tooltip } from '@/components/ui/tooltip';
@@ -56,6 +57,17 @@ interface EditorTab {
   id: string;
   fileId: string;
   isActive: boolean;
+}
+
+interface ContextMenuPosition {
+  x: number;
+  y: number;
+}
+
+interface ContextMenuState {
+  isOpen: boolean;
+  position: ContextMenuPosition;
+  itemId: string | null;
 }
 
 // Language detection by file extension
@@ -121,6 +133,13 @@ const OnlineCodeEditor: React.FC = () => {
   const [draggedItem, setDraggedItem] = useState<string | null>(null);
   const [dropTarget, setDropTarget] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState<boolean>(false);
+  
+  // Context menu state
+  const [contextMenu, setContextMenu] = useState<ContextMenuState>({
+    isOpen: false,
+    position: { x: 0, y: 0 },
+    itemId: null
+  });
   
   const [editorOptions, setEditorOptions] = useState({
     minimap: { enabled: true },
@@ -645,6 +664,16 @@ console.log("Let's start coding!");`,
             } else {
               openFile(item.id);
             }
+          }}
+          onContextMenu={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            // Open context menu for this item
+            setContextMenu({
+              isOpen: true,
+              position: { x: e.clientX, y: e.clientY },
+              itemId: item.id
+            });
           }}
           draggable={true}
           onDragStart={(e) => {
@@ -2422,10 +2451,213 @@ console.log("Starting fresh!");`,
     }
   };
 
+  // Add document click handler for context menu
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      // Close context menu on any click outside
+      if (contextMenu.isOpen) {
+        setContextMenu(prev => ({ ...prev, isOpen: false }));
+      }
+    };
+    
+    document.addEventListener('click', handleClickOutside);
+    
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [contextMenu.isOpen]);
+  
+  // Function to download a file
+  const downloadFile = (fileId: string) => {
+    const file = fileSystem.items[fileId];
+    if (!file || file.type !== 'file' || !file.content) {
+      toast({
+        title: "Error",
+        description: "Cannot download this file.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Create a blob and download link
+    const blob = new Blob([file.content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = file.name;
+    document.body.appendChild(a);
+    a.click();
+    
+    // Clean up
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 100);
+    
+    toast({
+      title: "Success",
+      description: `${file.name} downloaded successfully.`,
+    });
+  };
+  
+  // Function to download a folder (future implementation)
+  const downloadFolder = (folderId: string) => {
+    const folder = fileSystem.items[folderId];
+    if (!folder || folder.type !== 'folder') {
+      toast({
+        title: "Error",
+        description: "Cannot download this folder.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // For now we'll use a placeholder, but this could be expanded to create a zip archive
+    toast({
+      title: "Coming Soon",
+      description: "Folder download functionality will be added soon.",
+    });
+  };
+
+  // Function to handle context menu actions
+  const handleContextMenuAction = (action: string) => {
+    if (!contextMenu.itemId) return;
+    
+    const item = fileSystem.items[contextMenu.itemId];
+    if (!item) return;
+    
+    switch (action) {
+      case 'open':
+        if (item.type === 'file') {
+          openFile(item.id);
+        } else {
+          toggleFolder(item.id);
+        }
+        break;
+      case 'rename':
+        // Implement rename functionality here
+        toast({
+          title: "Coming Soon",
+          description: "Rename functionality will be added soon.",
+        });
+        break;
+      case 'delete':
+        deleteItem(item.id);
+        break;
+      case 'newFile':
+        if (item.type === 'folder') {
+          setNewItemParent(item.id);
+          setIsCreatingFile(true);
+        }
+        break;
+      case 'newFolder':
+        if (item.type === 'folder') {
+          setNewItemParent(item.id);
+          setIsCreatingFolder(true);
+        }
+        break;
+      case 'download':
+        if (item.type === 'file') {
+          downloadFile(item.id);
+        } else {
+          downloadFolder(item.id);
+        }
+        break;
+      default:
+        break;
+    }
+    
+    // Close the context menu after action
+    setContextMenu(prev => ({ ...prev, isOpen: false }));
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-black text-white">
       <Header />
       <VideoBackground opacity={0.10} />
+
+      {/* Context Menu */}
+      {contextMenu.isOpen && contextMenu.itemId && (
+        <div 
+          className="fixed z-50 bg-gray-800 border border-gray-700 shadow-lg rounded py-1 overflow-hidden w-48"
+          style={{ 
+            left: `${contextMenu.position.x}px`, 
+            top: `${contextMenu.position.y}px` 
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {(() => {
+            const item = fileSystem.items[contextMenu.itemId];
+            if (!item) return null;
+            
+            const isFolder = item.type === 'folder';
+            
+            return (
+              <>
+                <div className="px-2 py-1 text-sm text-gray-400 border-b border-gray-700">
+                  {item.name}
+                </div>
+                
+                <button 
+                  className="flex items-center w-full px-4 py-1.5 text-sm hover:bg-gray-700 text-left"
+                  onClick={() => handleContextMenuAction('open')}
+                >
+                  {isFolder ? <FaFolderOpen className="mr-2 text-yellow-400" /> : <FaFile className="mr-2 text-blue-400" />}
+                  {isFolder ? 'Open Folder' : 'Open File'}
+                </button>
+                
+                {isFolder && (
+                  <>
+                    <button 
+                      className="flex items-center w-full px-4 py-1.5 text-sm hover:bg-gray-700 text-left"
+                      onClick={() => handleContextMenuAction('newFile')}
+                    >
+                      <FaFile className="mr-2 text-blue-400" />
+                      New File
+                    </button>
+                    
+                    <button 
+                      className="flex items-center w-full px-4 py-1.5 text-sm hover:bg-gray-700 text-left"
+                      onClick={() => handleContextMenuAction('newFolder')}
+                    >
+                      <FaFolder className="mr-2 text-yellow-400" />
+                      New Folder
+                    </button>
+                  </>
+                )}
+                
+                <div className="border-t border-gray-700 my-1"></div>
+                
+                <button 
+                  className="flex items-center w-full px-4 py-1.5 text-sm hover:bg-gray-700 text-left"
+                  onClick={() => handleContextMenuAction('rename')}
+                >
+                  <FaEdit className="mr-2 text-green-400" />
+                  Rename
+                </button>
+                
+                <button 
+                  className="flex items-center w-full px-4 py-1.5 text-sm hover:bg-gray-700 text-left"
+                  onClick={() => handleContextMenuAction('download')}
+                >
+                  <FaDownload className="mr-2 text-purple-400" />
+                  Download
+                </button>
+                
+                <div className="border-t border-gray-700 my-1"></div>
+                
+                <button 
+                  className="flex items-center w-full px-4 py-1.5 text-sm hover:bg-red-800 text-left text-red-400"
+                  onClick={() => handleContextMenuAction('delete')}
+                >
+                  <FaTrash className="mr-2" />
+                  Delete
+                </button>
+              </>
+            );
+          })()}
+        </div>
+      )}
 
       <main className="flex-grow relative z-10 pt-24 pb-8">
         <Container maxWidth="6xl" className="h-full max-w-[95vw]">
