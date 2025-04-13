@@ -76,8 +76,8 @@ export default function IpLocationLookup() {
     try {
       setIsLoading(true);
       
-      // Make a request to ipify API to get the user's IP
-      const response = await fetch("https://api.ipify.org?format=json");
+      // Make a request to our backend API to get the user's IP
+      const response = await fetch("/api/ip");
       const data = await response.json();
       
       if (data.ip) {
@@ -141,9 +141,8 @@ export default function IpLocationLookup() {
   // Get detailed information for an IP address
   const lookupIpInfo = async (ip: string): Promise<IpLookupResult> => {
     try {
-      // For a real app, you would use your own API endpoint that securely calls an IP geolocation service
-      // Here's an example using the ipinfo.io service (would require an API token in production)
-      const response = await fetch(`https://ipinfo.io/${ip}/json`);
+      // Use our backend API that securely calls the IP geolocation service
+      const response = await fetch(`/api/ip-info/${ip}`);
       const data = await response.json();
       
       if (data.error) {

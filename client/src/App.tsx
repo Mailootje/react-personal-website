@@ -17,6 +17,8 @@ import WeatherDashboard from "@/pages/apps/WeatherDashboard";
 import OnlineCodeEditor from "@/pages/apps/OnlineCodeEditor";
 import ImageConverter from "@/pages/apps/ImageConverter";
 import HeaderChecker from "./pages/apps/HeaderChecker";
+import FaviconGenerator from "@/pages/apps/FaviconGenerator";
+import IpLocationLookup from "@/pages/apps/IpLocationLookup";
 import Snake from "@/pages/games/Snake";
 import Tetris from "@/pages/games/Tetris";
 import PacmanNew from "@/pages/games/PacmanNew";
@@ -39,6 +41,8 @@ function Router() {
       <Route path="/apps/online-code-editor" component={OnlineCodeEditor}/>
       <Route path="/apps/image-converter" component={ImageConverter}/>
       <Route path="/apps/header-checker" component={HeaderChecker}/>
+      <Route path="/apps/favicon-generator" component={FaviconGenerator}/>
+      <Route path="/apps/ip-location-lookup" component={IpLocationLookup}/>
       <Route path="/downloads" component={Downloads}/>
       <Route path="/downloads/euro-truck-simulator-2" component={EuroTruckSimulator2}/>
       <Route path="/downloads/american-truck-simulator" component={AmericanTruckSimulator}/>

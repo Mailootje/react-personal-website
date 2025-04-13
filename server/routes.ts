@@ -1154,6 +1154,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     }
   });
+  
+  // Route for IP lookup - get current IP
+  app.get("/api/ip", async (req, res) => {
+    try {
+      // You can use ipify.org to get the client's public IP
+      const response = await fetch("https://api.ipify.org?format=json");
+      const data = await response.json() as Record<string, any>;
+      res.json(data);
+    } catch (error: any) {
+      console.error("Error getting IP address:", error);
+      res.status(500).json({ error: error.message || "Failed to get IP address" });
+    }
+  });
+  
+  // Route for IP info - get details about an IP
+  app.get("/api/ip-info/:ip", async (req, res) => {
+    try {
+      const ip = req.params.ip;
+      
+      if (!ip) {
+        return res.status(400).json({ error: "IP parameter is required" });
+      }
+      
+      // ipinfo.io provides geolocation and other info about an IP
+      const response = await fetch(`https://ipinfo.io/${ip}/json`);
+      const data = await response.json() as Record<string, any>;
+      
+      if (data.error) {
+        return res.status(400).json({ error: data.error.message || "Invalid IP address" });
+      }
+      
+      res.json(data);
+    } catch (error: any) {
+      console.error("Error getting IP info:", error);
+      res.status(500).json({ error: error.message || "Failed to get IP information" });
+    }
+  });
 
   const httpServer = createServer(app);
 
