@@ -175,6 +175,9 @@ const OnlineCodeEditor: React.FC = () => {
   const [workspaceName, setWorkspaceName] = useState<string>('default');
   const [savedWorkspaces, setSavedWorkspaces] = useState<string[]>([]);
   const [isWorkspaceManagerOpen, setIsWorkspaceManagerOpen] = useState<boolean>(false);
+  const [isWorkspaceRestoreOpen, setIsWorkspaceRestoreOpen] = useState<boolean>(false);
+  const [workspaceToRestore, setWorkspaceToRestore] = useState<string>('default');
+  const [isWorkspaceMigrated, setIsWorkspaceMigrated] = useState<boolean>(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const editorRef = useRef<any>(null);
@@ -2400,18 +2403,10 @@ console.log("Starting fresh!");`,
     console.log("Has workspace data:", !!hasWorkspaceData);
     
     if (hasWorkspaceData) {
-      // We have saved data, ask the user if they want to load it
-      const shouldLoad = window.confirm(`Would you like to restore your previous workspace "${currentWorkspace}"?`);
-      if (shouldLoad) {
-        console.log("User confirmed loading workspace:", currentWorkspace);
-        loadFromLocalStorage(currentWorkspace);
-      } else {
-        console.log("User declined loading workspace, using default");
-        // Force save current state to ensure it's initialized properly
-        setTimeout(() => {
-          saveToLocalStorage(currentWorkspace);
-        }, 1000);
-      }
+      // We have saved data, show the workspace restore dialog
+      setWorkspaceToRestore(currentWorkspace);
+      setIsWorkspaceMigrated(false);
+      setIsWorkspaceRestoreOpen(true);
     }
     // If we have old format data, migrate it to the new format
     else if (localStorage.getItem('codeEditor_fileSystem')) {
@@ -2430,18 +2425,10 @@ console.log("Starting fresh!");`,
       localStorage.removeItem('codeEditor_tabs');
       localStorage.removeItem('codeEditor_options');
       
-      // Ask the user if they want to load it
-      const shouldLoad = window.confirm('Would you like to restore your previous workspace?');
-      if (shouldLoad) {
-        console.log("User confirmed loading migrated workspace");
-        loadFromLocalStorage('default');
-      } else {
-        console.log("User declined loading migrated workspace");
-        // Force save current state to ensure it's initialized properly
-        setTimeout(() => {
-          saveToLocalStorage('default');
-        }, 1000);
-      }
+      // Show the workspace restore dialog for the migrated workspace
+      setWorkspaceToRestore('default');
+      setIsWorkspaceMigrated(true);
+      setIsWorkspaceRestoreOpen(true);
     } else {
       console.log("No existing workspaces found, saving initial state");
       // Force save current state to ensure it's initialized properly
@@ -3555,6 +3542,54 @@ console.log("Starting fresh!");`,
         </DialogContent>
       </Dialog>
       
+      {/* Workspace Restore Dialog */}
+      <Dialog open={isWorkspaceRestoreOpen} onOpenChange={(open) => {
+        setIsWorkspaceRestoreOpen(open);
+        if (!open) {
+          // If dialog is closed without choosing an option, default to NOT restoring
+          console.log("Workspace restore dialog closed without choice, using default");
+          setTimeout(() => {
+            saveToLocalStorage(workspaceToRestore);
+          }, 1000);
+        }
+      }}>
+        <DialogContent className="sm:max-w-md bg-gray-900 text-white border-gray-700">
+          <DialogHeader>
+            <DialogTitle>Restore Workspace</DialogTitle>
+            <DialogDescription className="text-gray-400">
+              {isWorkspaceMigrated ? 
+                "We found a previously saved workspace. Would you like to restore it?" :
+                `Would you like to restore your previous workspace "${workspaceToRestore}"?`
+              }
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex space-x-4 justify-end">
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                console.log("User declined loading workspace, using default");
+                // Force save current state to ensure it's initialized properly
+                setTimeout(() => {
+                  saveToLocalStorage(workspaceToRestore);
+                }, 1000);
+                setIsWorkspaceRestoreOpen(false);
+              }}
+            >
+              No, Start Fresh
+            </Button>
+            <Button 
+              onClick={() => {
+                console.log(`User confirmed loading ${isWorkspaceMigrated ? 'migrated' : ''} workspace:`, workspaceToRestore);
+                loadFromLocalStorage(workspaceToRestore);
+                setIsWorkspaceRestoreOpen(false);
+              }}
+            >
+              Yes, Restore
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Workspace Manager Dialog */}
       <Dialog open={isWorkspaceManagerOpen} onOpenChange={setIsWorkspaceManagerOpen}>
         <DialogContent className="sm:max-w-md bg-gray-900 text-white border-gray-700">
