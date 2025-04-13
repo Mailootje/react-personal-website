@@ -183,6 +183,7 @@ const slides = [
       "Postman",
       "Git",
       "VS Code",
+      "JetBrains",
       "Docker",
     ],
     designTools: [
@@ -938,6 +939,10 @@ export default function SchoolPitch() {
                         case "VS Code": 
                           gradientColors = "from-blue-500/20 to-blue-700/20 border-blue-500/40"; 
                           icon = <div className="text-blue-500/80 mb-2 text-xl">VS Code</div>;
+                          break;
+                        case "JetBrains": 
+                          gradientColors = "from-purple-500/20 to-pink-600/20 border-purple-500/40"; 
+                          icon = <div className="text-purple-500/80 mb-2 text-xl">JetBrains</div>;
                           break;
                         case "Docker": 
                           gradientColors = "from-blue-400/20 to-blue-600/20 border-blue-500/40"; 
