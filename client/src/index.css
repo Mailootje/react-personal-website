@@ -32,37 +32,15 @@
     --input: 217 15% 15%;
     --ring: 210 100% 60%;
   }
-  
-  /* Global video background element */
-  #global-video-background {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    overflow: hidden;
-    background-color: #000;
-  }
-  
-  #global-video-background video {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0.3;
-  }
 }
 
 @layer components {
   .dark-card {
-    @apply bg-black/70 border border-gray-900 shadow-md backdrop-blur-sm;
+    @apply bg-black border border-gray-900 shadow-md;
   }
   
   .dark-section {
-    @apply bg-black/80 border-t border-b border-gray-900 backdrop-blur-sm;
+    @apply bg-black border-t border-b border-gray-900;
   }
   
   .dark-input {
@@ -71,10 +49,5 @@
   
   .dark-button {
     @apply bg-gray-900 text-white hover:bg-gray-800 border border-gray-800;
-  }
-  
-  /* Make some elements transparent to show video background */
-  .transparent-bg {
-    @apply bg-black/70 backdrop-blur-sm;
   }
 }

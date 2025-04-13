@@ -17,21 +17,6 @@ export function VideoBackground({
     // Ensure video is muted to allow autoplay
     if (videoRef.current) {
       videoRef.current.muted = true;
-      videoRef.current.defaultMuted = true;
-      
-      // Force video to play
-      const playVideo = () => {
-        if (videoRef.current) {
-          videoRef.current.play().catch(err => {
-            console.error("Error playing video:", err);
-          });
-        }
-      };
-
-      playVideo();
-      
-      // Try playing again after a delay just in case
-      setTimeout(playVideo, 1000);
     }
   }, []);
 
@@ -45,7 +30,6 @@ export function VideoBackground({
           loop
           muted
           playsInline
-          preload="auto"
           className="absolute inset-0 object-cover w-full h-full"
           style={{ opacity }}
         >
