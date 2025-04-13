@@ -87,9 +87,9 @@ export function Contact() {
   };
 
   return (
-    <section id="contact" className="py-20 px-6 bg-gray-50">
+    <section id="contact" className="py-20 px-6 bg-black">
       <Container maxWidth="5xl">
-        <SectionHeading subtitle="Get In Touch" title="Contact Me" />
+        <SectionHeading subtitle="Get In Touch" title="Contact Me" isDark />
         
         <div className="grid md:grid-cols-5 gap-8">
           <motion.div 
@@ -99,14 +99,14 @@ export function Contact() {
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
           >
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
+            <div className="bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-800 mb-6">
               <div className="flex items-start mb-6">
                 <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mr-4 mt-1 flex-shrink-0">
                   <i className="ri-map-pin-2-fill text-xl"></i>
                 </div>
                 <div>
-                  <h4 className="font-bold mb-1">Location</h4>
-                  <p className="text-muted-foreground">{contactInfo.location}</p>
+                  <h4 className="font-bold mb-1 text-gray-100">Location</h4>
+                  <p className="text-gray-400">{contactInfo.location}</p>
                 </div>
               </div>
               
@@ -115,8 +115,8 @@ export function Contact() {
                   <i className="ri-mail-fill text-xl"></i>
                 </div>
                 <div>
-                  <h4 className="font-bold mb-1">Email</h4>
-                  <p className="text-muted-foreground">{contactInfo.email}</p>
+                  <h4 className="font-bold mb-1 text-gray-100">Email</h4>
+                  <p className="text-gray-400">{contactInfo.email}</p>
                 </div>
               </div>
             </div>
@@ -147,13 +147,13 @@ export function Contact() {
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
           >
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-              <h4 className="font-bold text-lg mb-6">Send a Message</h4>
+            <div className="bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-800">
+              <h4 className="font-bold text-lg mb-6 text-gray-100">Send a Message</h4>
               
               <form onSubmit={handleSubmit}>
                 <div className="grid md:grid-cols-2 gap-6 mb-6">
                   <div>
-                    <Label htmlFor="name" className="text-sm font-medium text-muted-foreground mb-2">
+                    <Label htmlFor="name" className="text-sm font-medium text-gray-300 mb-2">
                       Your Name
                     </Label>
                     <Input 
@@ -163,12 +163,12 @@ export function Contact() {
                       placeholder="John Smith"
                       value={formData.name}
                       onChange={handleChange}
-                      className="w-full"
+                      className="w-full bg-gray-800 border-gray-700 text-gray-100"
                     />
                   </div>
                   
                   <div>
-                    <Label htmlFor="email" className="text-sm font-medium text-muted-foreground mb-2">
+                    <Label htmlFor="email" className="text-sm font-medium text-gray-300 mb-2">
                       Your Email
                     </Label>
                     <Input 
@@ -178,13 +178,13 @@ export function Contact() {
                       placeholder="john@example.com"
                       value={formData.email}
                       onChange={handleChange}
-                      className="w-full"
+                      className="w-full bg-gray-800 border-gray-700 text-gray-100"
                     />
                   </div>
                 </div>
                 
                 <div className="mb-6">
-                  <Label htmlFor="subject" className="text-sm font-medium text-muted-foreground mb-2">
+                  <Label htmlFor="subject" className="text-sm font-medium text-gray-300 mb-2">
                     Subject
                   </Label>
                   <Input 
@@ -194,12 +194,12 @@ export function Contact() {
                     placeholder="Project Inquiry"
                     value={formData.subject}
                     onChange={handleChange}
-                    className="w-full"
+                    className="w-full bg-gray-800 border-gray-700 text-gray-100"
                   />
                 </div>
                 
                 <div className="mb-6">
-                  <Label htmlFor="message" className="text-sm font-medium text-muted-foreground mb-2">
+                  <Label htmlFor="message" className="text-sm font-medium text-gray-300 mb-2">
                     Message
                   </Label>
                   <Textarea 
@@ -209,7 +209,7 @@ export function Contact() {
                     placeholder="How can I help you?"
                     value={formData.message}
                     onChange={handleChange}
-                    className="w-full resize-none"
+                    className="w-full resize-none bg-gray-800 border-gray-700 text-gray-100"
                   />
                 </div>
                 
