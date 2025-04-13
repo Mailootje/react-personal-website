@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { ArrowLeft, Download, FileText, Info, Clock, Tag, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Download, FileText, Info, Clock, Tag, Loader2, AlertCircle, CheckCircle2, List, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -41,6 +41,7 @@ export default function EuroTruckSimulator2() {
   const [selectedVersion, setSelectedVersion] = useState<string>('v1.53.x');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showLoadOrder, setShowLoadOrder] = useState(false);
   
   // Get version from URL query params if present
   useEffect(() => {
@@ -215,30 +216,150 @@ export default function EuroTruckSimulator2() {
                 </div>
               ) : (
                 <Tabs defaultValue="all" className="w-full">
-                  <TabsList className="mb-8 flex flex-wrap h-auto p-1">
-                    <TabsTrigger value="all">All Files</TabsTrigger>
-                    {categories.map(category => (
-                      <TabsTrigger key={category} value={category}>{category}</TabsTrigger>
-                    ))}
-                  </TabsList>
+                  <div className="flex flex-wrap justify-between items-center mb-8">
+                    <TabsList className="flex flex-wrap h-auto p-1">
+                      <TabsTrigger value="all">All Files</TabsTrigger>
+                      {categories.map(category => (
+                        <TabsTrigger key={category} value={category}>{category}</TabsTrigger>
+                      ))}
+                    </TabsList>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="lg:hidden mt-4 sm:mt-0" 
+                      onClick={() => setShowLoadOrder(!showLoadOrder)}
+                    >
+                      {showLoadOrder ? (
+                        <> <X className="h-4 w-4 mr-2" /> Hide Load Order </>
+                      ) : (
+                        <> <List className="h-4 w-4 mr-2" /> Show Load Order </>
+                      )}
+                    </Button>
+                  </div>
                   
                   <TabsContent value="all" className="mt-0">
-                    <div className="grid grid-cols-1 gap-6">
-                      {downloadFiles.map(file => (
-                        <DownloadCard key={file.id} file={file} />
-                      ))}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                      <div className="lg:col-span-2">
+                        <div className="grid grid-cols-1 gap-6">
+                          {downloadFiles.map(file => (
+                            <DownloadCard key={file.id} file={file} />
+                          ))}
+                        </div>
+                      </div>
+                      <div className={`lg:col-span-1 ${!showLoadOrder ? 'hidden lg:block' : ''}`}>
+                        <Card className="shadow-sm mb-6">
+                          <CardHeader>
+                            <CardTitle className="text-xl">Recommended Load Order</CardTitle>
+                            <CardDescription>For optimal compatibility with ProMods and other map mods</CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="rounded-md bg-muted p-4 font-mono text-sm">
+                              <p className="font-semibold mb-2">↑ Top of mod manager</p>
+                              <ul className="space-y-1 text-muted-foreground">
+                                <li>• ProMods Background Map (Pick one):</li>
+                                <li className="ml-4">- ProMods High Quality Background Map 1.9</li>
+                                <li className="ml-4">- ProMods High Quality Afroeurasia Background Map 2.5</li>
+                                <li>• ProMods New Map Icons ETS2</li>
+                                <li>• (Other mods)</li>
+                                <li>• ProMods Ferries Add-on</li>
+                                <li>• ProMods Cabin Accessories Pack 1.53</li>
+                                <li>• ProMods Trailer & Company Pack 1.53 Trailers Def Replacement</li>
+                                <li>• ProMods Trailer & Company Pack 1.53 Trailers Def Main</li>
+                                <li>• ProMods Trailer & Company Pack 1.53 Trailers</li>
+                                <li>• ProMods Trailer & Company Pack 1.53 Companies Def</li>
+                                <li>• ProMods Trailer & Company Pack 1.53 Companies</li>
+                                <li>• ProMods Middle-East Add-On 2.73 Def & Map</li>
+                                <li>• ProMods Middle-East Add-On 2.73 Assets</li>
+                                <li>• ProMods Europe 2.71 RusMap 2.51 Road Connection</li>
+                                <li>• ProMods Europe 2.73a DLC Support Pack</li>
+                                <li>• ProMods Europe 2.73a Def</li>
+                                <li>• ProMods Europe 2.73a Map</li>
+                                <li>• ProMods Europe 2.73a Models 1-3</li>
+                                <li>• ProMods Europe 2.73a Media</li>
+                                <li>• ProMods Europe 2.73a Assets</li>
+                                <li>• RusMap 2.51 Def</li>
+                                <li>• RusMap 2.51 Map</li>
+                                <li>• RusMap 2.51 Models</li>
+                                <li>• ProMods The Great Steppe 1.2.2 Def + Map</li>
+                                <li>• ProMods The Great Steppe 1.2.2 Asset</li>
+                              </ul>
+                              <p className="font-semibold mt-2">↓ Bottom of mod manager</p>
+                            </div>
+                            <div className="mt-4 text-sm text-muted-foreground">
+                              <p className="flex items-center mb-2">
+                                <AlertCircle className="h-4 w-4 mr-2 text-amber-500" />
+                                <span>This is not a guarantee for bug-free gameplay!</span>
+                              </p>
+                              <p>If you encounter problems, please check on a clean profile with only ProMods enabled. Some maps may not be compatible with the latest game version.</p>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
                     </div>
                   </TabsContent>
                   
                   {categories.map(category => (
                     <TabsContent key={category} value={category} className="mt-0">
-                      <div className="grid grid-cols-1 gap-6">
-                        {downloadFiles
-                          .filter(file => file.category === category)
-                          .map(file => (
-                            <DownloadCard key={file.id} file={file} />
-                          ))
-                        }
+                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div className="lg:col-span-2">
+                          <div className="grid grid-cols-1 gap-6">
+                            {downloadFiles
+                              .filter(file => file.category === category)
+                              .map(file => (
+                                <DownloadCard key={file.id} file={file} />
+                              ))
+                            }
+                          </div>
+                        </div>
+                        <div className={`lg:col-span-1 ${!showLoadOrder ? 'hidden lg:block' : ''}`}>
+                          <Card className="shadow-sm mb-6">
+                            <CardHeader>
+                              <CardTitle className="text-xl">Recommended Load Order</CardTitle>
+                              <CardDescription>For optimal compatibility with ProMods and other map mods</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="rounded-md bg-muted p-4 font-mono text-sm">
+                                <p className="font-semibold mb-2">↑ Top of mod manager</p>
+                                <ul className="space-y-1 text-muted-foreground">
+                                  <li>• ProMods Background Map (Pick one):</li>
+                                  <li className="ml-4">- ProMods High Quality Background Map 1.9</li>
+                                  <li className="ml-4">- ProMods High Quality Afroeurasia Background Map 2.5</li>
+                                  <li>• ProMods New Map Icons ETS2</li>
+                                  <li>• (Other mods)</li>
+                                  <li>• ProMods Ferries Add-on</li>
+                                  <li>• ProMods Cabin Accessories Pack 1.53</li>
+                                  <li>• ProMods Trailer & Company Pack 1.53 Trailers Def Replacement</li>
+                                  <li>• ProMods Trailer & Company Pack 1.53 Trailers Def Main</li>
+                                  <li>• ProMods Trailer & Company Pack 1.53 Trailers</li>
+                                  <li>• ProMods Trailer & Company Pack 1.53 Companies Def</li>
+                                  <li>• ProMods Trailer & Company Pack 1.53 Companies</li>
+                                  <li>• ProMods Middle-East Add-On 2.73 Def & Map</li>
+                                  <li>• ProMods Middle-East Add-On 2.73 Assets</li>
+                                  <li>• ProMods Europe 2.71 RusMap 2.51 Road Connection</li>
+                                  <li>• ProMods Europe 2.73a DLC Support Pack</li>
+                                  <li>• ProMods Europe 2.73a Def</li>
+                                  <li>• ProMods Europe 2.73a Map</li>
+                                  <li>• ProMods Europe 2.73a Models 1-3</li>
+                                  <li>• ProMods Europe 2.73a Media</li>
+                                  <li>• ProMods Europe 2.73a Assets</li>
+                                  <li>• RusMap 2.51 Def</li>
+                                  <li>• RusMap 2.51 Map</li>
+                                  <li>• RusMap 2.51 Models</li>
+                                  <li>• ProMods The Great Steppe 1.2.2 Def + Map</li>
+                                  <li>• ProMods The Great Steppe 1.2.2 Asset</li>
+                                </ul>
+                                <p className="font-semibold mt-2">↓ Bottom of mod manager</p>
+                              </div>
+                              <div className="mt-4 text-sm text-muted-foreground">
+                                <p className="flex items-center mb-2">
+                                  <AlertCircle className="h-4 w-4 mr-2 text-amber-500" />
+                                  <span>This is not a guarantee for bug-free gameplay!</span>
+                                </p>
+                                <p>If you encounter problems, please check on a clean profile with only ProMods enabled. Some maps may not be compatible with the latest game version.</p>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </div>
                       </div>
                     </TabsContent>
                   ))}

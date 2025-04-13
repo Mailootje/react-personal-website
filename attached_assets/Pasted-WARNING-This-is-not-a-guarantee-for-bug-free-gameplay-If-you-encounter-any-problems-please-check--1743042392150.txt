@@ -1,0 +1,48 @@
+WARNING! This is not a guarantee for bug-free gameplay! If you encounter any problems, please check again on a clean profile with only ProMods enabled. If the problem still persists, please file a report in the Troubleshooting & Support section. Otherwise please find out which mod is responsible for your problem and contact the creator(s) of said mod.
+
+There are a few maps compatible with ProMods. Those which we are aware of (and actually make sense to be combined in terms of quality and main goal) are listed and linked below and should work together well in the given load order. If you experience any errors, please try again on a clean profile with only ProMods and those maps enabled. In case you have a shifted world map it usually helps to put the ProMods Def package (with RusMap compatibility checked) at highest priority. If your problem persists, please open a new topic in Troubleshooting & Support/Gameplay Issues and describe your problem including your game.log.txt. There are a few map mods which we do not support and the discussion and support of which we forbid on our forums due to piracy and mod theft. You will find some examples of those below as well. If we have forgotten a map, please give us a note in the corresponding Discussion thread.
+
+Recommended load order in the mod manager:
+
+
+↑ Top of mod manager
+ProMods Background Map - Use one of these two:
+ProMods High Quality Background Map 1.9
+ProMods High Quality Afroeurasia Background Map 2.5 (suitable when using additional maps not covered by the standard background map)
+ProMods New Map Icons ETS2
+(Other mods)
+ProMods Ferries Add-on
+ProMods Cabin Accessories Pack 1.53
+ProMods Trailer & Company Pack 1.53 Trailers Def Replacement (or Standalone - do not activate both)
+ProMods Trailer & Company Pack 1.53 Trailers Def Main
+ProMods Trailer & Company Pack 1.53 Trailers
+ProMods Trailer & Company Pack 1.53 Companies Def
+ProMods Trailer & Company Pack 1.53 Companies
+Maghreb Map 0.3.5 Def - Not for 1.50-1.53 yet
+Maghreb Map 0.3.5 Map - Not for 1.50-1.53 yet
+Maghreb Map 0.3.5 Models 1 - Not for 1.50-1.53 yet
+Maghreb Map 0.3.5 Models 2 - Not for 1.50-1.53 yet
+Maghreb Map 0.3.5 Models 3 - Not for 1.50-1.53 yet
+ProMods Middle-East Add-On 2.73 Def & Map
+ProMods Middle-East Add-On 2.73 Assets
+ProMods Europe 2.71 RusMap 2.51 Road Connection - For 1.50, but works to 1.53 (Don't use RusMap 2.52 that causes game crash)
+RusMap 2.51 Map - For 1.50, but works to 1.53 (Don't use RusMap 2.52 that causes game crash)
+RusMap 2.51 Models 1 - For 1.50, but works to 1.53 (Don't use RusMap 2.52 that causes game crash)
+ProMods Europe 2.73a DLC Support Pack
+ProMods Europe 2.73a Def (with map zoom compatibility checked)
+ProMods Europe 2.73a Map
+ProMods Europe 2.73a Models 1
+ProMods Europe 2.73a Models 2
+ProMods Europe 2.73a Models 3
+ProMods Europe 2.73a Media
+ProMods Europe 2.73a Assets
+RusMap 2.51 Def - For 1.50, but works to 1.53 (Don't use RusMap 2.52 that causes game crash)
+ProMods The Great Steppe 1.2.2 Def + Map
+ProMods The Great Steppe 1.2.2 Asset
+English city names for Southern Region Map - Not for 1.52-1.53 yet
+Southern Region Map 13.0 - Not for 1.52-1.53 yet
+SibirMap 2.9.2 - Not ProMods Europe 2.73 compatible confirmed yet
+Java Road Revolution 0.8 Def & Map - Not for 1.51-1.53 yet
+Java Road Revolution 0.8 Assets & Models 1 - Not for 1.51-1.53 yet
+Java Road Revolution 0.8 Assets & Models 2 - Not for 1.51-1.53 yet
+↓ Bottom of mod manager
