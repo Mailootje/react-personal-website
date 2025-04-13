@@ -13,12 +13,25 @@ interface Photo {
   category: string;
 }
 
+// Function to get a proxied image URL
+function getProxiedImageUrl(originalUrl: string): string {
+  return `/api/image-proxy?url=${encodeURIComponent(originalUrl)}`;
+}
+
 export default function Photography() {
   const [activeFilter, setActiveFilter] = useState("all");
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
 
   // Categories for the filter
   const categories = ["all", "urban", "nature", "people"];
+  
+  // Category display names
+  const categoryDisplayNames = {
+    "all": "All Photos",
+    "urban": "Urban",
+    "nature": "Nature/Belgium",
+    "people": "People"
+  };
 
   // Fetch photos using React Query
   const { data: photos = [], isError, isLoading } = useQuery({
@@ -91,7 +104,7 @@ export default function Photography() {
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                   }`}
                 >
-                  {category.charAt(0).toUpperCase() + category.slice(1)}
+                  {categoryDisplayNames[category as keyof typeof categoryDisplayNames]}
                 </button>
               ))}
             </motion.div>
@@ -143,13 +156,17 @@ export default function Photography() {
                     transition={{ duration: 0.5 }}
                   >
                     <img
-                      src={photo.url}
+                      src={getProxiedImageUrl(photo.url)}
                       alt={photo.title}
                       className="w-full h-full object-cover transition-transform duration-500"
                       onError={(e) => {
+                        console.error(`Failed to load image: ${photo.url}`);
                         // If image fails to load, replace with placeholder
-                        (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x300?text=Image+Not+Found';
+                        (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x300?text=Image+Not+Available';
+                        // Add a class to indicate error
+                        (e.target as HTMLImageElement).classList.add('image-error');
                       }}
+                      crossOrigin="anonymous"
                     />
                   </motion.div>
                 ))}
@@ -173,9 +190,14 @@ export default function Photography() {
               onClick={(e) => e.stopPropagation()}
             >
               <img 
-                src={selectedPhoto.url} 
+                src={getProxiedImageUrl(selectedPhoto.url)} 
                 alt={selectedPhoto.title} 
                 className="w-full h-auto max-h-[90vh] object-contain rounded-lg"
+                onError={(e) => {
+                  console.error(`Failed to load modal image: ${selectedPhoto.url}`);
+                  (e.target as HTMLImageElement).src = 'https://via.placeholder.com/800x600?text=Image+Not+Available';
+                }}
+                crossOrigin="anonymous"
               />
               <button
                 onClick={closePhotoModal}
@@ -186,7 +208,7 @@ export default function Photography() {
               </button>
               <div className="bg-white p-4 absolute bottom-0 left-0 right-0 bg-opacity-90 backdrop-blur-sm">
                 <h3 className="font-bold text-lg">{selectedPhoto.title}</h3>
-                <p className="text-gray-600">Category: {selectedPhoto.category.charAt(0).toUpperCase() + selectedPhoto.category.slice(1)}</p>
+                <p className="text-gray-600">Category: {categoryDisplayNames[selectedPhoto.category as keyof typeof categoryDisplayNames] || selectedPhoto.category}</p>
               </div>
             </motion.div>
           </div>

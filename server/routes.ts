@@ -1,4 +1,4 @@
-import type { Express, Request, Response } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import path from "path";
@@ -7,6 +7,7 @@ import { z } from "zod";
 import { insertShortenedLinkSchema, ShortenedLink } from "@shared/schema";
 import { log } from "./vite";
 import QRCode from 'qrcode';
+import https from 'https';
 
 interface PhotoItem {
   id: string;
@@ -49,6 +50,45 @@ interface DownloadStat {
 const downloadStats: Map<string, DownloadStat> = new Map();
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Image proxy API for handling CORS issues with external images
+  app.get("/api/image-proxy", (req, res) => {
+    try {
+      const url = req.query.url as string;
+      
+      if (!url) {
+        return res.status(400).json({ message: "URL parameter is required" });
+      }
+      
+      // Check URL protocol for security reasons
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        return res.status(400).json({ message: "Invalid URL protocol" });
+      }
+      
+      // Handle the proxy request using https module
+      const proxyRequest = https.get(url, (proxyRes) => {
+        // Set the content-type header from the proxied response
+        res.setHeader('Content-Type', proxyRes.headers['content-type'] || 'image/jpeg');
+        
+        // Pipe the response data to our response
+        proxyRes.pipe(res);
+      });
+      
+      proxyRequest.on('error', (e) => {
+        console.error('Image proxy error:', e);
+        res.status(500).json({ message: 'Failed to fetch image' });
+      });
+      
+      // Set a timeout for the proxy request
+      proxyRequest.setTimeout(10000, () => {
+        proxyRequest.destroy();
+        res.status(504).json({ message: 'Image request timed out' });
+      });
+      
+    } catch (error) {
+      console.error("Error in image proxy:", error);
+      res.status(500).json({ message: "Failed to proxy image" });
+    }
+  });
   // Download files API
   app.get("/api/downloads/ets2", async (req, res) => {
     try {
@@ -294,50 +334,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const category = req.query.category as string | undefined;
       const photos: PhotoItem[] = [];
       
-      // Base directory for photography images
-      const baseDir = path.join("client", "public", "assets", "images", "photography");
+      // Fetch the gallery JSON from mailobedo.nl
+      const response = await fetch("https://mailobedo.nl/gallery/");
+      if (!response.ok) {
+        throw new Error(`Failed to fetch gallery: ${response.status} ${response.statusText}`);
+      }
       
-      // If category is specified and valid, only get images from that category folder
-      if (category && category !== "all" && ["urban", "nature", "people"].includes(category)) {
-        const categoryDir = path.join(baseDir, category);
-        
-        if (fs.existsSync(categoryDir)) {
-          const files = fs.readdirSync(categoryDir);
-          files.forEach((file, index) => {
-            if (file.match(/\.(jpg|jpeg|png|gif)$/i)) {
+      const galleryData = await response.json();
+      
+      // Map of categories we want to display
+      const categoryMap: Record<string, string> = {
+        "urban": "Urban",
+        "nature": "Belgium", // Using "Belgium" folder for nature category
+        "people": "People"
+      };
+      
+      // Process the photos
+      if (category && category !== "all") {
+        // Get specific category
+        const mappedCategory = categoryMap[category];
+        if (mappedCategory && galleryData[mappedCategory]) {
+          galleryData[mappedCategory].forEach((photo: any, index: number) => {
+            if (photo.url && photo.name && photo.url.match(/\.(jpg|jpeg|png|gif)$/i)) {
               photos.push({
                 id: `${category}-${index}`,
-                url: `/assets/images/photography/${category}/${file}`,
-                title: formatTitle(file),
+                url: photo.url,
+                title: formatTitle(photo.name),
                 category
               });
             }
           });
         }
       } else {
-        // Get all images from all categories
-        const categories = ["urban", "nature", "people"];
-        
-        categories.forEach(cat => {
-          const categoryDir = path.join(baseDir, cat);
-          
-          if (fs.existsSync(categoryDir)) {
-            const files = fs.readdirSync(categoryDir);
-            files.forEach((file, index) => {
-              if (file.match(/\.(jpg|jpeg|png|gif)$/i)) {
+        // Get all images from all mapped categories
+        Object.entries(categoryMap).forEach(([cat, mappedCat]) => {
+          if (galleryData[mappedCat]) {
+            galleryData[mappedCat].forEach((photo: any, index: number) => {
+              if (photo.url && photo.name && photo.url.match(/\.(jpg|jpeg|png|gif)$/i)) {
                 photos.push({
                   id: `${cat}-${index}`,
-                  url: `/assets/images/photography/${cat}/${file}`,
-                  title: formatTitle(file),
+                  url: photo.url,
+                  title: formatTitle(photo.name),
                   category: cat
                 });
               }
             });
           }
         });
+        
+        // Add some photos from the root category
+        if (galleryData.root) {
+          galleryData.root.forEach((photo: any, index: number) => {
+            if (photo.url && photo.name && photo.url.match(/\.(jpg|jpeg|png|gif)$/i) && photo.name !== "Thumbs.db") {
+              photos.push({
+                id: `general-${index}`,
+                url: photo.url,
+                title: formatTitle(photo.name),
+                category: "urban" // Assigning root photos to the urban category
+              });
+            }
+          });
+        }
       }
       
-      res.json(photos);
+      // Limit to 50 photos maximum to avoid overwhelming the UI
+      const limitedPhotos = photos.slice(0, 50);
+      
+      res.json(limitedPhotos);
     } catch (error) {
       console.error("Error fetching photos", error);
       res.status(500).json({ error: "Internal server error" });
