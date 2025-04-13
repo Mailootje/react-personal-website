@@ -164,6 +164,10 @@ export default function Tetris() {
   const [currentTetromino, setCurrentTetromino] = useState<Tetromino | null>(null);
   const [nextTetromino, setNextTetromino] = useState<Tetromino | null>(null);
   
+  // Add refs for direct access to current tetrominos without relying on React state
+  const currentTetrominoRef = useRef<Tetromino | null>(null);
+  const nextTetrominoRef = useRef<Tetromino | null>(null);
+  
   // Canvas references
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -487,6 +491,9 @@ export default function Tetris() {
       
       if (!collision) {
         console.log("🎮 No collision, updating tetromino position");
+        // Update the ref immediately for immediate rendering
+        currentTetrominoRef.current = newTetromino;
+        // Then update the React state
         setCurrentTetromino(newTetromino);
       } else {
         console.log("🎮 Collision detected, cannot move");
@@ -512,6 +519,9 @@ export default function Tetris() {
     
     // Try to rotate in place
     if (!isColliding(newTetromino)) {
+      // Update the ref immediately for immediate rendering
+      currentTetrominoRef.current = newTetromino;
+      // Then update the React state
       setCurrentTetromino(newTetromino);
       return;
     }
@@ -523,6 +533,9 @@ export default function Tetris() {
       kickedTetromino.position.x += offset;
       
       if (!isColliding(kickedTetromino)) {
+        // Update the ref immediately for immediate rendering
+        currentTetrominoRef.current = kickedTetromino;
+        // Then update the React state
         setCurrentTetromino(kickedTetromino);
         return;
       }
@@ -545,17 +558,26 @@ export default function Tetris() {
         }
       });
       console.log("New current tetromino:", newTetromino);
+      // Update ref immediately
+      currentTetrominoRef.current = newTetromino;
+      // Then update React state
       setCurrentTetromino(newTetromino);
     } else {
       console.log("No next tetromino, creating random one");
       const randomTet = randomTetromino();
       console.log("New random tetromino:", randomTet);
+      // Update ref immediately
+      currentTetrominoRef.current = randomTet;
+      // Then update React state
       setCurrentTetromino(randomTet);
     }
     
     // Generate a new next tetromino
     const newNextTet = randomTetromino();
     console.log("New next tetromino:", newNextTet);
+    // Update ref immediately
+    nextTetrominoRef.current = newNextTet;
+    // Then update React state
     setNextTetromino(newNextTet);
   }, [nextTetromino]);
   
@@ -676,6 +698,9 @@ export default function Tetris() {
       if (!collision) {
         console.log("Moving tetromino down to", newTetromino.position);
         console.log("Before update, current tetromino:", currentTetromino);
+        // Update the ref immediately for direct rendering
+        currentTetrominoRef.current = newTetromino;
+        // Then update the React state
         setCurrentTetromino(newTetromino);
         console.log("After update, setting to:", newTetromino);
       } else {
@@ -705,6 +730,9 @@ export default function Tetris() {
     }
     
     newTetromino.position.y = newY;
+    // Update ref immediately
+    currentTetrominoRef.current = newTetromino;
+    // Then update React state
     setCurrentTetromino(newTetromino);
     
     // Immediately settle the block
@@ -749,6 +777,13 @@ export default function Tetris() {
     
     // Immediately set the tetrominos - don't use setTimeout which can cause delays
     console.log("Setting initial tetrominos...");
+    
+    // Directly update the refs as a workaround for state update delays
+    // This ensures the renderLoop has access to the tetromino even before React updates state
+    currentTetrominoRef.current = initialTetromino;
+    nextTetrominoRef.current = initialNextTetromino;
+    
+    // Then update React state
     setCurrentTetromino(initialTetromino);
     setNextTetromino(initialNextTetromino);
     
@@ -758,22 +793,27 @@ export default function Tetris() {
       const currentGameState = GameState.PLAYING;
       console.log("Render loop called, forcing gameState to:", currentGameState);
       console.log("Current tetromino in render loop:", currentTetromino);
+      console.log("Current tetromino in ref:", currentTetrominoRef.current);
       
       // Always draw the board
       drawBoard();
       
-      // Draw the current tetromino - on the first few frames use initialTetromino,
-      // but then use the React state as it updates
-      if (currentTetromino) {
-        console.log("Drawing from currentTetromino");
+      // Use the tetromino from the ref first (always updated), then fall back to React state or initial value
+      if (currentTetrominoRef.current) {
+        console.log("Drawing from currentTetrominoRef");
+        drawCurrentTetromino(currentTetrominoRef.current);
+      } else if (currentTetromino) {
+        console.log("Drawing from currentTetromino state");
         drawCurrentTetromino(currentTetromino);
       } else {
         console.log("Falling back to initialTetromino");
         drawCurrentTetromino(initialTetromino);
       }
       
-      // Draw preview similarly
-      if (nextTetromino) {
+      // Draw preview similarly using ref first
+      if (nextTetrominoRef.current) {
+        drawPreview(nextTetrominoRef.current);
+      } else if (nextTetromino) {
         drawPreview(nextTetromino);
       } else {
         drawPreview(initialNextTetromino);
@@ -996,6 +1036,19 @@ export default function Tetris() {
       setHighScore(parseInt(savedHighScore));
     }
   }, []);
+  
+  // Keep refs in sync with state
+  useEffect(() => {
+    if (currentTetromino) {
+      currentTetrominoRef.current = currentTetromino;
+    }
+  }, [currentTetromino]);
+  
+  useEffect(() => {
+    if (nextTetromino) {
+      nextTetrominoRef.current = nextTetromino;
+    }
+  }, [nextTetromino]);
   
   // Cleanup on unmount
   useEffect(() => {

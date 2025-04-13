@@ -1,0 +1,2893 @@
+lockdown-install.js:1 Removing unpermitted intrinsics
+chunk-WERSD76P.js?v=ebdd1947:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+Tetris.tsx:1075 Start button clicked
+Tetris.tsx:1022 Level changed to 1, drop time adjusted to 1000ms
+Tetris.tsx:1080 Calling initGame after state update
+Tetris.tsx:716 Initializing game...
+Tetris.tsx:719 Game state should already be PLAYING
+Tetris.tsx:113 Creating tetromino with index 5, color: #800080
+Tetris.tsx:114 Shape: [[0,1,0],[1,1,1],[0,0,0]]
+Tetris.tsx:113 Creating tetromino with index 4, color: #00FF00
+Tetris.tsx:114 Shape: [[0,1,1],[1,1,0],[0,0,0]]
+Tetris.tsx:732 Created initial tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:733 Created initial next tetromino: {shape: Array(3), color: '#00FF00', position: {…}, rotation: 0}
+Tetris.tsx:751 Setting initial tetrominos...
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:186 Checking collision for tetromino at {x: 4, y: 0}
+Tetris.tsx:209 No collision detected
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:815 Starting game loop...
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+ Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:799 Auto drop scheduled, current game state: PLAYING
+Tetris.tsx:803 Dropping tetromino in auto drop
+Tetris.tsx:653 Drop tetromino called, current state: READY
+Tetris.tsx:654 Current tetromino: null
+Tetris.tsx:657 ⚠️ No current tetromino, cannot drop
+(anonymous) @ Tetris.tsx:657
+(anonymous) @ Tetris.tsx:804
+setTimeout
+scheduleDrop @ Tetris.tsx:796
+(anonymous) @ Tetris.tsx:816
+setTimeout
+(anonymous) @ Tetris.tsx:814
+(anonymous) @ Tetris.tsx:1081
+setTimeout
+onClick @ Tetris.tsx:1079
+callCallback2 @ chunk-WERSD76P.js?v=ebdd1947:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=ebdd1947:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=ebdd1947:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-WERSD76P.js?v=ebdd1947:3736
+executeDispatch @ chunk-WERSD76P.js?v=ebdd1947:7014
+processDispatchQueueItemsInOrder @ chunk-WERSD76P.js?v=ebdd1947:7034
+processDispatchQueue @ chunk-WERSD76P.js?v=ebdd1947:7043
+dispatchEventsForPlugins @ chunk-WERSD76P.js?v=ebdd1947:7051
+(anonymous) @ chunk-WERSD76P.js?v=ebdd1947:7174
+batchedUpdates$1 @ chunk-WERSD76P.js?v=ebdd1947:18913
+batchedUpdates @ chunk-WERSD76P.js?v=ebdd1947:3579
+dispatchEventForPluginEventSystem @ chunk-WERSD76P.js?v=ebdd1947:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-WERSD76P.js?v=ebdd1947:5478
+dispatchEvent @ chunk-WERSD76P.js?v=ebdd1947:5472
+dispatchDiscreteEvent @ chunk-WERSD76P.js?v=ebdd1947:5449
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ 🎮 Key pressed: ArrowDown Checking game state...
+ 🎮 Moving DOWN
+ Drop tetromino called, current state: PLAYING
+ Current tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Trying to drop tetromino from {x: 4, y: 0}
+ Checking collision for tetromino at {x: 4, y: 1}
+ No collision detected
+ Collision? false
+ Moving tetromino down to {x: 4, y: 1}
+ Before update, current tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ After update, setting to: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Checking collision for tetromino at {x: 4, y: 1}
+ No collision detected
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:885 🎮 Key pressed: ArrowDown Checking game state...
+Tetris.tsx:915 🎮 Moving DOWN
+Tetris.tsx:653 Drop tetromino called, current state: PLAYING
+Tetris.tsx:654 Current tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:666 Trying to drop tetromino from {x: 4, y: 1}
+Tetris.tsx:186 Checking collision for tetromino at {x: 4, y: 2}
+Tetris.tsx:209 No collision detected
+Tetris.tsx:674 Collision? false
+Tetris.tsx:677 Moving tetromino down to {x: 4, y: 2}
+Tetris.tsx:678 Before update, current tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:680 After update, setting to: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:186 Checking collision for tetromino at {x: 4, y: 2}
+Tetris.tsx:209 No collision detected
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Auto drop scheduled, current game state: PLAYING
+ Dropping tetromino in auto drop
+ Drop tetromino called, current state: READY
+ Current tetromino: null
+ ⚠️ No current tetromino, cannot drop
+(anonymous) @ Tetris.tsx:476
+(anonymous) @ Tetris.tsx:570
+setTimeout
+scheduleDrop @ Tetris.tsx:565
+(anonymous) @ Tetris.tsx:571
+setTimeout
+scheduleDrop @ Tetris.tsx:565
+(anonymous) @ Tetris.tsx:579
+setTimeout
+(anonymous) @ Tetris.tsx:577
+(anonymous) @ Tetris.tsx:857
+setTimeout
+onClick @ Tetris.tsx:855
+callCallback2 @ chunk-WERSD76P.js:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js:3699
+invokeGuardedCallback @ chunk-WERSD76P.js:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-WERSD76P.js:3736
+executeDispatch @ chunk-WERSD76P.js:7014
+processDispatchQueueItemsInOrder @ chunk-WERSD76P.js:7034
+processDispatchQueue @ chunk-WERSD76P.js:7043
+dispatchEventsForPlugins @ chunk-WERSD76P.js:7051
+(anonymous) @ chunk-WERSD76P.js:7174
+batchedUpdates$1 @ chunk-WERSD76P.js:18913
+batchedUpdates @ chunk-WERSD76P.js:3579
+dispatchEventForPluginEventSystem @ chunk-WERSD76P.js:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-WERSD76P.js:5478
+dispatchEvent @ chunk-WERSD76P.js:5472
+dispatchDiscreteEvent @ chunk-WERSD76P.js:5449
+ 🎮 Key pressed: ArrowDown Checking game state...
+ 🎮 Moving DOWN
+ Drop tetromino called, current state: PLAYING
+ Current tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Trying to drop tetromino from {x: 4, y: 2}
+ Checking collision for tetromino at {x: 4, y: 3}
+ No collision detected
+ Collision? false
+ Moving tetromino down to {x: 4, y: 3}
+ Before update, current tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ After update, setting to: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Checking collision for tetromino at {x: 4, y: 3}
+ No collision detected
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ 🎮 Key pressed: ArrowDown Checking game state...
+ 🎮 Moving DOWN
+Tetris.tsx:653 Drop tetromino called, current state: PLAYING
+Tetris.tsx:654 Current tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:666 Trying to drop tetromino from {x: 4, y: 3}
+Tetris.tsx:186 Checking collision for tetromino at {x: 4, y: 4}
+Tetris.tsx:209 No collision detected
+Tetris.tsx:674 Collision? false
+Tetris.tsx:677 Moving tetromino down to {x: 4, y: 4}
+Tetris.tsx:678 Before update, current tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:680 After update, setting to: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:186 Checking collision for tetromino at {x: 4, y: 4}
+Tetris.tsx:209 No collision detected
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:885 🎮 Key pressed: ArrowDown Checking game state...
+Tetris.tsx:915 🎮 Moving DOWN
+Tetris.tsx:653 Drop tetromino called, current state: PLAYING
+Tetris.tsx:654 Current tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:666 Trying to drop tetromino from {x: 4, y: 4}
+Tetris.tsx:186 Checking collision for tetromino at {x: 4, y: 5}
+Tetris.tsx:209 No collision detected
+Tetris.tsx:674 Collision? false
+Tetris.tsx:677 Moving tetromino down to {x: 4, y: 5}
+Tetris.tsx:678 Before update, current tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:680 After update, setting to: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:186 Checking collision for tetromino at {x: 4, y: 5}
+Tetris.tsx:209 No collision detected
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:885 🎮 Key pressed: ArrowDown Checking game state...
+Tetris.tsx:915 🎮 Moving DOWN
+Tetris.tsx:653 Drop tetromino called, current state: PLAYING
+Tetris.tsx:654 Current tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:666 Trying to drop tetromino from {x: 4, y: 5}
+Tetris.tsx:186 Checking collision for tetromino at {x: 4, y: 6}
+Tetris.tsx:209 No collision detected
+Tetris.tsx:674 Collision? false
+Tetris.tsx:677 Moving tetromino down to {x: 4, y: 6}
+Tetris.tsx:678 Before update, current tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:680 After update, setting to: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:186 Checking collision for tetromino at {x: 4, y: 6}
+Tetris.tsx:209 No collision detected
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:885 🎮 Key pressed: ArrowDown Checking game state...
+Tetris.tsx:915 🎮 Moving DOWN
+Tetris.tsx:653 Drop tetromino called, current state: PLAYING
+Tetris.tsx:654 Current tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:666 Trying to drop tetromino from {x: 4, y: 6}
+Tetris.tsx:186 Checking collision for tetromino at {x: 4, y: 7}
+Tetris.tsx:209 No collision detected
+Tetris.tsx:674 Collision? false
+Tetris.tsx:677 Moving tetromino down to {x: 4, y: 7}
+Tetris.tsx:678 Before update, current tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:680 After update, setting to: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:186 Checking collision for tetromino at {x: 4, y: 7}
+Tetris.tsx:209 No collision detected
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ 🎮 Key pressed: ArrowDown Checking game state...
+ 🎮 Moving DOWN
+ Drop tetromino called, current state: PLAYING
+ Current tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Trying to drop tetromino from {x: 4, y: 7}
+ Checking collision for tetromino at {x: 4, y: 8}
+ No collision detected
+ Collision? false
+ Moving tetromino down to {x: 4, y: 8}
+ Before update, current tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ After update, setting to: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Checking collision for tetromino at {x: 4, y: 8}
+ No collision detected
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ 🎮 Key pressed: ArrowDown Checking game state...
+ 🎮 Moving DOWN
+Tetris.tsx:653 Drop tetromino called, current state: PLAYING
+Tetris.tsx:654 Current tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:666 Trying to drop tetromino from {x: 4, y: 8}
+Tetris.tsx:186 Checking collision for tetromino at {x: 4, y: 9}
+Tetris.tsx:209 No collision detected
+Tetris.tsx:674 Collision? false
+Tetris.tsx:677 Moving tetromino down to {x: 4, y: 9}
+Tetris.tsx:678 Before update, current tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:680 After update, setting to: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:186 Checking collision for tetromino at {x: 4, y: 9}
+Tetris.tsx:209 No collision detected
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:885 🎮 Key pressed: ArrowDown Checking game state...
+Tetris.tsx:915 🎮 Moving DOWN
+Tetris.tsx:653 Drop tetromino called, current state: PLAYING
+Tetris.tsx:654 Current tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:666 Trying to drop tetromino from {x: 4, y: 9}
+Tetris.tsx:186 Checking collision for tetromino at {x: 4, y: 10}
+Tetris.tsx:209 No collision detected
+Tetris.tsx:674 Collision? false
+Tetris.tsx:677 Moving tetromino down to {x: 4, y: 10}
+Tetris.tsx:678 Before update, current tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:680 After update, setting to: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:186 Checking collision for tetromino at {x: 4, y: 10}
+Tetris.tsx:209 No collision detected
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+ Auto drop scheduled, current game state: PLAYING
+ Dropping tetromino in auto drop
+ Drop tetromino called, current state: READY
+ Current tetromino: null
+ ⚠️ No current tetromino, cannot drop
+(anonymous) @ Tetris.tsx:476
+(anonymous) @ Tetris.tsx:570
+setTimeout
+scheduleDrop @ Tetris.tsx:565
+(anonymous) @ Tetris.tsx:571
+setTimeout
+scheduleDrop @ Tetris.tsx:565
+(anonymous) @ Tetris.tsx:571
+setTimeout
+scheduleDrop @ Tetris.tsx:565
+(anonymous) @ Tetris.tsx:579
+setTimeout
+(anonymous) @ Tetris.tsx:577
+(anonymous) @ Tetris.tsx:857
+setTimeout
+onClick @ Tetris.tsx:855
+callCallback2 @ chunk-WERSD76P.js:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js:3699
+invokeGuardedCallback @ chunk-WERSD76P.js:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-WERSD76P.js:3736
+executeDispatch @ chunk-WERSD76P.js:7014
+processDispatchQueueItemsInOrder @ chunk-WERSD76P.js:7034
+processDispatchQueue @ chunk-WERSD76P.js:7043
+dispatchEventsForPlugins @ chunk-WERSD76P.js:7051
+(anonymous) @ chunk-WERSD76P.js:7174
+batchedUpdates$1 @ chunk-WERSD76P.js:18913
+batchedUpdates @ chunk-WERSD76P.js:3579
+dispatchEventForPluginEventSystem @ chunk-WERSD76P.js:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-WERSD76P.js:5478
+dispatchEvent @ chunk-WERSD76P.js:5472
+dispatchDiscreteEvent @ chunk-WERSD76P.js:5449
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:885 🎮 Key pressed: ArrowDown Checking game state...
+Tetris.tsx:915 🎮 Moving DOWN
+Tetris.tsx:653 Drop tetromino called, current state: PLAYING
+Tetris.tsx:654 Current tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:666 Trying to drop tetromino from {x: 4, y: 10}
+Tetris.tsx:186 Checking collision for tetromino at {x: 4, y: 11}
+Tetris.tsx:209 No collision detected
+Tetris.tsx:674 Collision? false
+Tetris.tsx:677 Moving tetromino down to {x: 4, y: 11}
+Tetris.tsx:678 Before update, current tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:680 After update, setting to: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:186 Checking collision for tetromino at {x: 4, y: 11}
+Tetris.tsx:209 No collision detected
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:885 🎮 Key pressed: ArrowDown Checking game state...
+Tetris.tsx:915 🎮 Moving DOWN
+Tetris.tsx:653 Drop tetromino called, current state: PLAYING
+Tetris.tsx:654 Current tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:666 Trying to drop tetromino from {x: 4, y: 11}
+Tetris.tsx:186 Checking collision for tetromino at {x: 4, y: 12}
+Tetris.tsx:209 No collision detected
+Tetris.tsx:674 Collision? false
+Tetris.tsx:677 Moving tetromino down to {x: 4, y: 12}
+Tetris.tsx:678 Before update, current tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:680 After update, setting to: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:186 Checking collision for tetromino at {x: 4, y: 12}
+Tetris.tsx:209 No collision detected
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ 🎮 Key pressed: ArrowDown Checking game state...
+ 🎮 Moving DOWN
+ Drop tetromino called, current state: PLAYING
+ Current tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Trying to drop tetromino from {x: 4, y: 12}
+ Checking collision for tetromino at {x: 4, y: 13}
+ No collision detected
+ Collision? false
+ Moving tetromino down to {x: 4, y: 13}
+ Before update, current tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ After update, setting to: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Checking collision for tetromino at {x: 4, y: 13}
+ No collision detected
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ 🎮 Key pressed: ArrowDown Checking game state...
+ 🎮 Moving DOWN
+ Drop tetromino called, current state: PLAYING
+ Current tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Trying to drop tetromino from {x: 4, y: 13}
+ Checking collision for tetromino at {x: 4, y: 14}
+ No collision detected
+ Collision? false
+ Moving tetromino down to {x: 4, y: 14}
+ Before update, current tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ After update, setting to: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Checking collision for tetromino at {x: 4, y: 14}
+ No collision detected
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:885 🎮 Key pressed: ArrowDown Checking game state...
+Tetris.tsx:915 🎮 Moving DOWN
+Tetris.tsx:653 Drop tetromino called, current state: PLAYING
+Tetris.tsx:654 Current tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:666 Trying to drop tetromino from {x: 4, y: 14}
+Tetris.tsx:186 Checking collision for tetromino at {x: 4, y: 15}
+Tetris.tsx:209 No collision detected
+Tetris.tsx:674 Collision? false
+Tetris.tsx:677 Moving tetromino down to {x: 4, y: 15}
+Tetris.tsx:678 Before update, current tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:680 After update, setting to: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:186 Checking collision for tetromino at {x: 4, y: 15}
+Tetris.tsx:209 No collision detected
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ 🎮 Key pressed: ArrowDown Checking game state...
+ 🎮 Moving DOWN
+ Drop tetromino called, current state: PLAYING
+ Current tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Trying to drop tetromino from {x: 4, y: 15}
+ Checking collision for tetromino at {x: 4, y: 16}
+ No collision detected
+ Collision? false
+ Moving tetromino down to {x: 4, y: 16}
+ Before update, current tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ After update, setting to: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Checking collision for tetromino at {x: 4, y: 16}
+ No collision detected
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ 🎮 Key pressed: ArrowDown Checking game state...
+ 🎮 Moving DOWN
+ Drop tetromino called, current state: PLAYING
+ Current tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Trying to drop tetromino from {x: 4, y: 16}
+ Checking collision for tetromino at {x: 4, y: 17}
+ No collision detected
+ Collision? false
+ Moving tetromino down to {x: 4, y: 17}
+ Before update, current tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ After update, setting to: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Checking collision for tetromino at {x: 4, y: 17}
+ No collision detected
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+ Drawing block at (150, 30)
+ Drawing block at (180, 30)
+ Auto drop scheduled, current game state: PLAYING
+ Dropping tetromino in auto drop
+ Drop tetromino called, current state: READY
+ Current tetromino: null
+ ⚠️ No current tetromino, cannot drop
+(anonymous) @ Tetris.tsx:476
+(anonymous) @ Tetris.tsx:570
+setTimeout
+scheduleDrop @ Tetris.tsx:565
+(anonymous) @ Tetris.tsx:571
+setTimeout
+scheduleDrop @ Tetris.tsx:565
+(anonymous) @ Tetris.tsx:571
+setTimeout
+scheduleDrop @ Tetris.tsx:565
+(anonymous) @ Tetris.tsx:571
+setTimeout
+scheduleDrop @ Tetris.tsx:565
+(anonymous) @ Tetris.tsx:579
+setTimeout
+(anonymous) @ Tetris.tsx:577
+(anonymous) @ Tetris.tsx:857
+setTimeout
+onClick @ Tetris.tsx:855
+callCallback2 @ chunk-WERSD76P.js:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js:3699
+invokeGuardedCallback @ chunk-WERSD76P.js:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-WERSD76P.js:3736
+executeDispatch @ chunk-WERSD76P.js:7014
+processDispatchQueueItemsInOrder @ chunk-WERSD76P.js:7034
+processDispatchQueue @ chunk-WERSD76P.js:7043
+dispatchEventsForPlugins @ chunk-WERSD76P.js:7051
+(anonymous) @ chunk-WERSD76P.js:7174
+batchedUpdates$1 @ chunk-WERSD76P.js:18913
+batchedUpdates @ chunk-WERSD76P.js:3579
+dispatchEventForPluginEventSystem @ chunk-WERSD76P.js:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-WERSD76P.js:5478
+dispatchEvent @ chunk-WERSD76P.js:5472
+dispatchDiscreteEvent @ chunk-WERSD76P.js:5449
+ Render loop called, forcing gameState to: PLAYING
+ Current tetromino in render loop: null
+ Falling back to initialTetromino
+ drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+ Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+ Drawing block at (150, 0)
+ Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:885 🎮 Key pressed: ArrowDown Checking game state...
+Tetris.tsx:915 🎮 Moving DOWN
+Tetris.tsx:653 Drop tetromino called, current state: PLAYING
+Tetris.tsx:654 Current tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:666 Trying to drop tetromino from {x: 4, y: 17}
+Tetris.tsx:186 Checking collision for tetromino at {x: 4, y: 18}
+Tetris.tsx:209 No collision detected
+Tetris.tsx:674 Collision? false
+Tetris.tsx:677 Moving tetromino down to {x: 4, y: 18}
+Tetris.tsx:678 Before update, current tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:680 After update, setting to: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:186 Checking collision for tetromino at {x: 4, y: 18}
+Tetris.tsx:209 No collision detected
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:759 Render loop called, forcing gameState to: PLAYING
+Tetris.tsx:760 Current tetromino in render loop: null
+Tetris.tsx:771 Falling back to initialTetromino
+Tetris.tsx:331 drawCurrentTetromino called with tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:347 Drawing tetromino: {shape: Array(3), color: '#800080', position: {…}, canvasWidth: 300, canvasHeight: 600}
+Tetris.tsx:364 Drawing block at (150, 0)
+Tetris.tsx:364 Drawing block at (120, 30)
+Tetris.tsx:364 Drawing block at (150, 30)
+Tetris.tsx:364 Drawing block at (180, 30)
+Tetris.tsx:885 🎮 Key pressed: ArrowDown Checking game state...
+Tetris.tsx:915 🎮 Moving DOWN
+Tetris.tsx:653 Drop tetromino called, current state: PLAYING
+Tetris.tsx:654 Current tetromino: {shape: Array(3), color: '#800080', position: {…}, rotation: 0}
+Tetris.tsx:666 Trying to drop tetromino from {x: 4, y: 18}
+Tetris.tsx:186 Checking collision for tetromino at {x: 4, y: 19}
+Tetris.tsx:196 Collision: Out of bounds at [4, 20]
+Tetris.tsx:674 Collision? true
+Tetris.tsx:682 Collision detected, settling block
+Tetris.tsx:569 Settling block at position: {x: 4, y: 18}
+Tetris.tsx:582 Settling block at grid: [5, 18] with color: #800080
+Tetris.tsx:582 Settling block at grid: [4, 19] with color: #800080
+Tetris.tsx:582 Settling block at grid: [5, 19] with color: #800080
+Tetris.tsx:582 Settling block at grid: [6, 19] with color: #800080
+Tetris.tsx:600 Completed lines: []
+Tetris.tsx:186 Checking collision for tetromino at {x: 4, y: 18}
+Tetris.tsx:202 Collision: Locked cell at [5, 18]
+Tetris.tsx:865 GAME OVER: Tetromino is colliding at starting position
+Tetris.tsx:534 Spawning new tetromino
+Tetris.tsx:538 Using next tetromino as current
+Tetris.tsx:547 New current tetromino: {shape: Array(3), color: '#00FF00', position: {…}, rotation: 0}
+Tetris.tsx:113 Creating tetromino with index 2, color: #FF8000
+Tetris.tsx:114 Shape: [[0,0,1],[1,1,1],[0,0,0]]
+Tetris.tsx:558 New next tetromino: {shape: Array(3), color: '#FF8000', position: {…}, rotation: 0}
+Tetris.tsx:885 🎮 Key pressed: ArrowDown Checking game state...
+Tetris.tsx:915 🎮 Moving DOWN
+Tetris.tsx:653 Drop tetromino called, current state: GAME_OVER
+Tetris.tsx:654 Current tetromino: {shape: Array(3), color: '#00FF00', position: {…}, rotation: 0}
+Tetris.tsx:662 ⚠️ Game not in PLAYING state, cannot drop, state is: GAME_OVER
+(anonymous) @ Tetris.tsx:662
+(anonymous) @ Tetris.tsx:916
+Tetris.tsx:885 🎮 Key pressed: ArrowDown Checking game state...
+Tetris.tsx:915 🎮 Moving DOWN
+Tetris.tsx:653 Drop tetromino called, current state: GAME_OVER
+Tetris.tsx:654 Current tetromino: {shape: Array(3), color: '#00FF00', position: {…}, rotation: 0}
+Tetris.tsx:662 ⚠️ Game not in PLAYING state, cannot drop, state is: GAME_OVER
+(anonymous) @ Tetris.tsx:662
+(anonymous) @ Tetris.tsx:916
