@@ -57,6 +57,9 @@ export default function Snake() {
   const nextDirection = useRef<Direction>(Direction.RIGHT);
   const speed = useRef(INITIAL_SPEED);
   
+  // Game loop time tracker
+  const lastFrameTimeRef = useRef<number>(0);
+  
   // Update refs when state changes
   useEffect(() => {
     gameStateRef.current = gameState;
@@ -72,36 +75,74 @@ export default function Snake() {
     }
   }, []);
   
-  // Initialize game
-  const initGame = useCallback(() => {
-    // Reset snake
-    snake.current = [];
-    for (let i = 0; i < INITIAL_SNAKE_LENGTH; i++) {
-      snake.current.unshift({
-        x: Math.floor(GRID_SIZE / 2) - i,
-        y: Math.floor(GRID_SIZE / 2),
-      });
-    }
+  // Draw game on canvas
+  const drawGame = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
     
-    // Reset direction
-    direction.current = Direction.RIGHT;
-    nextDirection.current = Direction.RIGHT;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
     
-    // Reset speed
-    speed.current = INITIAL_SPEED;
+    // Make sure canvas dimensions are set
+    canvas.width = GRID_SIZE * CELL_SIZE;
+    canvas.height = GRID_SIZE * CELL_SIZE;
     
-    // Reset score
-    setScore(0);
-    setLevel(1);
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Generate food
-    generateFood();
+    // Draw snake
+    ctx.fillStyle = "#4F46E5"; // Primary color
+    snake.current.forEach((segment, index) => {
+      // Head has a different color
+      if (index === 0) {
+        ctx.fillStyle = "#312E81"; // Darker blue
+      } else {
+        // Gradient effect for the body
+        const alpha = 1 - (index / snake.current.length) * 0.6;
+        ctx.fillStyle = `rgba(79, 70, 229, ${alpha})`;
+      }
+      
+      ctx.fillRect(
+        segment.x * CELL_SIZE,
+        segment.y * CELL_SIZE,
+        CELL_SIZE,
+        CELL_SIZE
+      );
+      
+      // Add border to cells
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(
+        segment.x * CELL_SIZE,
+        segment.y * CELL_SIZE,
+        CELL_SIZE,
+        CELL_SIZE
+      );
+    });
     
-    // Set game state
-    setGameState(GameState.PLAYING);
+    // Draw food
+    ctx.fillStyle = "#EF4444"; // Red
+    ctx.beginPath();
+    ctx.arc(
+      food.current.x * CELL_SIZE + CELL_SIZE / 2,
+      food.current.y * CELL_SIZE + CELL_SIZE / 2,
+      CELL_SIZE / 2,
+      0,
+      Math.PI * 2
+    );
+    ctx.fill();
     
-    // Start game loop
-    requestAnimationFrame(gameLoop);
+    // Add shine to food
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    ctx.arc(
+      food.current.x * CELL_SIZE + CELL_SIZE / 3,
+      food.current.y * CELL_SIZE + CELL_SIZE / 3,
+      CELL_SIZE / 6,
+      0,
+      Math.PI * 2
+    );
+    ctx.fill();
   }, []);
   
   // Generate food at random position
@@ -124,6 +165,11 @@ export default function Snake() {
         food.current = newFood;
       }
     }
+  };
+  
+  // Game over
+  const gameOver = () => {
+    setGameState(GameState.GAME_OVER);
   };
   
   // Move snake
@@ -200,14 +246,6 @@ export default function Snake() {
     }
   };
   
-  // Game over
-  const gameOver = () => {
-    setGameState(GameState.GAME_OVER);
-  };
-  
-  // Game loop time tracker
-  const lastFrameTimeRef = useRef<number>(0);
-  
   // Game loop
   const gameLoop = useCallback((timestamp: number) => {
     if (gameStateRef.current !== GameState.PLAYING) return;
@@ -225,95 +263,47 @@ export default function Snake() {
     
     // Continue game loop
     requestAnimationFrame(gameLoop);
-  }, []);
+  }, [drawGame]);
   
-  // Draw game on canvas
-  const drawGame = useCallback(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-    
-    // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Draw snake
-    ctx.fillStyle = "#4F46E5"; // Primary color
-    snake.current.forEach((segment, index) => {
-      // Head has a different color
-      if (index === 0) {
-        ctx.fillStyle = "#312E81"; // Darker blue
-      } else {
-        // Gradient effect for the body
-        const alpha = 1 - (index / snake.current.length) * 0.6;
-        ctx.fillStyle = `rgba(79, 70, 229, ${alpha})`;
-      }
-      
-      ctx.fillRect(
-        segment.x * CELL_SIZE,
-        segment.y * CELL_SIZE,
-        CELL_SIZE,
-        CELL_SIZE
-      );
-      
-      // Add border to cells
-      ctx.strokeStyle = "#ffffff";
-      ctx.lineWidth = 1;
-      ctx.strokeRect(
-        segment.x * CELL_SIZE,
-        segment.y * CELL_SIZE,
-        CELL_SIZE,
-        CELL_SIZE
-      );
-    });
-    
-    // Draw food
-    ctx.fillStyle = "#EF4444"; // Red
-    ctx.beginPath();
-    ctx.arc(
-      food.current.x * CELL_SIZE + CELL_SIZE / 2,
-      food.current.y * CELL_SIZE + CELL_SIZE / 2,
-      CELL_SIZE / 2,
-      0,
-      Math.PI * 2
-    );
-    ctx.fill();
-    
-    // Add shine to food
-    ctx.fillStyle = "#ffffff";
-    ctx.beginPath();
-    ctx.arc(
-      food.current.x * CELL_SIZE + CELL_SIZE / 3,
-      food.current.y * CELL_SIZE + CELL_SIZE / 3,
-      CELL_SIZE / 6,
-      0,
-      Math.PI * 2
-    );
-    ctx.fill();
-    
-    // Draw grid (optional) - disabled for better performance
-    /* 
-    ctx.strokeStyle = "#e5e7eb";
-    ctx.lineWidth = 0.5;
-    
-    // Draw vertical lines
-    for (let x = 0; x <= GRID_SIZE; x++) {
-      ctx.beginPath();
-      ctx.moveTo(x * CELL_SIZE, 0);
-      ctx.lineTo(x * CELL_SIZE, GRID_SIZE * CELL_SIZE);
-      ctx.stroke();
+  // Initialize game
+  const initGame = useCallback(() => {
+    // Reset snake
+    snake.current = [];
+    for (let i = 0; i < INITIAL_SNAKE_LENGTH; i++) {
+      snake.current.unshift({
+        x: Math.floor(GRID_SIZE / 2) - i,
+        y: Math.floor(GRID_SIZE / 2),
+      });
     }
     
-    // Draw horizontal lines
-    for (let y = 0; y <= GRID_SIZE; y++) {
-      ctx.beginPath();
-      ctx.moveTo(0, y * CELL_SIZE);
-      ctx.lineTo(GRID_SIZE * CELL_SIZE, y * CELL_SIZE);
-      ctx.stroke();
-    }
-    */
-  }, []);
+    // Reset direction
+    direction.current = Direction.RIGHT;
+    nextDirection.current = Direction.RIGHT;
+    
+    // Reset speed
+    speed.current = INITIAL_SPEED;
+    
+    // Reset score
+    setScore(0);
+    setLevel(1);
+    
+    // Generate food
+    generateFood();
+    
+    // Reset time tracker
+    lastFrameTimeRef.current = 0;
+    
+    // Set game state
+    setGameState(GameState.PLAYING);
+    
+    // Initial draw
+    drawGame();
+    
+    // Start game loop after a small delay to ensure state is updated
+    setTimeout(() => {
+      requestAnimationFrame(gameLoop);
+    }, 50);
+  }, [drawGame, gameLoop]);
   
   // Handle keyboard input
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
@@ -389,6 +379,22 @@ export default function Snake() {
     }
   }, []);
   
+  // Resume game from pause
+  const resumeGame = () => {
+    if (gameState === GameState.PAUSED) {
+      // Reset time tracker
+      lastFrameTimeRef.current = 0;
+      
+      // Set game state to playing
+      setGameState(GameState.PLAYING);
+      
+      // Start game loop with a small delay
+      setTimeout(() => {
+        requestAnimationFrame(gameLoop);
+      }, 50);
+    }
+  };
+  
   // Setup keyboard and touch event listeners
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
@@ -400,14 +406,6 @@ export default function Snake() {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [handleKeyDown, drawGame]);
-  
-  // Resume game from pause
-  const resumeGame = () => {
-    if (gameState === GameState.PAUSED) {
-      setGameState(GameState.PLAYING);
-      requestAnimationFrame(gameLoop);
-    }
-  };
   
   // Handle game state changes
   useEffect(() => {
