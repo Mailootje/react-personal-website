@@ -4,12 +4,14 @@ interface VideoBackgroundProps {
   opacity?: number;
   children?: React.ReactNode;
   className?: string;
+  isGlobal?: boolean;
 }
 
 export function VideoBackground({ 
   opacity = 0.3, 
   children, 
-  className = ""
+  className = "",
+  isGlobal = false
 }: VideoBackgroundProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -19,6 +21,26 @@ export function VideoBackground({
       videoRef.current.muted = true;
     }
   }, []);
+
+  if (isGlobal) {
+    return (
+      <div className={`fixed inset-0 z-[-1] overflow-hidden pointer-events-none ${className}`}>
+        <video
+          ref={videoRef}
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 object-cover w-full h-full"
+          style={{ opacity }}
+        >
+          <source src="/assets/videos/videoplayback.webm" type="video/webm" />
+          <source src="/assets/videos/videoplayback.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      </div>
+    );
+  }
 
   return (
     <div className={`relative overflow-hidden ${className}`}>
