@@ -26,7 +26,6 @@ interface AppInfo {
 
 export default function Apps() {
   const [apps] = useState<AppInfo[]>([
-    /* Temporarily removed until fixed
     {
       id: "video-chat",
       title: "Video Chat",
@@ -34,7 +33,6 @@ export default function Apps() {
       icon: "📹",
       tags: ["Communication", "Privacy"],
     },
-    */
     {
       id: "password-generator",
       title: "Password Generator",
