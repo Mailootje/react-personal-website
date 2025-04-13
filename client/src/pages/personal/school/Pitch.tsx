@@ -476,6 +476,31 @@ export default function SchoolPitch() {
       <main className="flex-grow min-h-[80vh] flex flex-col relative z-10">
         <Container maxWidth="xl" className="flex-grow flex flex-col">
           <div className="flex-grow flex flex-col relative overflow-hidden">
+            {/* Large Mobile Navigation Buttons (Absolute Positioned) */}
+            <div className="absolute inset-y-0 left-0 z-20 flex items-center px-1">
+              <Button 
+                variant="outline" 
+                size="lg"
+                onClick={handlePrev}
+                disabled={currentSlide === 0} 
+                className="h-12 w-12 rounded-full bg-black/60 border-gray-700 hover:bg-gray-800 text-white md:hidden"
+              >
+                <FaChevronLeft className="h-5 w-5" />
+              </Button>
+            </div>
+            
+            <div className="absolute inset-y-0 right-0 z-20 flex items-center px-1">
+              <Button 
+                variant="outline" 
+                size="lg"
+                onClick={handleNext}
+                disabled={currentSlide === slides.length - 1} 
+                className="h-12 w-12 rounded-full bg-black/60 border-gray-700 hover:bg-gray-800 text-white md:hidden"
+              >
+                <FaChevronRight className="h-5 w-5" />
+              </Button>
+            </div>
+            
             {/* Slide Content */}
             <AnimatePresence initial={false} custom={direction} mode="wait">
               <motion.div
@@ -500,14 +525,14 @@ export default function SchoolPitch() {
             </AnimatePresence>
 
             {/* PowerPoint style navigation */}
-            <div className="flex justify-between items-center mt-6 mb-4 px-4">
-              <div className="flex items-center space-x-2">
+            <div className="flex flex-col sm:flex-row justify-between items-center mt-6 mb-4 px-4 gap-4">
+              <div className="flex items-center space-x-2 order-2 sm:order-1">
                 <Button 
                   variant="outline" 
                   size="icon" 
                   onClick={handlePrev}
                   disabled={currentSlide === 0} 
-                  className="bg-gray-900/80 border-gray-700 hover:bg-gray-800 text-white"
+                  className="bg-gray-900/80 border-gray-700 hover:bg-gray-800 text-white hidden md:flex"
                 >
                   <FaChevronLeft className="h-4 w-4" />
                 </Button>
@@ -519,17 +544,17 @@ export default function SchoolPitch() {
                   size="icon" 
                   onClick={handleNext}
                   disabled={currentSlide === slides.length - 1} 
-                  className="bg-gray-900/80 border-gray-700 hover:bg-gray-800 text-white"
+                  className="bg-gray-900/80 border-gray-700 hover:bg-gray-800 text-white hidden md:flex"
                 >
                   <FaChevronRight className="h-4 w-4" />
                 </Button>
               </div>
               
-              <div className="flex">
+              <div className="flex order-1 sm:order-2">
                 {slides.map((_, idx) => (
                   <div 
                     key={idx}
-                    className={`w-2 h-2 mx-1 rounded-full cursor-pointer ${
+                    className={`w-3 h-3 mx-1 rounded-full cursor-pointer ${
                       idx === currentSlide ? 'bg-primary' : 'bg-gray-600'
                     }`}
                     onClick={() => {
