@@ -110,6 +110,21 @@ const randomTetromino = (): Tetromino => {
   const randIndex = Math.floor(Math.random() * TETROMINOES.length);
   const { shape, color } = TETROMINOES[randIndex];
   
+  console.log(`Creating tetromino with index ${randIndex}, color: ${color}`);
+  console.log("Shape:", JSON.stringify(shape));
+  
+  // Check if shape is valid
+  if (!shape || !Array.isArray(shape) || shape.length === 0) {
+    console.error("Invalid shape in tetromino:", shape);
+    // Provide a default shape as fallback (I-piece)
+    return {
+      shape: [[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]],
+      color: '#00FFFF',
+      position: { x: Math.floor(GRID_WIDTH / 2) - 2, y: 0 },
+      rotation: 0
+    };
+  }
+  
   return {
     // Deep copy the shape array to avoid reference issues
     shape: shape.map(row => [...row]),
@@ -172,7 +187,7 @@ export default function Tetris() {
     
     for (let y = 0; y < shape.length; y++) {
       for (let x = 0; x < shape[y].length; x++) {
-        if (shape[y][x]) {
+        if (shape[y][x] === 1) { // Explicitly check for active cells
           const gridY = position.y + y;
           const gridX = position.x + x;
           
@@ -285,7 +300,7 @@ export default function Tetris() {
         
         for (let y = 0; y < shape.length; y++) {
           for (let x = 0; x < shape[y].length; x++) {
-            if (shape[y][x]) {
+            if (shape[y][x] === 1) { // Explicitly check for 1 (active cell)
               const pixelX = (position.x + x) * CELL_SIZE;
               const pixelY = (position.y + y) * CELL_SIZE;
               
@@ -311,16 +326,22 @@ export default function Tetris() {
     if (currentTetromino) {
       const { shape, color, position } = currentTetromino;
       
+      console.log("Drawing current tetromino:", JSON.stringify(currentTetromino));
+      
+      // Set the fill color
       ctx.fillStyle = color;
       
       for (let y = 0; y < shape.length; y++) {
         for (let x = 0; x < shape[y].length; x++) {
-          if (shape[y][x]) {
+          if (shape[y][x] === 1) { // Explicitly check for 1 (active cell)
             const drawX = (position.x + x) * CELL_SIZE;
             const drawY = (position.y + y) * CELL_SIZE;
             
+            console.log(`Drawing block at grid: [${position.x + x}, ${position.y + y}], pixel: [${drawX}, ${drawY}]`);
+            
             // Only draw if within visible part of the grid
             if (position.y + y >= 0) {
+              // Fill the cell with the tetromino color
               ctx.fillRect(drawX, drawY, CELL_SIZE, CELL_SIZE);
               
               // Draw cell border with a more visible outline
@@ -386,11 +407,15 @@ export default function Tetris() {
     
     ctx.fillStyle = color;
     
+    console.log("Drawing preview for tetromino:", JSON.stringify(nextTetromino));
+    
     for (let y = 0; y < shape.length; y++) {
       for (let x = 0; x < shape[y].length; x++) {
-        if (shape[y][x]) {
+        if (shape[y][x] === 1) { // Explicitly check for 1 (active cell)
           const drawX = (offsetX + x) * PREVIEW_CELL_SIZE;
           const drawY = (offsetY + y) * PREVIEW_CELL_SIZE;
+          
+          console.log(`Drawing preview block at cell: [${x}, ${y}], pixel: [${drawX}, ${drawY}]`);
           
           // Draw the block
           ctx.fillRect(drawX, drawY, PREVIEW_CELL_SIZE, PREVIEW_CELL_SIZE);
@@ -505,9 +530,11 @@ export default function Tetris() {
     // Add the current tetromino to the grid
     for (let y = 0; y < shape.length; y++) {
       for (let x = 0; x < shape[y].length; x++) {
-        if (shape[y][x]) {
+        if (shape[y][x] === 1) { // Explicitly check for 1 (active cell)
           const gridY = position.y + y;
           const gridX = position.x + x;
+          
+          console.log(`Settling block at grid: [${gridX}, ${gridY}] with color: ${color}`);
           
           // Check if the position is within the grid
           if (gridY >= 0 && gridY < GRID_HEIGHT && gridX >= 0 && gridX < GRID_WIDTH) {
