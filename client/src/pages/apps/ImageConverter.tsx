@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { FaUpload, FaDownload, FaFileArchive, FaTrash, FaSyncAlt, FaMicrochip, FaImage, FaChartLine } from 'react-icons/fa';
+import { FaUpload, FaDownload, FaFileArchive, FaTrash, FaSyncAlt, FaMicrochip, FaImage, FaChartLine, FaClock } from 'react-icons/fa';
 import JSZip from 'jszip';
 import jsPDF from 'jspdf';
 import { Badge } from "@/components/ui/badge";
@@ -117,6 +117,9 @@ export default function ImageConverter() {
   const [processingProgress, setProcessingProgress] = useState(0);
   const [useHardwareAcceleration, setUseHardwareAcceleration] = useState(true);
   const [isHardwareAccelerationSupported, setIsHardwareAccelerationSupported] = useState(false);
+  const [conversionStartTime, setConversionStartTime] = useState<number | null>(null);
+  const [conversionDuration, setConversionDuration] = useState<number | null>(null);
+  const [elapsedTime, setElapsedTime] = useState<number>(0);
   
   // Fetch conversion counter data
   const { data: conversionCounter, isLoading: isCounterLoading } = useQuery<ConversionCounter>({
@@ -179,6 +182,27 @@ export default function ImageConverter() {
       setIsHardwareAccelerationSupported(false);
     }
   }, []);
+  
+  // Real-time timer effect
+  useEffect(() => {
+    let timerId: number | undefined;
+    
+    if (isProcessing && conversionStartTime) {
+      // Update elapsed time every 100ms
+      timerId = window.setInterval(() => {
+        const elapsed = Date.now() - conversionStartTime;
+        setElapsedTime(elapsed);
+      }, 100);
+    } else {
+      setElapsedTime(conversionDuration || 0);
+    }
+    
+    return () => {
+      if (timerId) {
+        clearInterval(timerId);
+      }
+    };
+  }, [isProcessing, conversionStartTime, conversionDuration]);
 
   // Handler for file selection
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -661,6 +685,23 @@ export default function ImageConverter() {
   };
 
   // Process images in batches with parallel processing
+  // Helper function to format duration in ms to readable format
+  const formatDuration = (ms: number): string => {
+    if (ms < 1000) return `${ms}ms`;
+    
+    const seconds = Math.floor(ms / 1000);
+    const milliseconds = ms % 1000;
+    
+    if (seconds < 60) {
+      return `${seconds}.${milliseconds.toString().padStart(3, '0')}s`;
+    }
+    
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    
+    return `${minutes}m ${remainingSeconds}s`;
+  };
+
   const convertAllImages = async () => {
     if (images.length === 0) {
       toast({
@@ -670,6 +711,11 @@ export default function ImageConverter() {
       });
       return;
     }
+    
+    // Start the timer
+    const startTime = Date.now();
+    setConversionStartTime(startTime);
+    setConversionDuration(null);
     
     setIsProcessing(true);
     setProcessingProgress(0);
@@ -766,12 +812,20 @@ export default function ImageConverter() {
       // Ensure progress shows 100% when complete
       setProcessingProgress(100);
       
-      // Show completion toast
+      // Calculate and set conversion duration
+      const endTime = Date.now();
+      const duration = endTime - startTime;
+      setConversionDuration(duration);
+      
+      // Show completion toast with duration
       const successCount = updatedImages.filter(img => img.convertedBlob).length;
       toast({
         title: "Conversion Complete",
-        description: `Successfully converted ${successCount} of ${updatedImages.length} images`,
+        description: `Successfully converted ${successCount} of ${updatedImages.length} images in ${formatDuration(duration)}`,
       });
+      
+      // Reset the conversion start time
+      setConversionStartTime(null);
       
       // Increment the conversion counter in the database
       if (successCount > 0) {
@@ -784,6 +838,12 @@ export default function ImageConverter() {
         description: "An error occurred during conversion.",
         variant: "destructive"
       });
+      
+      // Set duration even on error
+      if (conversionStartTime) {
+        setConversionDuration(Date.now() - startTime);
+        setConversionStartTime(null);
+      }
     } finally {
       setIsProcessing(false);
     }
@@ -1157,6 +1217,27 @@ export default function ImageConverter() {
                           <span className="text-sm text-gray-400">{processingProgress}%</span>
                         </div>
                         <Progress value={processingProgress} className="w-full h-2" />
+                      </div>
+                    )}
+                    
+                    {/* Conversion timer display */}
+                    {(isProcessing || conversionDuration) && (
+                      <div className="bg-gray-800/60 rounded-md p-3 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <FaClock className={`${isProcessing ? 'text-amber-300 animate-pulse' : 'text-amber-400'}`} />
+                          <span className="text-sm text-gray-300">
+                            {isProcessing ? 'Processing time:' : 'Last conversion time:'}
+                          </span>
+                        </div>
+                        <Badge variant="outline" className={`bg-gray-700 border-amber-700 ${isProcessing ? 'text-amber-300' : 'text-amber-400'}`}>
+                          {isProcessing ? (
+                            <span className="flex items-center">
+                              <span className="animate-pulse">{formatDuration(elapsedTime)}</span>
+                            </span>
+                          ) : (
+                            formatDuration(conversionDuration || 0)
+                          )}
+                        </Badge>
                       </div>
                     )}
                     
