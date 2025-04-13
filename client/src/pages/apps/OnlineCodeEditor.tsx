@@ -928,7 +928,7 @@ console.log("Let's start coding!");`,
       <Header />
       <VideoBackground opacity={0.10} />
 
-      <main className="flex-grow relative z-10 py-8">
+      <main className="flex-grow relative z-10 pt-24 pb-8">
         <Container maxWidth="6xl" className="h-full">
           <Card className="h-[80vh] overflow-hidden bg-gray-900/70 backdrop-blur border-gray-800">
             {/* Toolbar */}
