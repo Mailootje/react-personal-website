@@ -46,8 +46,6 @@ interface FileSystemItem {
   parent: string | null;
   children?: string[];
   isOpen?: boolean;
-  isImage?: boolean;
-  mimeType?: string;
 }
 
 interface FileSystemState {
@@ -75,29 +73,6 @@ interface ContextMenuState {
 // Function to check if a file is a ZIP file
 const isZipFile = (filename: string): boolean => {
   return filename.toLowerCase().endsWith('.zip');
-};
-
-// Function to check if a file is an image
-const isImageFile = (filename: string): boolean => {
-  const extension = filename.split('.').pop()?.toLowerCase() || '';
-  const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg', 'ico'];
-  return imageExtensions.includes(extension);
-};
-
-// Get MIME type by file extension
-const getMimeType = (filename: string): string => {
-  const extension = filename.split('.').pop()?.toLowerCase() || '';
-  const mimeMap: Record<string, string> = {
-    'jpg': 'image/jpeg',
-    'jpeg': 'image/jpeg',
-    'png': 'image/png',
-    'gif': 'image/gif',
-    'bmp': 'image/bmp',
-    'webp': 'image/webp',
-    'svg': 'image/svg+xml',
-    'ico': 'image/x-icon'
-  };
-  return mimeMap[extension] || 'application/octet-stream';
 };
 
 // Language detection by file extension
@@ -193,11 +168,6 @@ const OnlineCodeEditor: React.FC = () => {
   const [replaceTerm, setReplaceTerm] = useState<string>('');
   const [executeResults, setExecuteResults] = useState<string>('');
   const [isConsoleOpen, setIsConsoleOpen] = useState<boolean>(false);
-  
-  // Image viewer state
-  const [isViewingImage, setIsViewingImage] = useState<boolean>(false);
-  const [currentImageSrc, setCurrentImageSrc] = useState<string>('');
-  const [currentImageName, setCurrentImageName] = useState<string>('');
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState<boolean>(false);
   const [deleteConfirmInput, setDeleteConfirmInput] = useState<string>("");
@@ -992,20 +962,8 @@ console.log("Let's start coding with more storage!");`,
       ]);
     }
     
-    // Check if it's an image file
-    if (file.isImage) {
-      setIsViewingImage(true);
-      setCurrentImageSrc(file.content || '');
-      setCurrentImageName(file.name);
-      setCurrentContent(''); // Don't load the image data in the text editor
-    } else {
-      // It's a text file
-      setIsViewingImage(false);
-      setCurrentImageSrc('');
-      setCurrentImageName('');
-      setCurrentContent(file.content || '');
-    }
-    
+    // Set the editor content and language
+    setCurrentContent(file.content || '');
     setCurrentLanguage(file.language || 'plaintext');
   };
 
@@ -1026,7 +984,7 @@ console.log("Let's start coding with more storage!");`,
       
       // Set content and language to the new active tab
       const activeFile = fileSystem.items[newTabs[newActiveIndex].fileId];
-      setCurrentContent(activeFile.isImage ? '' : (activeFile.content || ''));
+      setCurrentContent(activeFile.content || '');
       setCurrentLanguage(activeFile.language || 'plaintext');
     }
     
@@ -1052,21 +1010,7 @@ console.log("Let's start coding with more storage!");`,
     const activeTab = newTabs.find(tab => tab.isActive);
     if (activeTab) {
       const activeFile = fileSystem.items[activeTab.fileId];
-      
-      // Handle image files differently
-      if (activeFile.isImage) {
-        setIsViewingImage(true);
-        setCurrentImageSrc(activeFile.content || '');
-        setCurrentImageName(activeFile.name);
-        setCurrentContent(''); // Don't load the image data in the text editor
-      } else {
-        // It's a text file
-        setIsViewingImage(false);
-        setCurrentImageSrc('');
-        setCurrentImageName('');
-        setCurrentContent(activeFile.content || '');
-      }
-      
+      setCurrentContent(activeFile.content || '');
       setCurrentLanguage(activeFile.language || 'plaintext');
     }
   };
@@ -1322,15 +1266,6 @@ console.log("Let's start coding with more storage!");`,
   // Process a single file upload
   const processSingleFile = (file: File) => {
     const reader = new FileReader();
-    const isImage = isImageFile(file.name);
-    
-    if (isImage) {
-      // For image files, use readAsDataURL to get a base64 string
-      reader.readAsDataURL(file);
-    } else {
-      // For text files, use readAsText
-      reader.readAsText(file);
-    }
     
     reader.onload = (e) => {
       const content = e.target?.result as string;
@@ -1338,7 +1273,6 @@ console.log("Let's start coding with more storage!");`,
       // Create a new file in the root
       const newFileId = generateId();
       const language = getLanguageByFilename(file.name);
-      const mimeType = isImage ? getMimeType(file.name) : 'text/plain';
       
       // Update the file system
       setFileSystem(prev => {
@@ -1352,9 +1286,7 @@ console.log("Let's start coding with more storage!");`,
             type: 'file',
             content: content,
             language: language,
-            parent: null,
-            isImage: isImage,
-            mimeType: mimeType
+            parent: null
           }
         };
         
@@ -1375,12 +1307,7 @@ console.log("Let's start coding with more storage!");`,
         newTab
       ]);
       
-      // Don't try to set image content as text in the editor
-      if (!isImage) {
-        setCurrentContent(content);
-      } else {
-        setCurrentContent('');  // Empty string for images
-      }
+      setCurrentContent(content);
       setCurrentLanguage(language);
       
       toast({
@@ -1388,6 +1315,8 @@ console.log("Let's start coding with more storage!");`,
         description: `${file.name} has been added to your workspace`,
       });
     };
+    
+    reader.readAsText(file);
   };
 
   // Process a ZIP file upload
@@ -4200,31 +4129,17 @@ console.log("Starting fresh with partial cleanup!");`,
                   })}
                 </div>
 
-                {/* Editor Area - Either Monaco Editor or Image Viewer */}
-                <div className="flex-grow relative">
-                  {/* Monaco Editor (hidden when viewing images) */}
-                  <div className={`absolute inset-0 ${isViewingImage ? 'hidden' : ''}`}>
-                    <Editor
-                      height="100%"
-                      language={currentLanguage}
-                      theme={editorTheme}
-                      value={currentContent}
-                      onChange={handleEditorChange}
-                      onMount={handleEditorDidMount}
-                      options={editorOptions}
-                    />
-                  </div>
-                  
-                  {/* Image Viewer (shown only when viewing images) */}
-                  {isViewingImage && (
-                    <div className="absolute inset-0 h-full w-full flex items-center justify-center bg-gray-900 overflow-auto p-4">
-                      <img 
-                        src={currentImageSrc}
-                        alt={currentImageName}
-                        className="max-w-full max-h-[calc(100vh-180px)] object-contain"
-                      />
-                    </div>
-                  )}
+                {/* Monaco Editor */}
+                <div className="flex-grow">
+                  <Editor
+                    height="100%"
+                    language={currentLanguage}
+                    theme={editorTheme}
+                    value={currentContent}
+                    onChange={handleEditorChange}
+                    onMount={handleEditorDidMount}
+                    options={editorOptions}
+                  />
                 </div>
               </div>
             </Split>
