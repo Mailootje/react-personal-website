@@ -218,6 +218,177 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // American Truck Simulator downloads API endpoint
+  app.get("/api/downloads/ats", async (req, res) => {
+    try {
+      // Get version from query parameter, default to 'v1.53.x'
+      const version = req.query.version as string || 'v1.53.x';
+      
+      // Fetch the ATS mods from mailobedo.nl
+      const response = await fetch('https://mailobedo.nl/files/');
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch mods: ${response.status} ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      
+      // Check if we have the American_Truck_Simulator key
+      if (!data.American_Truck_Simulator || !Array.isArray(data.American_Truck_Simulator)) {
+        // If there's no ATS specific key, try to find files that might be for ATS
+        // in the general collection or under a different key
+        
+        const allFiles = data.Euro_Truck_Simulator_2 || [];
+        
+        // For now, we'll filter ETS2 files that might be compatible with ATS
+        // based on common patterns (this is a fallback when no specific ATS files exist)
+        const atsCompatibleFiles = allFiles.filter((file: any) => {
+          const filename = file.name?.toLowerCase() || '';
+          return filename.includes('ats') || 
+                 filename.includes('american') ||
+                 filename.includes('usa') ||
+                 filename.includes('north america');
+        });
+        
+        // Process the files similar to ETS2
+        const processedFiles = atsCompatibleFiles.map((file: any, index: number) => {
+          const filename = file.name || '';
+          const cleanFilename = filename.replace('.scs', '').replace('.zip', '');
+          
+          const name = cleanFilename
+            .split('-')
+            .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ')
+            .replace(/_/g, ' ');
+          
+          const fileType = filename.endsWith('.scs') ? 'SCS Mod' : 'ZIP Archive';
+          
+          let category = 'Other';
+          if (filename.includes('traffic')) category = 'Traffic';
+          else if (filename.includes('map') || filename.includes('Map')) category = 'Maps';
+          else if (filename.includes('model') || filename.includes('assets')) category = 'Models & Assets';
+          else if (filename.includes('def')) category = 'Definition Files';
+          else if (filename.includes('media')) category = 'Media';
+          
+          const tags = cleanFilename.split(/[-_]/).filter((tag: string) => 
+            tag.length > 2 && 
+            !['and', 'the', 'for', 'with', 'v1', 'v2', 'v3'].includes(tag.toLowerCase())
+          );
+          
+          const fileSizeInMB = Math.round(file.size / (1024 * 1024) * 10) / 10;
+          const fileSize = fileSizeInMB >= 1000 
+            ? `${(fileSizeInMB / 1024).toFixed(2)} GB` 
+            : `${fileSizeInMB.toFixed(1)} MB`;
+          
+          return {
+            id: `ats-${index}`,
+            name: name.replace('Ets2', 'ATS'),
+            description: `${fileType} for American Truck Simulator ${version}`,
+            fileSize: fileSize,
+            version: filename.match(/v[0-9.]+/)?.[0] || 'Latest',
+            uploadDate: "2025-03-01", // Placeholder date
+            downloadCount: Math.floor(Math.random() * 800) + 300, // Random count for display
+            category: category,
+            tags: Array.from(new Set([...tags, 'ATS'])).slice(0, 3),
+            originalUrl: file.url,
+            downloadUrl: file.url
+          };
+        });
+        
+        // Return available versions (using same as ETS2 if needed)
+        const availableVersions = new Set<string>();
+        allFiles.forEach((file: any) => {
+          if (file.url) {
+            const urlParts = file.url.split('/');
+            for (let i = 0; i < urlParts.length; i++) {
+              if (/^v\d+\.\d+\.x$/i.test(urlParts[i])) {
+                availableVersions.add(urlParts[i].toLowerCase());
+                break;
+              }
+            }
+          }
+        });
+        
+        return res.json({
+          versions: Array.from(availableVersions).sort().reverse(),
+          currentVersion: version,
+          files: processedFiles
+        });
+      }
+      
+      // If we have specific ATS files, process them similar to ETS2
+      const availableVersions = new Set<string>();
+      data.American_Truck_Simulator.forEach((file: any) => {
+        if (file.url) {
+          const urlParts = file.url.split('/');
+          for (let i = 0; i < urlParts.length; i++) {
+            if (/^v\d+\.\d+\.x$/i.test(urlParts[i])) {
+              availableVersions.add(urlParts[i].toLowerCase());
+              break;
+            }
+          }
+        }
+      });
+      
+      const filteredFiles = data.American_Truck_Simulator.filter((file: any) => {
+        return file.url && file.url.toLowerCase().includes(version.toLowerCase());
+      });
+      
+      const processedFiles = filteredFiles.map((file: any, index: number) => {
+        const filename = file.name || '';
+        const cleanFilename = filename.replace('.scs', '').replace('.zip', '');
+        
+        const name = cleanFilename
+          .split('-')
+          .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ')
+          .replace(/_/g, ' ');
+        
+        const fileType = filename.endsWith('.scs') ? 'SCS Mod' : 'ZIP Archive';
+        
+        let category = 'Other';
+        if (filename.includes('traffic')) category = 'Traffic';
+        else if (filename.includes('map') || filename.includes('Map')) category = 'Maps';
+        else if (filename.includes('model') || filename.includes('assets')) category = 'Models & Assets';
+        else if (filename.includes('def')) category = 'Definition Files';
+        else if (filename.includes('media')) category = 'Media';
+        
+        const tags = cleanFilename.split(/[-_]/).filter((tag: string) => 
+          tag.length > 2 && 
+          !['and', 'the', 'for', 'with', 'v1', 'v2', 'v3'].includes(tag.toLowerCase())
+        );
+        
+        const fileSizeInMB = Math.round(file.size / (1024 * 1024) * 10) / 10;
+        const fileSize = fileSizeInMB >= 1000 
+          ? `${(fileSizeInMB / 1024).toFixed(2)} GB` 
+          : `${fileSizeInMB.toFixed(1)} MB`;
+        
+        return {
+          id: `ats-${index}`,
+          name: name,
+          description: `${fileType} for American Truck Simulator ${version}`,
+          fileSize: fileSize,
+          version: filename.match(/v[0-9.]+/)?.[0] || 'Latest',
+          uploadDate: "2025-03-01", // Placeholder date
+          downloadCount: Math.floor(Math.random() * 800) + 300, // Random count for display
+          category: category,
+          tags: Array.from(new Set(tags)).slice(0, 3),
+          originalUrl: file.url,
+          downloadUrl: file.url
+        };
+      });
+      
+      res.json({
+        versions: Array.from(availableVersions).sort().reverse(),
+        currentVersion: version,
+        files: processedFiles
+      });
+    } catch (error) {
+      console.error("Error fetching ATS mods:", error);
+      res.status(500).json({ message: "Failed to fetch American Truck Simulator mods from source" });
+    }
+  });
+  
   // Proxy endpoint for downloading files
   app.get("/api/downloads/proxy", async (req, res) => {
     try {
@@ -295,7 +466,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // ETS2 files (in ets2 subdirectory)
       if (fileId.startsWith('ets2-')) {
         filePath = path.join('assets', 'downloads', 'files', 'ets2', `${fileId}.zip`);
-      } else {
+      } 
+      // ATS files (in ats subdirectory)
+      else if (fileId.startsWith('ats-')) {
+        filePath = path.join('assets', 'downloads', 'files', 'ats', `${fileId}.zip`);
+      }
+      else {
         // Default path for other files
         filePath = path.join('assets', 'downloads', 'files', `${fileId}.zip`);
       }

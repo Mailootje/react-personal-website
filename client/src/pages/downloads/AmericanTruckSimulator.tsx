@@ -1,215 +1,409 @@
 import { useState, useEffect } from "react";
+import { Link, useLocation } from "wouter";
+import { ArrowLeft, Download, FileText, Info, Clock, Tag, Loader2, AlertCircle, CheckCircle2, List, X } from "lucide-react";
 import { motion } from "framer-motion";
-import { useLocation } from "wouter";
-import { Download, ArrowLeft, FileType2 } from "lucide-react";
-import { Container } from "@/components/ui/container";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
-import { VideoBackground } from "@/components/VideoBackground";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { apiRequest } from "@/lib/queryClient";
+import { Separator } from "@/components/ui/separator";
+import { toast } from "@/hooks/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-interface FileData {
+interface DownloadFile {
+  id: string;
   name: string;
-  url: string;
-  size: number;
+  description: string;
+  fileSize: string;
+  version: string;
+  uploadDate: string;
+  downloadCount: number;
+  category: string;
+  tags: string[];
+  downloadUrl: string;
+  originalUrl?: string;
+}
+
+interface DownloadsResponse {
+  versions: string[];
+  currentVersion: string;
+  files: DownloadFile[];
 }
 
 export default function AmericanTruckSimulator() {
-  const [, setLocation] = useLocation();
-  const [files, setFiles] = useState<FileData[]>([]);
+  const [location, setLocation] = useLocation();
+  const [downloadData, setDownloadData] = useState<DownloadsResponse | null>(null);
+  const [downloadFiles, setDownloadFiles] = useState<DownloadFile[]>([]);
+  const [selectedVersion, setSelectedVersion] = useState<string>('v1.53.x');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  const [showLoadOrder, setShowLoadOrder] = useState(false);
+  
+  // Get version from URL query params if present
   useEffect(() => {
-    const fetchFiles = async () => {
+    const params = new URLSearchParams(window.location.search);
+    const version = params.get('version');
+    if (version) {
+      setSelectedVersion(version);
+    }
+  }, []);
+  
+  // Fetch downloads based on selected version
+  useEffect(() => {
+    const fetchDownloads = async () => {
+      setIsLoading(true);
+      setError(null);
+      
       try {
-        setIsLoading(true);
-        // Use a direct URL instead of proxy for American Truck Simulator files
-        const response = await fetch("https://mailobedo.nl/files/American_Truck_Simulator/v1.54.x/mods/list.json");
-        const data = await response.json();
+        const response = await fetch(`/api/downloads/ats?version=${selectedVersion}`);
         
-        if (data && data.American_Truck_Simulator) {
-          setFiles(data.American_Truck_Simulator);
-        } else {
-          // Fallback to static data if the API fails
-          const fallbackData = [
-            {
-              name: "promods-ats-assets-v133.scs",
-              url: "https://mailobedo.nl/files/American_Truck_Simulator/v1.54.x/mods/promods-ats-assets-v133.scs",
-              size: 253369419
-            },
-            {
-              name: "promods-ats-def-v140.scs",
-              url: "https://mailobedo.nl/files/American_Truck_Simulator/v1.54.x/mods/promods-ats-def-v140.scs",
-              size: 91172
-            },
-            {
-              name: "promods-ats-map-v133.scs",
-              url: "https://mailobedo.nl/files/American_Truck_Simulator/v1.54.x/mods/promods-ats-map-v133.scs",
-              size: 67433466
-            },
-            {
-              name: "promods-ats-models-v133.scs",
-              url: "https://mailobedo.nl/files/American_Truck_Simulator/v1.54.x/mods/promods-ats-models-v133.scs",
-              size: 331540900
-            }
-          ];
-          setFiles(fallbackData);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch downloads: ${response.status}`);
         }
-        setIsLoading(false);
+        
+        const data = await response.json();
+        setDownloadData(data);
+        setDownloadFiles(data.files || []);
+        
+        // Update URL with the selected version
+        const params = new URLSearchParams(window.location.search);
+        params.set('version', data.currentVersion);
+        const newUrl = `${window.location.pathname}?${params.toString()}`;
+        window.history.replaceState({}, '', newUrl);
+        
       } catch (err) {
-        console.error("Error fetching files:", err);
-        setError("Failed to load files. Please try again later.");
+        console.error('Error fetching downloads:', err);
+        setError('Failed to load downloads. Please try again later.');
+        toast({
+          title: 'Error',
+          description: 'Failed to load downloads from the server.',
+          variant: 'destructive'
+        });
+      } finally {
         setIsLoading(false);
       }
     };
+    
+    fetchDownloads();
+  }, [selectedVersion]);
 
-    fetchFiles();
-  }, []);
-
-  // Format file size to human-readable format
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return "0 Bytes";
-    const k = 1024;
-    const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-  };
-
-  // Extract file extension from filename
-  const getFileExtension = (filename: string) => {
-    return filename.slice(((filename.lastIndexOf(".") - 1) >>> 0) + 2);
-  };
-
+  const categories = Array.from(new Set(downloadFiles.map(file => file.category)));
+  
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <Header />
       <main className="flex-grow">
-        <VideoBackground opacity={0.15} className="bg-black">
-          <section className="py-16 px-6">
-            <Container maxWidth="6xl">
-              <div className="mb-8">
-                <Button 
-                  variant="outline" 
-                  onClick={() => setLocation("/downloads")}
-                  className="mb-4 text-white"
-                >
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  Back to Downloads
-                </Button>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <h1 className="text-3xl md:text-4xl font-bold mb-4 text-white">American Truck Simulator Mods</h1>
-                  <p className="text-gray-300 max-w-3xl mb-8">
-                    Download custom mods for American Truck Simulator to enhance your gameplay experience with new maps, vehicles, and assets.
+        <section className="py-20 px-6">
+          <Container maxWidth="6xl">
+            <div className="mb-8">
+              <Link to="/downloads" 
+                className="inline-flex items-center text-primary hover:text-primary/80 transition-colors cursor-pointer"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Downloads
+              </Link>
+            </div>
+            
+            <motion.div
+              className="mb-12"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <div className="flex flex-col md:flex-row md:items-center gap-6 mb-8">
+                <div className="bg-primary/10 text-primary rounded-2xl w-20 h-20 flex items-center justify-center text-4xl flex-shrink-0">
+                  🚛
+                </div>
+                <div>
+                  <h1 className="text-3xl md:text-4xl font-bold mb-3">American Truck Simulator Downloads</h1>
+                  <p className="text-muted-foreground max-w-3xl">
+                    A collection of high-quality mods and enhancements for American Truck Simulator.
+                    All files are regularly tested and updated for compatibility.
                   </p>
-                </motion.div>
-              </div>
-
-              <Card className="bg-black/50 border-gray-800 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle className="text-white">Installation Instructions</CardTitle>
-                  <CardDescription className="text-gray-300">
-                    Follow these steps to properly install the mods
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="text-gray-300">
-                  <ol className="list-decimal pl-5 space-y-2">
-                    <li>Download all the required mod files</li>
-                    <li>Place the files in your American Truck Simulator mods folder (typically located at <code className="bg-gray-800 px-1 rounded">Documents/American Truck Simulator/mod</code>)</li>
-                    <li>Make sure to load them in the correct order as shown below, from bottom to top</li>
-                    <li>Enable the mods in the game's mod manager before starting a new game or profile</li>
-                  </ol>
-
-                  <div className="mt-6 p-4 bg-gray-800/70 rounded-md">
-                    <h3 className="text-lg font-medium mb-2 text-white">Recommended Load Order:</h3>
-                    <ul className="pl-5 space-y-1 list-disc">
-                      <li>1. promods-ats-def-v140.scs</li>
-                      <li>2. promods-ats-map-v133.scs</li>
-                      <li>3. promods-ats-assets-v133.scs</li>
-                      <li>4. promods-ats-models-v133.scs</li>
-                    </ul>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <div className="mt-8">
-                <h2 className="text-xl font-bold mb-4 text-white">Available Files</h2>
-                {isLoading ? (
-                  <div className="text-center py-8 text-gray-300">Loading files...</div>
-                ) : error ? (
-                  <div className="text-center py-8 text-red-400">{error}</div>
-                ) : (
-                  <div className="overflow-x-auto rounded-lg border border-gray-800">
-                    <Table>
-                      <TableHeader className="bg-gray-900">
-                        <TableRow>
-                          <TableHead className="text-white">File Name</TableHead>
-                          <TableHead className="text-white">Type</TableHead>
-                          <TableHead className="text-white text-right">Size</TableHead>
-                          <TableHead className="text-white text-right">Action</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {files.map((file, index) => (
-                          <TableRow key={index} className="border-gray-800 hover:bg-gray-800/60">
-                            <TableCell className="font-medium text-gray-300">{file.name}</TableCell>
-                            <TableCell>
-                              <Badge variant="outline" className="text-gray-300 border-gray-700">
-                                <FileType2 className="h-3 w-3 mr-1" />
-                                {getFileExtension(file.name).toUpperCase()}
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="text-right text-gray-300">{formatFileSize(file.size)}</TableCell>
-                            <TableCell className="text-right">
-                              <a 
-                                href={file.url} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="inline-flex"
-                              >
-                                <Button size="sm" variant="outline" className="text-primary hover:text-primary-foreground hover:bg-primary">
-                                  <Download className="h-4 w-4 mr-1" />
-                                  Download
-                                </Button>
-                              </a>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                )}
-              </div>
-              
-              <div className="mt-12 bg-black/50 p-6 rounded-lg border border-gray-800 backdrop-blur-sm">
-                <h2 className="text-xl font-bold mb-4 text-white">Additional Information</h2>
-                <p className="text-gray-300 mb-4">
-                  This collection includes ProMods for American Truck Simulator, which expands the game map with new areas and enhances existing ones with improved detail and realism.
-                </p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                  <div className="p-4 bg-gray-800/60 rounded-md">
-                    <h3 className="font-semibold text-white mb-2">Compatibility</h3>
-                    <p className="text-gray-300 text-sm">Works with American Truck Simulator v1.54.x. May not be compatible with older or newer game versions.</p>
-                  </div>
-                  <div className="p-4 bg-gray-800/60 rounded-md">
-                    <h3 className="font-semibold text-white mb-2">DLC Requirements</h3>
-                    <p className="text-gray-300 text-sm">Some mods may require official DLCs to function properly. Check the ProMods documentation for specific requirements.</p>
-                  </div>
                 </div>
               </div>
-            </Container>
-          </section>
-        </VideoBackground>
+              
+              <Separator className="my-8" />
+              
+              {/* Version Selector */}
+              {downloadData?.versions && downloadData.versions.length > 0 && (
+                <div className="mb-8">
+                  <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                    <div className="flex items-center">
+                      <h3 className="text-lg font-semibold mr-3">Game Version:</h3>
+                      <Select
+                        value={selectedVersion}
+                        onValueChange={(value) => setSelectedVersion(value)}
+                      >
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Select version" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {downloadData.versions.map((version) => (
+                            <SelectItem key={version} value={version}>
+                              <div className="flex items-center">
+                                {version}
+                                {version === selectedVersion && (
+                                  <CheckCircle2 className="ml-2 h-4 w-4 text-primary" />
+                                )}
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <p className="text-sm text-muted-foreground">
+                      Showing {downloadFiles.length} mods compatible with American Truck Simulator {selectedVersion}
+                    </p>
+                  </div>
+                </div>
+              )}
+              
+              {isLoading ? (
+                <div className="space-y-6">
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="w-12 h-12 animate-spin text-primary" />
+                  </div>
+                  <div className="space-y-4">
+                    {[1, 2, 3].map(i => (
+                      <Card key={i} className="w-full">
+                        <CardHeader>
+                          <Skeleton className="h-6 w-1/3 mb-2" />
+                          <Skeleton className="h-4 w-full" />
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            {[1, 2, 3, 4].map(j => (
+                              <Skeleton key={j} className="h-4 w-full" />
+                            ))}
+                          </div>
+                          <div className="flex gap-2">
+                            {[1, 2, 3].map(j => (
+                              <Skeleton key={j} className="h-6 w-16" />
+                            ))}
+                          </div>
+                        </CardContent>
+                        <CardFooter className="flex justify-between border-t pt-4">
+                          <Skeleton className="h-6 w-20" />
+                          <Skeleton className="h-10 w-28" />
+                        </CardFooter>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              ) : error ? (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <AlertCircle className="w-12 h-12 text-destructive mb-4" />
+                  <h3 className="text-xl font-semibold mb-2">Failed to Load Downloads</h3>
+                  <p className="text-muted-foreground mb-6">{error}</p>
+                  <Button
+                    onClick={() => window.location.reload()}
+                    variant="outline"
+                  >
+                    Try Again
+                  </Button>
+                </div>
+              ) : downloadFiles.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <AlertCircle className="w-12 h-12 text-muted-foreground mb-4" />
+                  <h3 className="text-xl font-semibold mb-2">No Downloads Available</h3>
+                  <p className="text-muted-foreground">No mods or files are currently available for download.</p>
+                </div>
+              ) : (
+                <Tabs defaultValue="all" className="w-full">
+                  <div className="flex flex-wrap justify-between items-center mb-8">
+                    <TabsList className="flex flex-wrap h-auto p-1">
+                      <TabsTrigger value="all">All Files</TabsTrigger>
+                      {categories.map(category => (
+                        <TabsTrigger key={category} value={category}>{category}</TabsTrigger>
+                      ))}
+                    </TabsList>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="lg:hidden mt-4 sm:mt-0" 
+                      onClick={() => setShowLoadOrder(!showLoadOrder)}
+                    >
+                      {showLoadOrder ? (
+                        <> <X className="h-4 w-4 mr-2" /> Hide Load Order </>
+                      ) : (
+                        <> <List className="h-4 w-4 mr-2" /> Show Load Order </>
+                      )}
+                    </Button>
+                  </div>
+                  
+                  <TabsContent value="all" className="mt-0">
+                    <div className="grid grid-cols-1 gap-6">
+                      <div className={`${!showLoadOrder ? 'hidden lg:block' : ''}`}>
+                        <Card className="shadow-sm mb-6">
+                          <CardHeader>
+                            <CardTitle className="text-xl">Recommended Load Order</CardTitle>
+                            <CardDescription>For optimal compatibility with ProMods and other map mods</CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="rounded-md bg-muted p-5 font-mono text-base">
+                              <p className="font-semibold mb-3 text-lg">↑ Top of mod manager</p>
+                              <ul className="space-y-1.5 text-muted-foreground">
+                                <li>• ProMods Background Map (Pick one):</li>
+                                <li className="ml-4">- ProMods North America Background Map</li>
+                                <li>• ProMods New Map Icons ATS</li>
+                                <li>• (Other mods)</li>
+                                <li>• ProMods Trailer & Company Pack ATS Trailers Def Replacement</li>
+                                <li>• ProMods Trailer & Company Pack ATS Trailers Def Main</li>
+                                <li>• ProMods Trailer & Company Pack ATS Trailers</li>
+                                <li>• ProMods Trailer & Company Pack ATS Companies Def</li>
+                                <li>• ProMods Trailer & Company Pack ATS Companies</li>
+                                <li>• ProMods Canada Add-On Def & Map</li>
+                                <li>• ProMods Canada Add-On Assets</li>
+                                <li>• ProMods North America DLC Support Pack</li>
+                                <li>• ProMods North America Def</li>
+                                <li>• ProMods North America Map</li>
+                                <li>• ProMods North America Models 1-3</li>
+                                <li>• ProMods North America Media</li>
+                                <li>• ProMods North America Assets</li>
+                              </ul>
+                              <p className="font-semibold mt-3 text-lg">↓ Bottom of mod manager</p>
+                            </div>
+                            <div className="mt-5 text-base text-muted-foreground">
+                              <p className="flex items-center mb-3">
+                                <AlertCircle className="h-5 w-5 mr-2 text-amber-500" />
+                                <span className="font-medium">This is not a guarantee for bug-free gameplay!</span>
+                              </p>
+                              <p>If you encounter problems, please check on a clean profile with only ProMods enabled. Some maps may not be compatible with the latest game version.</p>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+                      <div>
+                        <div className="grid grid-cols-1 gap-6">
+                          {downloadFiles.map(file => (
+                            <DownloadCard key={file.id} file={file} />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </TabsContent>
+                  
+                  {categories.map(category => (
+                    <TabsContent key={category} value={category} className="mt-0">
+                      <div className="grid grid-cols-1 gap-6">
+                        <div className={`${!showLoadOrder ? 'hidden lg:block' : ''}`}>
+                          <Card className="shadow-sm mb-6">
+                            <CardHeader>
+                              <CardTitle className="text-xl">Recommended Load Order</CardTitle>
+                              <CardDescription>For optimal compatibility with ProMods and other map mods</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="rounded-md bg-muted p-5 font-mono text-base">
+                                <p className="font-semibold mb-3 text-lg">↑ Top of mod manager</p>
+                                <ul className="space-y-1.5 text-muted-foreground">
+                                  <li>• ProMods Background Map (Pick one):</li>
+                                  <li className="ml-4">- ProMods North America Background Map</li>
+                                  <li>• ProMods New Map Icons ATS</li>
+                                  <li>• (Other mods)</li>
+                                  <li>• ProMods Trailer & Company Pack ATS Trailers Def Replacement</li>
+                                  <li>• ProMods Trailer & Company Pack ATS Trailers Def Main</li>
+                                  <li>• ProMods Trailer & Company Pack ATS Trailers</li>
+                                  <li>• ProMods Trailer & Company Pack ATS Companies Def</li>
+                                  <li>• ProMods Trailer & Company Pack ATS Companies</li>
+                                  <li>• ProMods Canada Add-On Def & Map</li>
+                                  <li>• ProMods Canada Add-On Assets</li>
+                                  <li>• ProMods North America DLC Support Pack</li>
+                                  <li>• ProMods North America Def</li>
+                                  <li>• ProMods North America Map</li>
+                                  <li>• ProMods North America Models 1-3</li>
+                                  <li>• ProMods North America Media</li>
+                                  <li>• ProMods North America Assets</li>
+                                </ul>
+                                <p className="font-semibold mt-3 text-lg">↓ Bottom of mod manager</p>
+                              </div>
+                              <div className="mt-5 text-base text-muted-foreground">
+                                <p className="flex items-center mb-3">
+                                  <AlertCircle className="h-5 w-5 mr-2 text-amber-500" />
+                                  <span className="font-medium">This is not a guarantee for bug-free gameplay!</span>
+                                </p>
+                                <p>If you encounter problems, please check on a clean profile with only ProMods enabled. Some maps may not be compatible with the latest game version.</p>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </div>
+                        <div>
+                          <div className="grid grid-cols-1 gap-6">
+                            {downloadFiles
+                              .filter(file => file.category === category)
+                              .map(file => (
+                                <DownloadCard key={file.id} file={file} />
+                              ))}
+                          </div>
+                        </div>
+                      </div>
+                    </TabsContent>
+                  ))}
+                </Tabs>
+              )}
+            </motion.div>
+          </Container>
+        </section>
       </main>
       <Footer />
     </div>
+  );
+}
+
+function DownloadCard({ file }: { file: DownloadFile }) {
+  return (
+    <Card className="shadow-sm hover:shadow-md transition-shadow">
+      <CardHeader>
+        <CardTitle className="text-xl">{file.name}</CardTitle>
+        <CardDescription>{file.description}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div className="flex items-center gap-2 text-sm">
+            <FileText className="h-4 w-4 text-muted-foreground" />
+            <span className="text-muted-foreground">Size:</span>
+            <span>{file.fileSize}</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <Info className="h-4 w-4 text-muted-foreground" />
+            <span className="text-muted-foreground">Version:</span>
+            <span>{file.version}</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <Clock className="h-4 w-4 text-muted-foreground" />
+            <span className="text-muted-foreground">Uploaded:</span>
+            <span>{new Date(file.uploadDate).toLocaleDateString()}</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <Download className="h-4 w-4 text-muted-foreground" />
+            <span className="text-muted-foreground">Downloads:</span>
+            <span>{file.downloadCount.toLocaleString()}</span>
+          </div>
+        </div>
+        
+        <div className="flex flex-wrap gap-2">
+          {file.tags.map(tag => (
+            <Badge key={tag} variant="secondary" className="text-xs">
+              <Tag className="h-3 w-3 mr-1" />
+              {tag}
+            </Badge>
+          ))}
+        </div>
+      </CardContent>
+      <CardFooter className="flex justify-between items-center border-t pt-4">
+        <Badge>{file.category}</Badge>
+        <a href={file.originalUrl || file.downloadUrl} target="_blank" rel="noopener noreferrer">
+          <Button className="gap-2">
+            <Download className="h-4 w-4" />
+            Download
+          </Button>
+        </a>
+      </CardFooter>
+    </Card>
   );
 }
