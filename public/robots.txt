@@ -1,0 +1,12 @@
+# robots.txt for mailobedo.nl
+
+# Allow all web crawlers to access all content
+User-agent: *
+Allow: /
+
+# Sitemap location (if you create one in the future)
+# Sitemap: https://mailobedo.nl/sitemap.xml
+
+# Disallow access to specific routes (uncomment if needed)
+# Disallow: /admin/
+# Disallow: /personal/private/
