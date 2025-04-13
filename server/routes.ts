@@ -38,7 +38,93 @@ function getExpirationDate(): Date {
   return date;
 }
 
+// Interface for download file stats
+interface DownloadStat {
+  fileId: string;
+  downloadCount: number;
+  lastDownloaded: Date;
+}
+
+// In-memory storage for download stats
+const downloadStats: Map<string, DownloadStat> = new Map();
+
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Download files API
+  app.get("/api/downloads/stats/:fileId", (req, res) => {
+    try {
+      const { fileId } = req.params;
+      
+      // Get the download stats for the file
+      const stats = downloadStats.get(fileId) || {
+        fileId,
+        downloadCount: 0,
+        lastDownloaded: new Date(0) // Unix epoch
+      };
+      
+      res.json(stats);
+    } catch (error) {
+      console.error("Error getting download stats:", error);
+      res.status(500).json({ message: "Failed to get download stats" });
+    }
+  });
+
+  // Track download endpoint - increment counter and redirect to actual file
+  app.get("/downloads/files/:fileId", (req, res) => {
+    try {
+      const { fileId } = req.params;
+      
+      // Update download stats
+      const stats = downloadStats.get(fileId) || {
+        fileId,
+        downloadCount: 0,
+        lastDownloaded: new Date()
+      };
+      
+      // Increment download count and update timestamp
+      stats.downloadCount += 1;
+      stats.lastDownloaded = new Date();
+      
+      // Save back to map
+      downloadStats.set(fileId, stats);
+      
+      // Create proper file path for the download
+      // This assumes files are stored in client/public/assets/downloads/files/
+      // with proper organization by game/category
+      let filePath;
+      
+      // ETS2 files (in ets2 subdirectory)
+      if (fileId.startsWith('ets2-')) {
+        filePath = path.join('assets', 'downloads', 'files', 'ets2', `${fileId}.zip`);
+      } else {
+        // Default path for other files
+        filePath = path.join('assets', 'downloads', 'files', `${fileId}.zip`);
+      }
+      
+      console.log(`Download request for ${fileId}, serving file: ${filePath}`);
+      
+      // Check if the file exists (for better debugging)
+      const fullPath = path.join(process.cwd(), 'client', 'public', filePath);
+      if (!fs.existsSync(fullPath)) {
+        console.error(`File not found: ${fullPath}`);
+        res.status(404).json({ message: "File not found" });
+        return;
+      }
+      
+      // Send the file for download with appropriate headers
+      res.download(fullPath, path.basename(fullPath), (err) => {
+        if (err) {
+          console.error(`Error downloading file: ${err}`);
+          // If headers already sent, we can't send another response
+          if (!res.headersSent) {
+            res.status(500).json({ message: "Error downloading file" });
+          }
+        }
+      });
+    } catch (error) {
+      console.error("Error tracking download:", error);
+      res.status(500).json({ message: "Failed to process download" });
+    }
+  });
   // API route for contact form submission
   app.post("/api/contact", async (req, res) => {
     try {

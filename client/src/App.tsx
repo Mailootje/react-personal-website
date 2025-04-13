@@ -6,9 +6,11 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import Photography from "@/pages/Photography";
 import Apps from "@/pages/Apps";
+import Downloads from "@/pages/Downloads";
 import PasswordGenerator from "@/pages/apps/PasswordGenerator";
 import LinkShortener from "@/pages/apps/LinkShortener";
 import QRCodeGenerator from "@/pages/apps/QRCodeGenerator";
+import EuroTruckSimulator2 from "@/pages/downloads/EuroTruckSimulator2";
 
 function Router() {
   return (
@@ -19,6 +21,8 @@ function Router() {
       <Route path="/apps/password-generator" component={PasswordGenerator}/>
       <Route path="/apps/link-shortener" component={LinkShortener}/>
       <Route path="/apps/qr-code-generator" component={QRCodeGenerator}/>
+      <Route path="/downloads" component={Downloads}/>
+      <Route path="/downloads/euro-truck-simulator-2" component={EuroTruckSimulator2}/>
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
