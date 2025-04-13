@@ -1,0 +1,124 @@
+{
+    "Euro_Truck_Simulator_2": [
+        {
+            "name": "promods-tgs-defmap-v122.scs",
+            "url": "https:\/\/mailobedo.nl\/Euro_Truck_Simulator_2\/v1.53.x\/mods\/promods-tgs-defmap-v122.scs",
+            "size": 38186931
+        },
+        {
+            "name": "promods-tgs-assets-v122.scs",
+            "url": "https:\/\/mailobedo.nl\/Euro_Truck_Simulator_2\/v1.53.x\/mods\/promods-tgs-assets-v122.scs",
+            "size": 1810533076
+        },
+        {
+            "name": "sibirmap292.scs",
+            "url": "https:\/\/mailobedo.nl\/Euro_Truck_Simulator_2\/v1.53.x\/mods\/sibirmap292.scs",
+            "size": 615812788
+        },
+        {
+            "name": "promods-dlcsupport-v273a.zip",
+            "url": "https:\/\/mailobedo.nl\/Euro_Truck_Simulator_2\/v1.53.x\/mods\/promods-dlcsupport-v273a.zip",
+            "size": 26579
+        },
+        {
+            "name": "Worlds_Combined_Background_Map_v1.2.scs",
+            "url": "https:\/\/mailobedo.nl\/Euro_Truck_Simulator_2\/v1.53.x\/mods\/Worlds_Combined_Background_Map_v1.2.scs",
+            "size": 35854895
+        },
+        {
+            "name": "JRR_Assets&Models2.scs",
+            "url": "https:\/\/mailobedo.nl\/Euro_Truck_Simulator_2\/v1.53.x\/mods\/JRR_Assets&Models2.scs",
+            "size": 65912896
+        },
+        {
+            "name": "promods-model2-v273a.scs",
+            "url": "https:\/\/mailobedo.nl\/Euro_Truck_Simulator_2\/v1.53.x\/mods\/promods-model2-v273a.scs",
+            "size": 1696642026
+        },
+        {
+            "name": "promods-media-v273a.scs",
+            "url": "https:\/\/mailobedo.nl\/Euro_Truck_Simulator_2\/v1.53.x\/mods\/promods-media-v273a.scs",
+            "size": 46804725
+        },
+        {
+            "name": "promods-model3-v273a.scs",
+            "url": "https:\/\/mailobedo.nl\/Euro_Truck_Simulator_2\/v1.53.x\/mods\/promods-model3-v273a.scs",
+            "size": 662087007
+        },
+        {
+            "name": "promods-me-assets-v273.scs",
+            "url": "https:\/\/mailobedo.nl\/Euro_Truck_Simulator_2\/v1.53.x\/mods\/promods-me-assets-v273.scs",
+            "size": 581079695
+        },
+        {
+            "name": "RusMap_Def.scs",
+            "url": "https:\/\/mailobedo.nl\/Euro_Truck_Simulator_2\/v1.53.x\/mods\/RusMap_Def.scs",
+            "size": 3419328
+        },
+        {
+            "name": "SRmod_v13.scs",
+            "url": "https:\/\/mailobedo.nl\/Euro_Truck_Simulator_2\/v1.53.x\/mods\/SRmod_v13.scs",
+            "size": 1245612748
+        },
+        {
+            "name": "promods-me-defmap-v273.scs",
+            "url": "https:\/\/mailobedo.nl\/Euro_Truck_Simulator_2\/v1.53.x\/mods\/promods-me-defmap-v273.scs",
+            "size": 35593298
+        },
+        {
+            "name": "promods-map-v273a.scs",
+            "url": "https:\/\/mailobedo.nl\/Euro_Truck_Simulator_2\/v1.53.x\/mods\/promods-map-v273a.scs",
+            "size": 2349764048
+        },
+        {
+            "name": "promods-model1-v273a.scs",
+            "url": "https:\/\/mailobedo.nl\/Euro_Truck_Simulator_2\/v1.53.x\/mods\/promods-model1-v273a.scs",
+            "size": 3918417464
+        },
+        {
+            "name": "cnx-pm-v271-rm-v251.scs",
+            "url": "https:\/\/mailobedo.nl\/Euro_Truck_Simulator_2\/v1.53.x\/mods\/cnx-pm-v271-rm-v251.scs",
+            "size": 24553935
+        },
+        {
+            "name": "promods-assets-v273a.scs",
+            "url": "https:\/\/mailobedo.nl\/Euro_Truck_Simulator_2\/v1.53.x\/mods\/promods-assets-v273a.scs",
+            "size": 3252939113
+        },
+        {
+            "name": "JRR_Assets&Models1.scs",
+            "url": "https:\/\/mailobedo.nl\/Euro_Truck_Simulator_2\/v1.53.x\/mods\/JRR_Assets&Models1.scs",
+            "size": 274620513
+        },
+        {
+            "name": "RusMap_Models.scs",
+            "url": "https:\/\/mailobedo.nl\/Euro_Truck_Simulator_2\/v1.53.x\/mods\/RusMap_Models.scs",
+            "size": 1483565856
+        },
+        {
+            "name": "JRR_Def&Map[1.53-1.54]_PM-BG.scs",
+            "url": "https:\/\/mailobedo.nl\/Euro_Truck_Simulator_2\/v1.53.x\/mods\/JRR_Def&Map[1.53-1.54]_PM-BG.scs",
+            "size": 22673621
+        },
+        {
+            "name": "promods-afroeurasia-background-v25.scs",
+            "url": "https:\/\/mailobedo.nl\/Euro_Truck_Simulator_2\/v1.53.x\/mods\/promods-afroeurasia-background-v25.scs",
+            "size": 8973650
+        },
+        {
+            "name": "ai_traffic_pack_by_Jazzycat_v21.8.5.scs",
+            "url": "https:\/\/mailobedo.nl\/Euro_Truck_Simulator_2\/v1.53.x\/mods\/ai_traffic_pack_by_Jazzycat_v21.8.5.scs",
+            "size": 757687432
+        },
+        {
+            "name": "promods-def-v273a.scs",
+            "url": "https:\/\/mailobedo.nl\/Euro_Truck_Simulator_2\/v1.53.x\/mods\/promods-def-v273a.scs",
+            "size": 2999626
+        },
+        {
+            "name": "RusMap_Map.scs",
+            "url": "https:\/\/mailobedo.nl\/Euro_Truck_Simulator_2\/v1.53.x\/mods\/RusMap_Map.scs",
+            "size": 122673168
+        }
+    ]
+}

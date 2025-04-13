@@ -59,12 +59,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         throw new Error(`Failed to fetch mods: ${response.status} ${response.statusText}`);
       }
       
-      const files = await response.json();
+      const data = await response.json();
+      
+      // Check if we have the new format with Euro_Truck_Simulator_2 key
+      if (!data.Euro_Truck_Simulator_2 || !Array.isArray(data.Euro_Truck_Simulator_2)) {
+        throw new Error('Invalid data format received from API');
+      }
       
       // Process the files to create a proper response
-      const processedFiles = files.map((url: string, index: number) => {
-        // Extract filename from URL
-        const filename = url.split('/').pop() || '';
+      const processedFiles = data.Euro_Truck_Simulator_2.map((file: any, index: number) => {
+        // Extract filename from file object
+        const filename = file.name || '';
         const cleanFilename = filename.replace('.scs', '').replace('.zip', '');
         
         // Create a more user-friendly name from the filename
@@ -91,18 +96,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
           !['and', 'the', 'for', 'with', 'v1', 'v2', 'v3'].includes(tag.toLowerCase())
         );
         
+        // Format the file size
+        const fileSizeInMB = Math.round(file.size / (1024 * 1024) * 10) / 10;
+        const fileSize = fileSizeInMB >= 1000 
+          ? `${(fileSizeInMB / 1024).toFixed(2)} GB` 
+          : `${fileSizeInMB.toFixed(1)} MB`;
+        
         return {
           id: `ets2-${index}`,
           name: name,
           description: `${fileType} for Euro Truck Simulator 2 v1.53.x`,
-          fileSize: "Unknown", // We don't have actual file sizes
+          fileSize: fileSize,
           version: filename.match(/v[0-9.]+/)?.[0] || 'Latest',
           uploadDate: "2025-03-01", // Placeholder date
           downloadCount: Math.floor(Math.random() * 1000) + 500, // Random count for display
           category: category,
           tags: Array.from(new Set(tags)).slice(0, 3), // Take up to 3 unique tags
-          originalUrl: url,
-          downloadUrl: `/api/downloads/proxy?url=${encodeURIComponent(url)}`
+          originalUrl: file.url,
+          downloadUrl: `/api/downloads/proxy?url=${encodeURIComponent(file.url)}`
         };
       });
       
