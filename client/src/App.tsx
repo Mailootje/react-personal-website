@@ -15,6 +15,7 @@ import LinkShortener from "@/pages/apps/LinkShortener";
 import QRCodeGenerator from "@/pages/apps/QRCodeGenerator";
 import WeatherDashboard from "@/pages/apps/WeatherDashboard";
 import OnlineCodeEditor from "@/pages/apps/OnlineCodeEditor";
+import ImageConverter from "@/pages/apps/ImageConverter";
 import Snake from "@/pages/games/Snake";
 import Tetris from "@/pages/games/Tetris";
 import PacmanNew from "@/pages/games/PacmanNew";
@@ -35,6 +36,7 @@ function Router() {
       <Route path="/apps/qr-code-generator" component={QRCodeGenerator}/>
       <Route path="/apps/weather-dashboard" component={WeatherDashboard}/>
       <Route path="/apps/online-code-editor" component={OnlineCodeEditor}/>
+      <Route path="/apps/image-converter" component={ImageConverter}/>
       <Route path="/downloads" component={Downloads}/>
       <Route path="/downloads/euro-truck-simulator-2" component={EuroTruckSimulator2}/>
       <Route path="/downloads/american-truck-simulator" component={AmericanTruckSimulator}/>

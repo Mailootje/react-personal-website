@@ -64,6 +64,14 @@ export default function Apps() {
       icon: "👨‍💻",
       tags: ["Development", "Productivity"],
     },
+    {
+      id: "image-converter",
+      title: "Image Converter",
+      description:
+        "Convert images between different formats with customizable settings. All processing happens in your browser.",
+      icon: "🖼️",
+      tags: ["Media", "Utility"],
+    },
     // Add more apps as needed
   ]);
 
