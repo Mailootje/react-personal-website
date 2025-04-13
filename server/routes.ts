@@ -1201,7 +1201,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     cors: {
       origin: "*",
       methods: ["GET", "POST"]
-    }
+    },
+    path: "/socket.io"
   });
   
   // Store active rooms with their access codes

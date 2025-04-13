@@ -38,7 +38,7 @@ interface Participant {
   id: string;
   name: string;
   stream?: MediaStream;
-  peer?: SimplePeer.Instance;
+  peer?: any; // SimplePeer.Instance
 }
 
 interface Message {
@@ -68,24 +68,48 @@ export default function VideoChat() {
   const socketRef = useRef<Socket | null>(null);
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const peersRef = useRef<{
-    [key: string]: SimplePeer.Instance
+    [key: string]: any // SimplePeer.Instance
   }>({});
   const messageEndRef = useRef<HTMLDivElement>(null);
   
   // Connect to socket server
   useEffect(() => {
-    // Get protocol (ws or wss) based on current connection
-    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    const host = window.location.host;
-    
-    // Connect to Socket.IO server
-    socketRef.current = io();
-    
-    return () => {
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-      }
-    };
+    try {
+      // Get protocol and host for Socket.IO connection
+      const protocol = window.location.protocol;
+      const host = window.location.host;
+      
+      console.log(`Connecting to Socket.IO server at ${protocol}//${host}`);
+      
+      // Connect to Socket.IO server with explicit URL
+      socketRef.current = io(`${protocol}//${host}`, {
+        path: '/socket.io',
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000,
+        timeout: 20000
+      });
+      
+      socketRef.current.on('connect', () => {
+        console.log('Connected to Socket.IO server with ID:', socketRef.current?.id);
+      });
+      
+      socketRef.current.on('connect_error', (err) => {
+        console.error('Socket.IO connection error:', err);
+      });
+      
+      socketRef.current.on('disconnect', (reason) => {
+        console.log('Socket.IO disconnected:', reason);
+      });
+      
+      return () => {
+        console.log('Cleaning up Socket.IO connection');
+        if (socketRef.current) {
+          socketRef.current.disconnect();
+        }
+      };
+    } catch (error) {
+      console.error('Error setting up Socket.IO:', error);
+    }
   }, []);
   
   // Setup media stream
@@ -278,9 +302,9 @@ export default function VideoChat() {
       initiator: true,
       trickle: false,
       stream
-    });
+    } as any);
     
-    peer.on("signal", (signal) => {
+    peer.on("signal", (signal: any) => {
       socketRef.current?.emit("signal", {
         roomId,
         to: userToSignal,
@@ -288,7 +312,7 @@ export default function VideoChat() {
       });
     });
     
-    peer.on("stream", (peerStream) => {
+    peer.on("stream", (peerStream: MediaStream) => {
       // Update participant with stream
       setParticipants(prev => prev.map(p => {
         if (p.id === userToSignal) {
@@ -307,9 +331,9 @@ export default function VideoChat() {
       initiator: false,
       trickle: false,
       stream
-    });
+    } as any);
     
-    peer.on("signal", (signal) => {
+    peer.on("signal", (signal: any) => {
       socketRef.current?.emit("signal", {
         roomId,
         to: callerId,
@@ -317,7 +341,7 @@ export default function VideoChat() {
       });
     });
     
-    peer.on("stream", (peerStream) => {
+    peer.on("stream", (peerStream: MediaStream) => {
       // Update participant with stream
       setParticipants(prev => prev.map(p => {
         if (p.id === callerId) {
@@ -351,7 +375,7 @@ export default function VideoChat() {
       
       // Create peer for new participant
       if (localStream) {
-        const peer = addPeer(null, data.id, localStream);
+        const peer = addPeer({} as any, data.id, localStream);
         peersRef.current[data.id] = peer;
       }
     });
@@ -703,7 +727,9 @@ export default function VideoChat() {
                           autoPlay
                           playsInline
                           className="w-full h-full object-cover"
-                          srcObject={participant.stream}
+                          ref={(ref) => {
+                            if (ref && participant.stream) ref.srcObject = participant.stream;
+                          }}
                         />
                       ) : (
                         <div className="absolute inset-0 flex items-center justify-center bg-gray-800">
