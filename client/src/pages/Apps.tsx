@@ -73,34 +73,6 @@ export default function Apps() {
       tags: ["Media", "Utility"],
     },
     {
-      id: "unit-converter",
-      title: "Unit Converter",
-      description: "Convert between units of length, weight, temperature, currency, and more",
-      icon: "📏",
-      tags: ["Utility", "Calculation"],
-    },
-    {
-      id: "timestamp-converter",
-      title: "Timestamp Converter",
-      description: "Convert Unix timestamps to human-readable formats and vice versa",
-      icon: "🕒",
-      tags: ["Utility", "Time"],
-    },
-    {
-      id: "json-formatter",
-      title: "JSON Formatter",
-      description: "Pretty-print and validate JSON for easier reading and debugging",
-      icon: "{ }",
-      tags: ["Development", "Utility"],
-    },
-    {
-      id: "color-picker",
-      title: "Color Picker / Palette Generator",
-      description: "Pick colors or generate beautiful color palettes for design projects",
-      icon: "🎨",
-      tags: ["Design", "Utility"],
-    },
-    {
       id: "favicon-generator",
       title: "Favicon Generator",
       description: "Upload an image and get multiple sizes and formats of a favicon",
@@ -120,27 +92,6 @@ export default function Apps() {
       description: "Inspect response headers from any website — useful for developers",
       icon: "🔍",
       tags: ["Development", "Network"],
-    },
-    {
-      id: "hash-generator",
-      title: "Hash Generator",
-      description: "Generate MD5, SHA-1, SHA-256, etc., hashes for strings or files",
-      icon: "🔒",
-      tags: ["Security", "Utility"],
-    },
-    {
-      id: "file-encryption",
-      title: "File Encryption Tool",
-      description: "Encrypt/decrypt files directly in the browser with a password",
-      icon: "🔐",
-      tags: ["Security", "Privacy"],
-    },
-    {
-      id: "random-generator",
-      title: "Random Generator",
-      description: "Generate random names, numbers, passwords, etc.",
-      icon: "🎲",
-      tags: ["Utility", "Development"],
     },
   ]);
 
