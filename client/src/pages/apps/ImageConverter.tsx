@@ -416,16 +416,16 @@ export default function ImageConverter() {
              1.0,  1.0
           ]), webgl.STATIC_DRAW);
           
-          // Set up texture coordinates - standard mapping (no flips)
+          // Flip the texture coordinates vertically to fix the upside-down image
           const texCoordBuffer = webgl.createBuffer();
           webgl.bindBuffer(webgl.ARRAY_BUFFER, texCoordBuffer);
           webgl.bufferData(webgl.ARRAY_BUFFER, new Float32Array([
+            0.0, 1.0, // bottom left
+            1.0, 1.0, // bottom right
             0.0, 0.0, // top left
-            1.0, 0.0, // top right
-            0.0, 1.0, // bottom left
-            0.0, 1.0, // bottom left
-            1.0, 0.0, // top right
-            1.0, 1.0  // bottom right
+            0.0, 0.0, // top left
+            1.0, 1.0, // bottom right
+            1.0, 0.0  // top right
           ]), webgl.STATIC_DRAW);
           
           // Create texture for the image
