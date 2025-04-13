@@ -2392,39 +2392,16 @@ console.log("Let's start coding!");`,
       return;
     }
     
-    // Reset to a new empty workspace
-    const welcomeId = generateId();
-    const initialFileSystem: FileSystemState = {
-      items: {
-        [welcomeId]: {
-          id: welcomeId,
-          name: 'welcome.js',
-          type: 'file',
-          content: `// Welcome to your new workspace: ${name}
-// This editor runs completely in your browser
-// You can:
-// - Create and edit files and folders
-// - Upload files and even entire folders (as ZIP)
-// - Download your files
-// - Switch between different workspaces
-// - Syntax highlighting for many languages
-
-console.log("Let's start coding in workspace ${name}!");`,
-          language: 'javascript',
-          parent: null
-        }
-      },
-      rootItems: [welcomeId]
+    // Create a completely empty workspace with no files or folders
+    const emptyFileSystem: FileSystemState = {
+      items: {},
+      rootItems: []
     };
     
-    setFileSystem(initialFileSystem);
-    setTabs([{
-      id: generateId(),
-      fileId: welcomeId,
-      isActive: true
-    }]);
-    setCurrentContent(initialFileSystem.items[welcomeId].content || '');
-    setCurrentLanguage('javascript');
+    setFileSystem(emptyFileSystem);
+    setTabs([]);
+    setCurrentContent('');
+    setCurrentLanguage('plaintext');
     
     // Save the new workspace
     saveToLocalStorage(name);
