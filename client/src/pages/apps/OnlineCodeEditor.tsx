@@ -590,7 +590,7 @@ MIT
     ];
     
     // Check if the current key combination matches any of our shortcuts
-    const isEditorShortcut = editorShortcuts.some(shortcut => 
+    const isEditorShortcut = e.key && editorShortcuts.some(shortcut => 
       e.key.toLowerCase() === shortcut.key.toLowerCase() &&
       e.ctrlKey === shortcut.ctrl &&
       e.altKey === shortcut.alt &&
