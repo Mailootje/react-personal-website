@@ -325,8 +325,8 @@ export default function QRCodeGenerator() {
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <Header />
       <main className="flex-grow">
-        <section className="py-20 px-6">
-          <Container maxWidth="lg">
+        <section className="py-20 px-4 md:px-8">
+          <Container maxWidth="6xl">
             <div className="mb-8">
               <Link
                 to="/apps"
@@ -409,7 +409,7 @@ export default function QRCodeGenerator() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="flex flex-col items-center pb-8">
-                    <div className="bg-white rounded-lg p-4 w-full max-w-xs mx-auto shadow-sm border flex items-center justify-center min-h-[300px]">
+                    <div className="bg-white rounded-lg p-4 w-full max-w-sm mx-auto shadow-sm border flex items-center justify-center min-h-[300px]">
                       {isGenerating ? (
                         <div className="flex flex-col items-center justify-center text-center p-6">
                           <Loader2 className="h-10 w-10 text-primary animate-spin mb-4" />
