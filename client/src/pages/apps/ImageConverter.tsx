@@ -416,16 +416,16 @@ export default function ImageConverter() {
              1.0,  1.0
           ]), webgl.STATIC_DRAW);
           
-          // Set up texture coordinates
+          // Set up texture coordinates - standard mapping (no flips)
           const texCoordBuffer = webgl.createBuffer();
           webgl.bindBuffer(webgl.ARRAY_BUFFER, texCoordBuffer);
           webgl.bufferData(webgl.ARRAY_BUFFER, new Float32Array([
-            0.0, 0.0,
-            1.0, 0.0,
-            0.0, 1.0,
-            0.0, 1.0,
-            1.0, 0.0,
-            1.0, 1.0
+            0.0, 0.0, // top left
+            1.0, 0.0, // top right
+            0.0, 1.0, // bottom left
+            0.0, 1.0, // bottom left
+            1.0, 0.0, // top right
+            1.0, 1.0  // bottom right
           ]), webgl.STATIC_DRAW);
           
           // Create texture for the image
@@ -483,12 +483,8 @@ export default function ImageConverter() {
             return;
           }
           
-          // Draw WebGL canvas to regular canvas with orientation preservation
-          outputCtx.save();
-          outputCtx.translate(width/2, height/2);
-          outputCtx.scale(1, 1);
-          outputCtx.drawImage(canvas, -width/2, -height/2, width, height);
-          outputCtx.restore();
+          // Draw WebGL canvas to regular canvas without any transformations
+          outputCtx.drawImage(canvas, 0, 0);
           
           // Convert to blob
           const quality = options.quality / 100;
@@ -576,14 +572,9 @@ export default function ImageConverter() {
             ctx.fillRect(0, 0, width, height);
           }
           
-          // Fix for orientation issues - preserve the correct orientation by
-          // ensuring the canvas context is properly set up before drawing
-          ctx.save(); // Save the current state
-          ctx.translate(width/2, height/2); // Move to center
-          ctx.scale(1, 1); // Use scale(1, -1) if flipped vertically or scale(-1, 1) if flipped horizontally
-          ctx.rotate(0); // Use Math.PI if rotated 180 degrees
-          ctx.drawImage(img, -width/2, -height/2, width, height); // Draw from center
-          ctx.restore(); // Restore to the saved state
+          // Just draw the image directly without any transformations
+          // This is the simplest approach and often works best
+          ctx.drawImage(img, 0, 0, width, height);
           
           // Convert to selected format
           const quality = options.quality / 100;
