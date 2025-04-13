@@ -40,19 +40,42 @@ export default function LinkShortener() {
   const { data: recentLinks, isLoading: isLoadingLinks } = useQuery<ShortenedLinkResponse[]>({
     queryKey: ['/api/links'],
     staleTime: 30000, // 30 seconds
+    queryFn: async () => {
+      try {
+        const response = await fetch('/api/links');
+        if (!response.ok) {
+          throw new Error('Failed to fetch recent links');
+        }
+        return await response.json();
+      } catch (error) {
+        console.error('Error fetching recent links:', error);
+        return [];
+      }
+    }
   });
   
   // Create shorten link mutation
   const shortenMutation = useMutation({
     mutationFn: async (url: string) => {
-      const response = await apiRequest<ShortenedLinkResponse>('/api/shorten', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ url }),
-      });
-      return response;
+      try {
+        const response = await fetch('/api/shorten', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ url }),
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Failed to shorten URL');
+        }
+        
+        return await response.json() as ShortenedLinkResponse;
+      } catch (error: any) {
+        console.error('Error shortening URL:', error);
+        throw new Error(error.message || 'Failed to shorten URL');
+      }
     },
     onSuccess: (data) => {
       setShortUrl(data.shortUrl);
