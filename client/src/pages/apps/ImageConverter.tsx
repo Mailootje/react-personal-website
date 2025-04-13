@@ -1,7 +1,10 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { FaUpload, FaDownload, FaFileArchive, FaTrash, FaSyncAlt, FaMicrochip } from 'react-icons/fa';
+import { FaUpload, FaDownload, FaFileArchive, FaTrash, FaSyncAlt, FaMicrochip, FaImage, FaChartLine } from 'react-icons/fa';
 import JSZip from 'jszip';
 import jsPDF from 'jspdf';
+import { Badge } from "@/components/ui/badge";
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { apiRequest, queryClient } from '@/lib/queryClient';
 
 // Ensure WebGL context type is available
 declare global {
@@ -96,6 +99,14 @@ interface ImageItem {
   error: string | null;
 }
 
+// Type definition for conversion counter
+interface ConversionCounter {
+  id: number;
+  name: string;
+  count: number;
+  lastUpdated: string;
+}
+
 export default function ImageConverter() {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -106,6 +117,44 @@ export default function ImageConverter() {
   const [processingProgress, setProcessingProgress] = useState(0);
   const [useHardwareAcceleration, setUseHardwareAcceleration] = useState(true);
   const [isHardwareAccelerationSupported, setIsHardwareAccelerationSupported] = useState(false);
+  
+  // Fetch conversion counter data
+  const { data: conversionCounter, isLoading: isCounterLoading } = useQuery<ConversionCounter>({
+    queryKey: ['/api/counters/conversions/total_images'],
+    queryFn: async () => {
+      const response = await fetch('/api/counters/conversions/total_images');
+      if (!response.ok) {
+        if (response.status === 404) {
+          // Counter doesn't exist yet, return default
+          return { id: 0, name: 'total_images', count: 0, lastUpdated: new Date().toISOString() };
+        }
+        throw new Error('Failed to fetch conversion counter');
+      }
+      return response.json();
+    },
+    refetchOnWindowFocus: false
+  });
+  
+  // Mutation to increment the counter
+  const incrementCounterMutation = useMutation({
+    mutationFn: async (count: number) => {
+      const response = await fetch('/api/counters/conversions/total_images/increment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ count })
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      // Invalidate the counter query to refresh the data
+      queryClient.invalidateQueries({ queryKey: ['/api/counters/conversions/total_images'] });
+    },
+    onError: (error: Error) => {
+      console.error('Failed to increment counter:', error);
+    }
+  });
   
   // Check if hardware acceleration (WebGL) is supported
   useEffect(() => {
@@ -723,6 +772,11 @@ export default function ImageConverter() {
         title: "Conversion Complete",
         description: `Successfully converted ${successCount} of ${updatedImages.length} images`,
       });
+      
+      // Increment the conversion counter in the database
+      if (successCount > 0) {
+        incrementCounterMutation.mutate(successCount);
+      }
     } catch (error) {
       console.error("Error in batch conversion:", error);
       toast({
@@ -884,6 +938,21 @@ export default function ImageConverter() {
               Process multiple images simultaneously with hardware acceleration for maximum speed.
               No uploads to external servers - all processing happens locally.
             </p>
+            
+            {/* Conversion counter display */}
+            <div className="mt-4 flex justify-center items-center">
+              <div className="bg-gray-800/60 backdrop-blur px-4 py-2 rounded-full inline-flex items-center gap-2">
+                <FaImage className="text-blue-400" />
+                <span className="text-gray-300">Total conversions:</span>
+                {isCounterLoading ? (
+                  <span className="text-white font-semibold animate-pulse">Loading...</span>
+                ) : (
+                  <Badge variant="default" className="bg-blue-600 hover:bg-blue-700 ml-1">
+                    <span className="text-sm font-bold">{conversionCounter?.count || 0}</span>
+                  </Badge>
+                )}
+              </div>
+            </div>
           </div>
           
           <div className="grid md:grid-cols-12 gap-6">
