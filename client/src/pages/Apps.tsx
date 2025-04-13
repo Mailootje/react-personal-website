@@ -81,7 +81,7 @@ export default function Apps() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                 >
-                  <Card className="h-full cursor-pointer hover:shadow-lg transition-shadow" onClick={() => window.location.href = `/apps/${app.id}`}>
+                  <Card className="h-full hover:shadow-lg transition-shadow">
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <div className="text-4xl mb-4">{app.icon}</div>
@@ -104,9 +104,11 @@ export default function Apps() {
                     {/* Placeholder for app preview */}
                   </CardContent>
                   <CardFooter>
-                    <Button className="w-full">
-                      Launch App
-                    </Button>
+                    <Link href={`/apps/${app.id}`}>
+                      <Button className="w-full">
+                        Launch App
+                      </Button>
+                    </Link>
                   </CardFooter>
                 </Card>
                 </motion.div>

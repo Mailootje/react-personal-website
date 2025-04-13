@@ -674,16 +674,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const currentWeatherData = await currentWeatherResponse.json();
       
-      // Get forecast data
-      const { q, ...otherParams } = params;
+      // Get forecast data using the 5 day / 3 hour forecast API instead
+      // The OneCall API requires a paid subscription, so we're using the free 5-day forecast
       const forecastParams = {
-        ...otherParams,
         lat: currentWeatherData.coord.lat,
         lon: currentWeatherData.coord.lon,
-        exclude: 'minutely,alerts'
+        units: units as string,
+        appid: process.env.OPENWEATHER_API_KEY
       };
       
-      const forecastUrl = `https://api.openweathermap.org/data/2.5/onecall?${new URLSearchParams(forecastParams as any).toString()}`;
+      const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?${new URLSearchParams(forecastParams as any).toString()}`;
       const forecastResponse = await fetch(forecastUrl);
       
       if (!forecastResponse.ok) {
@@ -694,10 +694,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const forecastData = await forecastResponse.json();
       
+      // Restructure the data to match our frontend expectations
+      const processedForecastData = {
+        current: {
+          dt: currentWeatherData.dt,
+          temp: currentWeatherData.main.temp,
+          feels_like: currentWeatherData.main.feels_like,
+          humidity: currentWeatherData.main.humidity,
+          uvi: 0, // Not available in the free API
+          wind_speed: currentWeatherData.wind.speed
+        },
+        hourly: forecastData.list.slice(0, 8).map((item: any) => ({
+          dt: item.dt,
+          temp: item.main.temp,
+          weather: item.weather
+        })),
+        daily: processDaily(forecastData.list, units as string)
+      };
+      
       // Combine the data
       res.json({
         current: currentWeatherData,
-        forecast: forecastData
+        forecast: processedForecastData
       });
     } catch (error) {
       log(`Error fetching weather data: ${error}`, "routes");
@@ -719,4 +737,71 @@ function formatTitle(filename: string): string {
   return name.split(" ")
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
+}
+
+// Process forecast data to create daily summaries from 3-hour forecast
+function processDaily(forecastList: any[], units: string): any[] {
+  // Group forecast data by day
+  const dailyData: {[key: string]: any[]} = {};
+  
+  forecastList.forEach((item: any) => {
+    const date = new Date(item.dt * 1000);
+    const day = date.toISOString().split('T')[0];
+    
+    if (!dailyData[day]) {
+      dailyData[day] = [];
+    }
+    
+    dailyData[day].push(item);
+  });
+  
+  // Process each day's data
+  return Object.keys(dailyData).map(day => {
+    const dayData = dailyData[day];
+    const temps = dayData.map(item => item.main.temp);
+    const weatherCounts: {[key: string]: number} = {};
+    let maxPop = 0;
+    let sumHumidity = 0;
+    let sumWindSpeed = 0;
+    
+    // Process weather conditions, find most common
+    dayData.forEach(item => {
+      if (item.pop && item.pop > maxPop) maxPop = item.pop;
+      sumHumidity += item.main.humidity;
+      sumWindSpeed += item.wind.speed;
+      
+      const weather = item.weather[0];
+      if (!weatherCounts[weather.id]) {
+        weatherCounts[weather.id] = 0;
+      }
+      weatherCounts[weather.id]++;
+    });
+    
+    // Find most common weather condition
+    let mostCommonWeatherId = 800; // Default to clear
+    let maxCount = 0;
+    
+    Object.keys(weatherCounts).forEach(id => {
+      if (weatherCounts[id] > maxCount) {
+        maxCount = weatherCounts[id];
+        mostCommonWeatherId = parseInt(id);
+      }
+    });
+    
+    // Find the weather object with this ID
+    const commonWeather = dayData.find(item => item.weather[0].id === mostCommonWeatherId)?.weather[0] || dayData[0].weather[0];
+    
+    return {
+      dt: dayData[0].dt,
+      temp: {
+        min: Math.min(...temps),
+        max: Math.max(...temps),
+        day: temps.reduce((sum, temp) => sum + temp, 0) / temps.length
+      },
+      weather: [commonWeather],
+      humidity: Math.round(sumHumidity / dayData.length),
+      wind_speed: sumWindSpeed / dayData.length,
+      pop: maxPop // Probability of precipitation
+    };
+  });
 }
