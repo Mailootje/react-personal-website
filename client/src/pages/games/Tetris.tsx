@@ -96,12 +96,23 @@ interface Tetromino {
 type GridCell = string | null;
 
 // Helper functions
+// Create a deep copy of a tetromino to avoid reference issues
+const cloneTetromino = (tetromino: Tetromino): Tetromino => {
+  return {
+    shape: tetromino.shape.map(row => [...row]),
+    color: tetromino.color,
+    position: { ...tetromino.position },
+    rotation: tetromino.rotation
+  };
+};
+
 const randomTetromino = (): Tetromino => {
   const randIndex = Math.floor(Math.random() * TETROMINOES.length);
   const { shape, color } = TETROMINOES[randIndex];
   
   return {
-    shape: [...shape],
+    // Deep copy the shape array to avoid reference issues
+    shape: shape.map(row => [...row]),
     color,
     position: { x: Math.floor(GRID_WIDTH / 2) - Math.floor(shape[0].length / 2), y: 0 },
     rotation: 0
@@ -150,9 +161,14 @@ export default function Tetris() {
   
   // Check if a tetromino is colliding with walls, floor, or locked cells
   const isColliding = useCallback((tetromino: Tetromino): boolean => {
-    if (!tetromino) return false;
+    if (!tetromino) {
+      console.error("isColliding called with null tetromino");
+      return false;
+    }
     
     const { shape, position } = tetromino;
+    
+    console.log("Checking collision for tetromino at", position);
     
     for (let y = 0; y < shape.length; y++) {
       for (let x = 0; x < shape[y].length; x++) {
@@ -162,17 +178,20 @@ export default function Tetris() {
           
           // Check if out of bounds
           if (gridY >= GRID_HEIGHT || gridX < 0 || gridX >= GRID_WIDTH) {
+            console.log(`Collision: Out of bounds at [${gridX}, ${gridY}]`);
             return true;
           }
           
-          // Check if colliding with locked cells
-          if (gridY >= 0 && grid[gridY][gridX] !== null) {
+          // Check if colliding with locked cells (only check if not above the grid)
+          if (gridY >= 0 && grid[gridY] && grid[gridY][gridX] !== null) {
+            console.log(`Collision: Locked cell at [${gridX}, ${gridY}]`);
             return true;
           }
         }
       }
     }
     
+    console.log("No collision detected");
     return false;
   }, [grid]);
   
@@ -229,27 +248,33 @@ export default function Tetris() {
       }
     }
     
+    // Create a test tetromino if none exists
+    const tetrominoToDraw = currentTetromino || {
+      shape: TETROMINOES[0].shape,
+      color: TETROMINOES[0].color,
+      position: { x: Math.floor(GRID_WIDTH / 2) - 2, y: 5 },
+      rotation: 0
+    };
+    
     // Draw current tetromino
-    if (currentTetromino) {
-      console.log("Drawing tetromino:", currentTetromino);
-      const { shape, color, position } = currentTetromino;
-      
-      ctx.fillStyle = color;
-      
-      for (let y = 0; y < shape.length; y++) {
-        for (let x = 0; x < shape[y].length; x++) {
-          if (shape[y][x] && position.y + y >= 0) {
-            const drawX = (position.x + x) * CELL_SIZE;
-            const drawY = (position.y + y) * CELL_SIZE;
-            console.log(`Drawing block at (${drawX}, ${drawY})`);
-            
-            ctx.fillRect(drawX, drawY, CELL_SIZE, CELL_SIZE);
-            
-            // Draw cell border
-            ctx.strokeStyle = '#000000';
-            ctx.lineWidth = 1;
-            ctx.strokeRect(drawX, drawY, CELL_SIZE, CELL_SIZE);
-          }
+    console.log("Drawing tetromino:", tetrominoToDraw);
+    const { shape, color, position } = tetrominoToDraw;
+    
+    ctx.fillStyle = color;
+    
+    for (let y = 0; y < shape.length; y++) {
+      for (let x = 0; x < shape[y].length; x++) {
+        if (shape[y][x]) {
+          const drawX = (position.x + x) * CELL_SIZE;
+          const drawY = (position.y + y) * CELL_SIZE;
+          console.log(`Drawing block at (${drawX}, ${drawY})`);
+          
+          ctx.fillRect(drawX, drawY, CELL_SIZE, CELL_SIZE);
+          
+          // Draw cell border with a more visible outline
+          ctx.strokeStyle = '#000000';
+          ctx.lineWidth = 1.5;
+          ctx.strokeRect(drawX, drawY, CELL_SIZE, CELL_SIZE);
         }
       }
     }
@@ -321,15 +346,9 @@ export default function Tetris() {
     
     const deltaX = direction === 'left' ? -1 : 1;
     
-    const newPosition = {
-      ...currentTetromino.position,
-      x: currentTetromino.position.x + deltaX
-    };
-    
-    const newTetromino = {
-      ...currentTetromino,
-      position: newPosition
-    };
+    // Create a deep copy of the tetromino with new position
+    const newTetromino = cloneTetromino(currentTetromino);
+    newTetromino.position.x += deltaX;
     
     if (!isColliding(newTetromino)) {
       setCurrentTetromino(newTetromino);
@@ -340,12 +359,15 @@ export default function Tetris() {
   const rotateTetromino = useCallback(() => {
     if (!currentTetromino || gameState !== GameState.PLAYING) return;
     
-    const rotatedShape = rotateMatrix(currentTetromino.shape);
-    const newTetromino = {
-      ...currentTetromino,
-      shape: rotatedShape,
-      rotation: (currentTetromino.rotation + 1) % 4
-    };
+    // Create a deep copy of the tetromino
+    const newTetromino = cloneTetromino(currentTetromino);
+    
+    // Create a new rotated shape using the rotateMatrix function
+    const rotatedShape = rotateMatrix(currentTetromino.shape.map(row => [...row]));
+    
+    // Update the shape and rotation in the copied tetromino
+    newTetromino.shape = rotatedShape;
+    newTetromino.rotation = (currentTetromino.rotation + 1) % 4;
     
     // Try to rotate in place
     if (!isColliding(newTetromino)) {
@@ -355,13 +377,9 @@ export default function Tetris() {
     
     // Wall kick - try shifting the tetromino to fit after rotation
     for (let offset of [-1, 1, -2, 2]) {
-      const kickedTetromino = {
-        ...newTetromino,
-        position: {
-          ...newTetromino.position,
-          x: newTetromino.position.x + offset
-        }
-      };
+      // Create a new tetromino with the offset position
+      const kickedTetromino = cloneTetromino(newTetromino);
+      kickedTetromino.position.x += offset;
       
       if (!isColliding(kickedTetromino)) {
         setCurrentTetromino(kickedTetromino);
@@ -372,18 +390,32 @@ export default function Tetris() {
   
   // Spawn a new tetromino
   const spawnTetromino = useCallback(() => {
+    console.log("Spawning new tetromino");
+    
     // Use the next tetromino as the current one
     if (nextTetromino) {
-      setCurrentTetromino({
+      console.log("Using next tetromino as current");
+      // Make a deep copy to avoid reference issues
+      const newTetromino = cloneTetromino({
         ...nextTetromino,
-        position: { x: Math.floor(GRID_WIDTH / 2) - Math.floor(nextTetromino.shape[0].length / 2), y: 0 }
+        position: { 
+          x: Math.floor(GRID_WIDTH / 2) - Math.floor(nextTetromino.shape[0].length / 2), 
+          y: 0 
+        }
       });
+      console.log("New current tetromino:", newTetromino);
+      setCurrentTetromino(newTetromino);
     } else {
-      setCurrentTetromino(randomTetromino());
+      console.log("No next tetromino, creating random one");
+      const randomTet = randomTetromino();
+      console.log("New random tetromino:", randomTet);
+      setCurrentTetromino(randomTet);
     }
     
     // Generate a new next tetromino
-    setNextTetromino(randomTetromino());
+    const newNextTet = randomTetromino();
+    console.log("New next tetromino:", newNextTet);
+    setNextTetromino(newNextTet);
   }, [nextTetromino]);
   
   // Lock the current tetromino in place
@@ -452,21 +484,33 @@ export default function Tetris() {
   
   // Drop tetromino by one cell
   const dropTetromino = useCallback(() => {
-    if (!currentTetromino || gameState !== GameState.PLAYING) return;
+    console.log("Drop tetromino called, current state:", gameState);
+    console.log("Current tetromino:", currentTetromino);
     
-    const newPosition = {
-      ...currentTetromino.position,
-      y: currentTetromino.position.y + 1
-    };
+    if (!currentTetromino) {
+      console.log("No current tetromino, cannot drop");
+      return;
+    }
     
-    const newTetromino = {
-      ...currentTetromino,
-      position: newPosition
-    };
+    if (gameState !== GameState.PLAYING) {
+      console.log("Game not in PLAYING state, cannot drop");
+      return;
+    }
     
-    if (!isColliding(newTetromino)) {
+    console.log("Trying to drop tetromino from", currentTetromino.position);
+    
+    // Create a deep copy of the tetromino with new position
+    const newTetromino = cloneTetromino(currentTetromino);
+    newTetromino.position.y += 1;
+    
+    const collision = isColliding(newTetromino);
+    console.log("Collision?", collision);
+    
+    if (!collision) {
+      console.log("Moving tetromino down to", newTetromino.position);
       setCurrentTetromino(newTetromino);
     } else {
+      console.log("Collision detected, settling block");
       // The tetromino cannot move down further, so lock it in place
       settleBlock();
     }
@@ -476,20 +520,20 @@ export default function Tetris() {
   const hardDrop = useCallback(() => {
     if (!currentTetromino || gameState !== GameState.PLAYING) return;
     
-    let newY = currentTetromino.position.y;
+    // Create a deep copy of the tetromino
+    const newTetromino = cloneTetromino(currentTetromino);
+    let newY = newTetromino.position.y;
     
     // Find the lowest position without collision
     while (!isColliding({
-      ...currentTetromino,
-      position: { ...currentTetromino.position, y: newY + 1 }
+      ...newTetromino,
+      position: { ...newTetromino.position, y: newY + 1 }
     })) {
       newY++;
     }
     
-    setCurrentTetromino({
-      ...currentTetromino,
-      position: { ...currentTetromino.position, y: newY }
-    });
+    newTetromino.position.y = newY;
+    setCurrentTetromino(newTetromino);
     
     // Immediately settle the block
     settleBlock();
@@ -505,12 +549,24 @@ export default function Tetris() {
     setLines(0);
     setLevel(1);
     
-    // Spawn initial tetrominos
-    const initialTetromino = randomTetromino();
-    const initialNextTetromino = randomTetromino();
+    // Create initial tetrominos using our helper function for proper deep copying
+    const initialTetromino = {
+      shape: [...TETROMINOES[0].shape.map(row => [...row])], // I-piece with deep copied shape
+      color: TETROMINOES[0].color,
+      position: { x: Math.floor(GRID_WIDTH / 2) - 2, y: 0 },
+      rotation: 0
+    };
     
-    setCurrentTetromino(initialTetromino);
-    setNextTetromino(initialNextTetromino);
+    const randomIndex = Math.floor(Math.random() * TETROMINOES.length);
+    const initialNextTetromino = {
+      shape: [...TETROMINOES[randomIndex].shape.map(row => [...row])], // Deep copied shape
+      color: TETROMINOES[randomIndex].color,
+      position: { x: 0, y: 0 },
+      rotation: 0
+    };
+    
+    console.log("Created initial tetromino:", initialTetromino);
+    console.log("Created initial next tetromino:", initialNextTetromino);
     
     // Reset drop time
     dropTimeRef.current = 1000;
@@ -527,10 +583,12 @@ export default function Tetris() {
       dropIntervalRef.current = null;
     }
     
-    // Change the game state to PLAYING
+    // Set the tetrominos and game state - must be done before setting up intervals
+    setCurrentTetromino(initialTetromino);
+    setNextTetromino(initialNextTetromino);
     setGameState(GameState.PLAYING);
     
-    // Start the render loop first
+    // Start the render loop first to show the initial state
     const renderLoop = () => {
       drawBoard();
       drawPreview();
@@ -539,15 +597,22 @@ export default function Tetris() {
     
     gameLoopRef.current = requestAnimationFrame(renderLoop);
     
-    // Add a slight delay before starting the drop interval to ensure state is updated
+    // Store the initial tetromino locally for the timeout to use
+    const activeTetromino = initialTetromino;
+    
+    // Add a delay before starting the drop interval to ensure state is updated
     setTimeout(() => {
-      // Set up auto-drop interval
       console.log("Setting up drop interval...");
+      
+      // Use the local variable instead of state which may not be updated yet
+      console.log("Initial tetromino for interval:", activeTetromino);
+      
+      // Set up auto-drop interval using direct function instead of dropTetromino
       dropIntervalRef.current = window.setInterval(() => {
-        console.log("Dropping tetromino...");
+        // This will use the latest state from closure, not the stale one
         dropTetromino();
       }, dropTimeRef.current);
-    }, 100);
+    }, 500); // Longer delay to ensure React state updates
     
   }, [drawBoard, drawPreview, dropTetromino]);
   
