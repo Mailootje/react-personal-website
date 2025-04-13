@@ -394,10 +394,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Sort photos by filename for consistent ordering
       photos.sort((a, b) => a.title.localeCompare(b.title));
       
-      // Limit to 50 photos maximum to avoid overwhelming the UI
-      const limitedPhotos = photos.slice(0, 50);
-      
-      res.json(limitedPhotos);
+      // Return all photos without limiting
+      res.json(photos);
     } catch (error) {
       console.error("Error fetching photos", error);
       res.status(500).json({ error: "Internal server error" });
