@@ -11,8 +11,6 @@ import PasswordGenerator from "@/pages/apps/PasswordGenerator";
 import LinkShortener from "@/pages/apps/LinkShortener";
 import QRCodeGenerator from "@/pages/apps/QRCodeGenerator";
 import EuroTruckSimulator2 from "@/pages/downloads/EuroTruckSimulator2";
-import AnimatedExperience from "@/pages/AnimatedExperience";
-import AnimationGuide from "@/pages/AnimationGuide";
 
 function Router() {
   return (
@@ -25,8 +23,6 @@ function Router() {
       <Route path="/apps/qr-code-generator" component={QRCodeGenerator}/>
       <Route path="/downloads" component={Downloads}/>
       <Route path="/downloads/euro-truck-simulator-2" component={EuroTruckSimulator2}/>
-      <Route path="/experience" component={AnimatedExperience}/>
-      <Route path="/animation-guide" component={AnimationGuide}/>
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>

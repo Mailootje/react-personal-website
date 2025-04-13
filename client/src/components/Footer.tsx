@@ -88,32 +88,13 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-gray-800 mt-12 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center mb-6">
-            <p className="text-gray-400 text-sm">
-              © {new Date().getFullYear()} Mailo Bedo. All rights reserved.
-            </p>
-            <p className="text-gray-400 text-sm mt-2 md:mt-0">
-              Designed & Built with <span className="text-red-500">❤</span>
-            </p>
-          </div>
-          
-          <div className="bg-gradient-to-r from-purple-900/40 to-cyan-900/40 rounded-lg p-4 mt-4">
-            <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-              <div>
-                <h3 className="text-lg font-bold bg-gradient-to-r from-purple-400 to-cyan-400 inline-block text-transparent bg-clip-text">Animated Experience</h3>
-                <p className="text-gray-400 text-sm">Check out our special animated scrolling experience</p>
-              </div>
-              <div className="flex gap-3">
-                <a href="/experience" className="text-white text-sm bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700 px-4 py-2 rounded-md transition-colors">
-                  Try it Now
-                </a>
-                <a href="/animation-guide" className="text-white text-sm bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-md transition-colors">
-                  Learn More
-                </a>
-              </div>
-            </div>
-          </div>
+        <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+          <p className="text-gray-400 text-sm">
+            © {new Date().getFullYear()} Mailo Bedo. All rights reserved.
+          </p>
+          <p className="text-gray-400 text-sm mt-2 md:mt-0">
+            Designed & Built with <span className="text-red-500">❤</span>
+          </p>
         </div>
       </Container>
     </footer>

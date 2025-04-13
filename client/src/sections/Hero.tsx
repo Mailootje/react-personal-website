@@ -62,17 +62,6 @@ export function Hero() {
                   View My Work
                 </a>
               </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="secondary"
-                className="bg-gradient-to-r from-purple-500 to-cyan-500 hover:from-purple-600 hover:to-cyan-600 text-white border-none font-medium group flex items-center gap-2"
-              >
-                <a href="/experience">
-                  <span>Try Animated Experience</span>
-                  <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
-                </a>
-              </Button>
             </div>
           </motion.div>
 
