@@ -2250,25 +2250,115 @@ console.log("Let's start coding!");`,
   // Load available workspaces from localStorage
   const loadWorkspaceList = () => {
     try {
-      const workspaceList = localStorage.getItem('codeEditor_workspaceList');
-      if (workspaceList) {
-        setSavedWorkspaces(JSON.parse(workspaceList));
-      } else {
-        // Initialize with default workspace if none exist
-        setSavedWorkspaces(['default']);
-        localStorage.setItem('codeEditor_workspaceList', JSON.stringify(['default']));
-      }
+      // First try to load workspace list from IndexedDB
+      openDB().then(db => {
+        const transaction = db.transaction(['meta'], 'readonly');
+        const request = transaction.objectStore('meta').get('workspaceList');
+        
+        request.onsuccess = (event) => {
+          const result = request.result;
+          if (result && result.value) {
+            console.log("Workspace list loaded from IndexedDB:", result.value);
+            setSavedWorkspaces(result.value);
+          } else {
+            console.log("No workspace list found in IndexedDB, checking localStorage");
+            // Fallback to localStorage
+            const workspaceList = localStorage.getItem('codeEditor_workspaceList');
+            if (workspaceList) {
+              const parsedList = JSON.parse(workspaceList);
+              console.log("Workspace list loaded from localStorage:", parsedList);
+              setSavedWorkspaces(parsedList);
+              
+              // Save to IndexedDB for future use
+              const updateTx = db.transaction(['meta'], 'readwrite');
+              updateTx.objectStore('meta').put({
+                key: 'workspaceList',
+                value: parsedList
+              });
+            } else {
+              // Initialize with default workspace if none exist
+              console.log("No workspace list found, initializing with default");
+              setSavedWorkspaces(['default']);
+              
+              // Save to IndexedDB
+              const updateTx = db.transaction(['meta'], 'readwrite');
+              updateTx.objectStore('meta').put({
+                key: 'workspaceList',
+                value: ['default']
+              });
+            }
+          }
+          
+          // Close the database connection
+          db.close();
+        };
+        
+        request.onerror = (event) => {
+          console.error("Error loading workspace list from IndexedDB:", event);
+          throw new Error("Failed to load workspace list from IndexedDB");
+        };
+      }).catch(error => {
+        console.error("IndexedDB error, falling back to localStorage:", error);
+        
+        // Fallback to localStorage
+        const workspaceList = localStorage.getItem('codeEditor_workspaceList');
+        if (workspaceList) {
+          setSavedWorkspaces(JSON.parse(workspaceList));
+        } else {
+          // Initialize with default workspace if none exist
+          setSavedWorkspaces(['default']);
+          localStorage.setItem('codeEditor_workspaceList', JSON.stringify(['default']));
+        }
+      });
     } catch (error) {
       console.error('Failed to load workspace list:', error);
+      
+      // Ensure we at least have a default workspace
+      setSavedWorkspaces(['default']);
     }
   };
 
   // Save to localStorage
+  // Function to open IndexedDB
+  const openDB = (): Promise<IDBDatabase> => {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open('CodeEditorDB', 1);
+      
+      request.onerror = (event) => {
+        console.error('IndexedDB error:', event);
+        reject('Error opening IndexedDB');
+      };
+      
+      request.onupgradeneeded = (event) => {
+        const db = (event.target as IDBOpenDBRequest).result;
+        
+        // Create object stores if they don't exist
+        if (!db.objectStoreNames.contains('fileSystem')) {
+          db.createObjectStore('fileSystem', { keyPath: 'workspaceName' });
+        }
+        
+        if (!db.objectStoreNames.contains('tabs')) {
+          db.createObjectStore('tabs', { keyPath: 'workspaceName' });
+        }
+        
+        if (!db.objectStoreNames.contains('options')) {
+          db.createObjectStore('options', { keyPath: 'workspaceName' });
+        }
+        
+        if (!db.objectStoreNames.contains('meta')) {
+          db.createObjectStore('meta', { keyPath: 'key' });
+        }
+      };
+      
+      request.onsuccess = (event) => {
+        const db = (event.target as IDBOpenDBRequest).result;
+        resolve(db);
+      };
+    });
+  };
+  
   const saveToLocalStorage = (name: string = workspaceName, showNotification: boolean = true) => {
-    console.log("saveToLocalStorage called with name:", name);
-    console.log("fileSystem:", fileSystem);
-    console.log("tabs:", tabs);
-    console.log("editorOptions:", editorOptions);
+    console.log("Saving to IndexedDB with name:", name);
     
     try {
       // Save current workspace state
@@ -2276,94 +2366,271 @@ console.log("Let's start coding!");`,
       const tabsString = JSON.stringify(tabs);
       const optionsString = JSON.stringify(editorOptions);
       
-      console.log("JSON.stringify fileSystem length:", fileSystemString.length);
-      console.log("JSON.stringify tabs length:", tabsString.length);
-      console.log("JSON.stringify options length:", optionsString.length);
-      
-      localStorage.setItem(`codeEditor_fileSystem_${name}`, fileSystemString);
-      localStorage.setItem(`codeEditor_tabs_${name}`, tabsString);
-      localStorage.setItem(`codeEditor_options_${name}`, optionsString);
-      
-      console.log("Items saved to localStorage successfully");
-      
-      // Update workspace list if this is a new workspace
-      if (!savedWorkspaces.includes(name)) {
-        console.log("Adding new workspace to workspace list:", name);
-        const updatedWorkspaces = [...savedWorkspaces, name];
-        setSavedWorkspaces(updatedWorkspaces);
-        localStorage.setItem('codeEditor_workspaceList', JSON.stringify(updatedWorkspaces));
-      }
-      
-      // Show notification if requested
-      if (showNotification) {
-        toast({
-          title: "Changes saved",
-          description: `All changes saved to "${name}" workspace`,
-          duration: 2000
+      // Connect to IndexedDB and save data
+      openDB().then(db => {
+        // Start a transaction
+        const transaction = db.transaction(['fileSystem', 'tabs', 'options', 'meta'], 'readwrite');
+        
+        // Save file system data
+        transaction.objectStore('fileSystem').put({
+          workspaceName: name,
+          data: fileSystem
         });
-      }
-      
-      // Set as current workspace
-      setWorkspaceName(name);
-      localStorage.setItem('codeEditor_currentWorkspace', name);
-      
-      // Verify data was saved correctly
-      const savedFileSystem = localStorage.getItem(`codeEditor_fileSystem_${name}`);
-      if (savedFileSystem) {
-        console.log("Verification: fileSystem saved successfully");
-      } else {
-        console.error("Verification failed: fileSystem not saved");
-      }
+        
+        // Save tabs data
+        transaction.objectStore('tabs').put({
+          workspaceName: name,
+          data: tabs
+        });
+        
+        // Save options data
+        transaction.objectStore('options').put({
+          workspaceName: name,
+          data: editorOptions
+        });
+        
+        // Set current workspace
+        transaction.objectStore('meta').put({
+          key: 'currentWorkspace',
+          value: name
+        });
+        
+        // Update workspace list if needed
+        if (!savedWorkspaces.includes(name)) {
+          console.log("Adding new workspace to list:", name);
+          const updatedWorkspaces = [...savedWorkspaces, name];
+          setSavedWorkspaces(updatedWorkspaces);
+          
+          transaction.objectStore('meta').put({
+            key: 'workspaceList',
+            value: updatedWorkspaces
+          });
+        }
+        
+        // Handle transaction completion
+        transaction.oncomplete = () => {
+          console.log("Successfully saved to IndexedDB");
+          
+          // Set as current workspace in state
+          setWorkspaceName(name);
+          
+          // Show notification if requested
+          if (showNotification) {
+            toast({
+              title: "Changes saved",
+              description: `All changes saved to "${name}" workspace`,
+              duration: 2000
+            });
+          }
+        };
+        
+        transaction.onerror = (event) => {
+          console.error("Transaction error:", event);
+          throw new Error("Failed to save data to IndexedDB");
+        };
+        
+        // Close DB when done
+        db.close();
+      }).catch(error => {
+        console.error("IndexedDB error:", error);
+        toast({
+          title: "Save Failed",
+          description: "Failed to save to IndexedDB. Please try again.",
+          variant: "destructive"
+        });
+      });
     } catch (error) {
-      console.error("Error saving to localStorage:", error);
+      console.error("Error preparing data for IndexedDB:", error);
       toast({
         title: "Save Failed",
-        description: "Failed to save to browser storage. It might be disabled or full.",
+        description: "Failed to prepare data for storage.",
         variant: "destructive"
       });
     }
   };
 
-  // Load from localStorage
+  // Load from IndexedDB
   const loadFromLocalStorage = (name: string = workspaceName) => {
     try {
-      const savedFileSystem = localStorage.getItem(`codeEditor_fileSystem_${name}`);
-      const savedTabs = localStorage.getItem(`codeEditor_tabs_${name}`);
-      const savedOptions = localStorage.getItem(`codeEditor_options_${name}`);
+      console.log("Loading from IndexedDB with name:", name);
       
-      if (savedFileSystem) {
-        setFileSystem(JSON.parse(savedFileSystem));
-      }
-      
-      if (savedTabs) {
-        const parsedTabs = JSON.parse(savedTabs);
-        setTabs(parsedTabs);
+      // Connect to IndexedDB
+      openDB().then(db => {
+        // Create transaction to read data
+        const transaction = db.transaction(['fileSystem', 'tabs', 'options', 'meta'], 'readonly');
         
-        // Set the content for the active tab
-        const activeTab = parsedTabs.find((tab: EditorTab) => tab.isActive);
-        if (activeTab) {
-          const fileSystem = JSON.parse(savedFileSystem || '{}');
-          const file = fileSystem.items[activeTab.fileId];
-          if (file) {
-            setCurrentContent(file.content || '');
-            setCurrentLanguage(file.language || 'plaintext');
+        // Get file system data
+        const fileSystemRequest = transaction.objectStore('fileSystem').get(name);
+        
+        fileSystemRequest.onsuccess = (event) => {
+          const result = fileSystemRequest.result;
+          if (result && result.data) {
+            console.log("File system loaded from IndexedDB");
+            setFileSystem(result.data);
+          } else {
+            console.log("No file system data found in IndexedDB for", name);
+            
+            // Fallback to localStorage if data not in IndexedDB yet
+            const savedFileSystem = localStorage.getItem(`codeEditor_fileSystem_${name}`);
+            if (savedFileSystem) {
+              console.log("Using file system data from localStorage instead");
+              setFileSystem(JSON.parse(savedFileSystem));
+            }
           }
+        };
+        
+        // Get tabs data
+        const tabsRequest = transaction.objectStore('tabs').get(name);
+        
+        tabsRequest.onsuccess = (event) => {
+          const result = tabsRequest.result;
+          if (result && result.data) {
+            console.log("Tabs loaded from IndexedDB");
+            const parsedTabs = result.data;
+            setTabs(parsedTabs);
+            
+            // Set the content for the active tab
+            const activeTab = parsedTabs.find((tab: EditorTab) => tab.isActive);
+            if (activeTab) {
+              // Wait for file system to be loaded first
+              fileSystemRequest.onsuccess = (event) => {
+                const fsResult = fileSystemRequest.result;
+                if (fsResult && fsResult.data) {
+                  const fileSystem = fsResult.data;
+                  const file = fileSystem.items[activeTab.fileId];
+                  if (file) {
+                    setCurrentContent(file.content || '');
+                    setCurrentLanguage(file.language || 'plaintext');
+                  }
+                }
+              };
+            }
+          } else {
+            console.log("No tabs data found in IndexedDB for", name);
+            
+            // Fallback to localStorage
+            const savedTabs = localStorage.getItem(`codeEditor_tabs_${name}`);
+            if (savedTabs) {
+              console.log("Using tabs data from localStorage instead");
+              const parsedTabs = JSON.parse(savedTabs);
+              setTabs(parsedTabs);
+              
+              // Set the content for the active tab
+              const activeTab = parsedTabs.find((tab: EditorTab) => tab.isActive);
+              if (activeTab) {
+                const savedFileSystem = localStorage.getItem(`codeEditor_fileSystem_${name}`);
+                if (savedFileSystem) {
+                  const fileSystem = JSON.parse(savedFileSystem);
+                  const file = fileSystem.items[activeTab.fileId];
+                  if (file) {
+                    setCurrentContent(file.content || '');
+                    setCurrentLanguage(file.language || 'plaintext');
+                  }
+                }
+              }
+            }
+          }
+        };
+        
+        // Get options data
+        const optionsRequest = transaction.objectStore('options').get(name);
+        
+        optionsRequest.onsuccess = (event) => {
+          const result = optionsRequest.result;
+          if (result && result.data) {
+            console.log("Options loaded from IndexedDB");
+            setEditorOptions(result.data);
+          } else {
+            console.log("No options data found in IndexedDB for", name);
+            
+            // Fallback to localStorage
+            const savedOptions = localStorage.getItem(`codeEditor_options_${name}`);
+            if (savedOptions) {
+              console.log("Using options data from localStorage instead");
+              setEditorOptions(JSON.parse(savedOptions));
+            }
+          }
+        };
+        
+        // Handle transaction completion
+        transaction.oncomplete = () => {
+          console.log("Transaction completed");
+          
+          // Update meta data for current workspace
+          const updateTransaction = db.transaction(['meta'], 'readwrite');
+          updateTransaction.objectStore('meta').put({
+            key: 'currentWorkspace',
+            value: name
+          });
+          
+          // Set as current workspace in state
+          setWorkspaceName(name);
+          
+          // Show toast notification
+          toast({
+            title: "Workspace Loaded",
+            description: `Workspace "${name}" has been loaded from browser storage`,
+            duration: 3000
+          });
+          
+          // Close the database connection
+          db.close();
+        };
+        
+        transaction.onerror = (event) => {
+          console.error("Transaction error:", event);
+          throw new Error("Failed to load data from IndexedDB");
+        };
+      }).catch(error => {
+        console.error("Error loading from IndexedDB:", error);
+        
+        // Try fallback to localStorage
+        try {
+          console.log("Attempting fallback to localStorage");
+          const savedFileSystem = localStorage.getItem(`codeEditor_fileSystem_${name}`);
+          const savedTabs = localStorage.getItem(`codeEditor_tabs_${name}`);
+          const savedOptions = localStorage.getItem(`codeEditor_options_${name}`);
+          
+          if (savedFileSystem) {
+            setFileSystem(JSON.parse(savedFileSystem));
+          }
+          
+          if (savedTabs) {
+            const parsedTabs = JSON.parse(savedTabs);
+            setTabs(parsedTabs);
+            
+            const activeTab = parsedTabs.find((tab: EditorTab) => tab.isActive);
+            if (activeTab && savedFileSystem) {
+              const fileSystem = JSON.parse(savedFileSystem);
+              const file = fileSystem.items[activeTab.fileId];
+              if (file) {
+                setCurrentContent(file.content || '');
+                setCurrentLanguage(file.language || 'plaintext');
+              }
+            }
+          }
+          
+          if (savedOptions) {
+            setEditorOptions(JSON.parse(savedOptions));
+          }
+          
+          setWorkspaceName(name);
+          toast({
+            title: "Workspace Loaded",
+            description: `Workspace "${name}" has been loaded from localStorage (fallback)`,
+            duration: 3000
+          });
+        } catch (fallbackError) {
+          console.error("Fallback to localStorage also failed:", fallbackError);
+          toast({
+            title: "Load Failed",
+            description: "Failed to load workspace from any storage",
+            variant: "destructive"
+          });
         }
-      }
-      
-      if (savedOptions) {
-        setEditorOptions(JSON.parse(savedOptions));
-      }
-      
-      // Set as current workspace
-      setWorkspaceName(name);
-      localStorage.setItem('codeEditor_currentWorkspace', name);
-      
-      toast({
-        title: "Workspace Loaded",
-        description: `Workspace "${name}" has been loaded from browser storage`
       });
     } catch (error) {
+      console.error("Error in loadFromLocalStorage:", error);
       toast({
         title: "Load Failed",
         description: "Failed to load from browser storage",
@@ -2418,28 +2685,95 @@ console.log("Let's start coding!");`,
       return;
     }
     
-    // Remove workspace data from localStorage
-    localStorage.removeItem(`codeEditor_fileSystem_${name}`);
-    localStorage.removeItem(`codeEditor_tabs_${name}`);
-    localStorage.removeItem(`codeEditor_options_${name}`);
-    
-    // Update workspace list
-    const updatedWorkspaces = savedWorkspaces.filter(ws => ws !== name);
-    setSavedWorkspaces(updatedWorkspaces);
-    localStorage.setItem('codeEditor_workspaceList', JSON.stringify(updatedWorkspaces));
-    
-    // If we're deleting the current workspace, switch to default
-    if (name === workspaceName) {
-      loadFromLocalStorage('default');
+    try {
+      // First delete from IndexedDB
+      openDB().then(db => {
+        // Create transaction to delete data
+        const transaction = db.transaction(['fileSystem', 'tabs', 'options'], 'readwrite');
+        
+        // Delete workspace data from all stores
+        transaction.objectStore('fileSystem').delete(name);
+        transaction.objectStore('tabs').delete(name);
+        transaction.objectStore('options').delete(name);
+        
+        // Handle transaction completion
+        transaction.oncomplete = () => {
+          console.log(`Workspace "${name}" deleted from IndexedDB`);
+          
+          // Also delete from localStorage as a cleanup (in case it's there)
+          localStorage.removeItem(`codeEditor_fileSystem_${name}`);
+          localStorage.removeItem(`codeEditor_tabs_${name}`);
+          localStorage.removeItem(`codeEditor_options_${name}`);
+          
+          // Update workspace list
+          const updatedWorkspaces = savedWorkspaces.filter(ws => ws !== name);
+          setSavedWorkspaces(updatedWorkspaces);
+          
+          // Update the workspace list in IndexedDB
+          const metaTransaction = db.transaction(['meta'], 'readwrite');
+          metaTransaction.objectStore('meta').put({
+            key: 'workspaceList',
+            value: updatedWorkspaces
+          });
+          
+          // Also update in localStorage for backward compatibility
+          localStorage.setItem('codeEditor_workspaceList', JSON.stringify(updatedWorkspaces));
+          
+          // If we're deleting the current workspace, switch to default
+          if (name === workspaceName) {
+            loadFromLocalStorage('default');
+          }
+          
+          toast({
+            title: "Workspace Deleted",
+            description: `Workspace "${name}" has been deleted`
+          });
+          
+          // Close the database connection
+          db.close();
+        };
+        
+        transaction.onerror = (event) => {
+          console.error("Transaction error:", event);
+          throw new Error("Failed to delete workspace from IndexedDB");
+        };
+      }).catch(error => {
+        console.error("IndexedDB error:", error);
+        
+        // Fallback to localStorage
+        console.log("Falling back to localStorage for deletion");
+        
+        // Remove workspace data from localStorage
+        localStorage.removeItem(`codeEditor_fileSystem_${name}`);
+        localStorage.removeItem(`codeEditor_tabs_${name}`);
+        localStorage.removeItem(`codeEditor_options_${name}`);
+        
+        // Update workspace list
+        const updatedWorkspaces = savedWorkspaces.filter(ws => ws !== name);
+        setSavedWorkspaces(updatedWorkspaces);
+        localStorage.setItem('codeEditor_workspaceList', JSON.stringify(updatedWorkspaces));
+        
+        // If we're deleting the current workspace, switch to default
+        if (name === workspaceName) {
+          loadFromLocalStorage('default');
+        }
+        
+        toast({
+          title: "Workspace Deleted",
+          description: `Workspace "${name}" has been deleted from localStorage`
+        });
+      });
+    } catch (error) {
+      console.error("Error in deleteWorkspace:", error);
+      toast({
+        title: "Delete Failed",
+        description: "Failed to delete workspace",
+        variant: "destructive"
+      });
     }
-    
-    toast({
-      title: "Workspace Deleted",
-      description: `Workspace "${name}" has been deleted`
-    });
   };
   
-  // Delete all localStorage data
+  // Delete all storage data (both IndexedDB and localStorage)
   const deleteAllLocalStorage = () => {
     if (deleteConfirmInput !== "Confirm") {
       toast({
@@ -2450,63 +2784,252 @@ console.log("Let's start coding!");`,
       return;
     }
     
-    // Get all keys from localStorage
-    const keys = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('codeEditor_')) {
-        keys.push(key);
-      }
-    }
-    
-    // Remove all code editor related localStorage items
-    keys.forEach(key => {
-      localStorage.removeItem(key);
-    });
-    
-    // Reset state
-    setSavedWorkspaces(['default']);
-    setWorkspaceName('default');
-    
-    // Reset editor to initial state
-    const welcomeId = generateId();
-    const initialFileSystem: FileSystemState = {
-      items: {
-        [welcomeId]: {
-          id: welcomeId,
-          name: 'welcome.js',
-          type: 'file',
-          content: `// Welcome to the Online Code Editor
+    try {
+      // First try to delete from IndexedDB
+      console.log("Deleting all IndexedDB data");
+      
+      // Function to delete the entire database
+      const deleteIndexedDB = () => {
+        return new Promise<void>((resolve, reject) => {
+          // First try the standard way to delete the DB
+          const deleteRequest = indexedDB.deleteDatabase('CodeEditorDB');
+          
+          deleteRequest.onsuccess = () => {
+            console.log("Successfully deleted IndexedDB database");
+            resolve();
+          };
+          
+          deleteRequest.onerror = (event) => {
+            console.error("Error deleting IndexedDB database:", event);
+            reject(new Error("Failed to delete IndexedDB database"));
+          };
+          
+          deleteRequest.onblocked = () => {
+            console.warn("IndexedDB deletion was blocked. This usually means there are still active connections.");
+            // Try to close all connections and retry
+            try {
+              openDB().then(db => {
+                db.close();
+                // Retry deletion after a short delay
+                setTimeout(() => {
+                  const retryRequest = indexedDB.deleteDatabase('CodeEditorDB');
+                  
+                  retryRequest.onsuccess = () => {
+                    console.log("Successfully deleted IndexedDB database on retry");
+                    resolve();
+                  };
+                  
+                  retryRequest.onerror = (event) => {
+                    console.error("Error deleting IndexedDB database on retry:", event);
+                    reject(new Error("Failed to delete IndexedDB database on retry"));
+                  };
+                }, 500);
+              }).catch(error => {
+                console.error("Error opening DB to close it:", error);
+                reject(error);
+              });
+            } catch (error) {
+              console.error("Error in onblocked handler:", error);
+              reject(error);
+            }
+          };
+        });
+      };
+      
+      // Execute IndexedDB deletion and continue with localStorage cleanup
+      deleteIndexedDB().then(() => {
+        // Now also clear localStorage as a backup
+        console.log("Clearing localStorage data");
+        
+        // Get all keys from localStorage
+        const keys = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('codeEditor_')) {
+            keys.push(key);
+          }
+        }
+        
+        // Remove all code editor related localStorage items
+        keys.forEach(key => {
+          localStorage.removeItem(key);
+        });
+        
+        // Reset state
+        setSavedWorkspaces(['default']);
+        setWorkspaceName('default');
+        
+        // Reset editor to initial state
+        const welcomeId = generateId();
+        const initialFileSystem: FileSystemState = {
+          items: {
+            [welcomeId]: {
+              id: welcomeId,
+              name: 'welcome.js',
+              type: 'file',
+              content: `// Welcome to the Online Code Editor
 // This editor runs completely in your browser
 // All previous workspaces have been cleared
-// Your local storage has been emptied of all editor data
+// All your data has been deleted from browser storage
 
 console.log("Starting fresh!");`,
-          language: 'javascript',
-          parent: null
+              language: 'javascript',
+              parent: null
+            }
+          },
+          rootItems: [welcomeId]
+        };
+        
+        setFileSystem(initialFileSystem);
+        setTabs([{
+          id: generateId(),
+          fileId: welcomeId,
+          isActive: true
+        }]);
+        setCurrentContent(initialFileSystem.items[welcomeId].content || '');
+        setCurrentLanguage('javascript');
+        
+        // Create a new IndexedDB database with the new default workspace
+        openDB().then(db => {
+          // Create transaction for the new default workspace
+          const transaction = db.transaction(['fileSystem', 'tabs', 'options', 'meta'], 'readwrite');
+          
+          // Save file system data
+          transaction.objectStore('fileSystem').put({
+            workspaceName: 'default',
+            data: initialFileSystem
+          });
+          
+          // Save tabs data
+          const defaultTabs = [{
+            id: generateId(),
+            fileId: welcomeId,
+            isActive: true
+          }];
+          
+          transaction.objectStore('tabs').put({
+            workspaceName: 'default',
+            data: defaultTabs
+          });
+          
+          // Save default options
+          transaction.objectStore('options').put({
+            workspaceName: 'default',
+            data: editorOptions
+          });
+          
+          // Save meta data
+          transaction.objectStore('meta').put({
+            key: 'workspaceList',
+            value: ['default']
+          });
+          
+          transaction.objectStore('meta').put({
+            key: 'currentWorkspace',
+            value: 'default'
+          });
+          
+          // Close the database when done
+          transaction.oncomplete = () => {
+            console.log("New default workspace created in IndexedDB");
+            db.close();
+          };
+          
+          transaction.onerror = (event) => {
+            console.error("Error creating default workspace in new IndexedDB:", event);
+          };
+        }).catch(error => {
+          console.error("Error recreating IndexedDB database:", error);
+        });
+        
+        // Close the confirmation dialog
+        setIsDeleteConfirmOpen(false);
+        setDeleteConfirmInput("");
+        
+        toast({
+          title: "All Data Deleted",
+          description: "All code editor data has been cleared from your browser storage",
+          duration: 5000
+        });
+      }).catch(error => {
+        console.error("Error during IndexedDB deletion:", error);
+        
+        // Fallback: Just clear localStorage if IndexedDB deletion fails
+        console.log("Falling back to clearing just localStorage");
+        
+        // Get all keys from localStorage
+        const keys = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('codeEditor_')) {
+            keys.push(key);
+          }
         }
-      },
-      rootItems: [welcomeId]
-    };
-    
-    setFileSystem(initialFileSystem);
-    setTabs([{
-      id: generateId(),
-      fileId: welcomeId,
-      isActive: true
-    }]);
-    setCurrentContent(initialFileSystem.items[welcomeId].content || '');
-    setCurrentLanguage('javascript');
-    
-    // Close the confirmation dialog
-    setIsDeleteConfirmOpen(false);
-    setDeleteConfirmInput("");
-    
-    toast({
-      title: "All Data Deleted",
-      description: "All code editor data has been cleared from your browser",
-      duration: 5000
-    });
+        
+        // Remove all code editor related localStorage items
+        keys.forEach(key => {
+          localStorage.removeItem(key);
+        });
+        
+        // Reset state
+        setSavedWorkspaces(['default']);
+        setWorkspaceName('default');
+        
+        // Reset editor to initial state
+        const welcomeId = generateId();
+        const initialFileSystem: FileSystemState = {
+          items: {
+            [welcomeId]: {
+              id: welcomeId,
+              name: 'welcome.js',
+              type: 'file',
+              content: `// Welcome to the Online Code Editor
+// This editor runs completely in your browser
+// All previous workspaces have been cleared
+// Your local storage has been emptied of editor data
+// Note: IndexedDB deletion failed, so some data may remain there
+
+console.log("Starting fresh!");`,
+              language: 'javascript',
+              parent: null
+            }
+          },
+          rootItems: [welcomeId]
+        };
+        
+        setFileSystem(initialFileSystem);
+        setTabs([{
+          id: generateId(),
+          fileId: welcomeId,
+          isActive: true
+        }]);
+        setCurrentContent(initialFileSystem.items[welcomeId].content || '');
+        setCurrentLanguage('javascript');
+        
+        // Close the confirmation dialog
+        setIsDeleteConfirmOpen(false);
+        setDeleteConfirmInput("");
+        
+        toast({
+          title: "Partial Data Deleted",
+          description: "LocalStorage data cleared, but IndexedDB deletion failed",
+          duration: 5000,
+          variant: "destructive"
+        });
+      });
+    } catch (error) {
+      console.error("Error in deleteAllLocalStorage:", error);
+      
+      toast({
+        title: "Delete Failed",
+        description: "An error occurred while deleting data",
+        variant: "destructive"
+      });
+      
+      // Close the confirmation dialog
+      setIsDeleteConfirmOpen(false);
+      setDeleteConfirmInput("");
+    }
   };
 
   // Auto-save effect
