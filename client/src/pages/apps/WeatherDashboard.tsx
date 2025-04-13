@@ -27,8 +27,10 @@ import {
   Search,
   Loader2,
   MapPin,
-  Clock as ClockIcon
+  Clock as ClockIcon,
+  ArrowLeft
 } from "lucide-react";
+import { Link } from "wouter";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -311,11 +313,21 @@ export default function WeatherDashboard() {
       
       <main className="flex-1">
         <Container>
+          <div className="mb-8">
+            <Link
+              to="/apps"
+              className="inline-flex items-center text-primary hover:text-primary/80 transition-colors cursor-pointer"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Apps
+            </Link>
+          </div>
+
           <SectionHeading
             subtitle="Check current conditions & forecast"
             title="Weather Dashboard"
             center
-            className="mt-8 mb-10"
+            className="mb-10"
           />
           
           <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
