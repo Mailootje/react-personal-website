@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "wouter";
+import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import SimplePeer from "simple-peer";
 import { io, Socket } from "socket.io-client";
@@ -50,7 +50,7 @@ interface Message {
 
 export default function VideoChat() {
   const { toast } = useToast();
-  const navigate = useNavigate();
+  const [, navigate] = useLocation();
   const [tab, setTab] = useState("join");
   const [userName, setUserName] = useState("");
   const [roomId, setRoomId] = useState("");

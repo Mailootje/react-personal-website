@@ -25,6 +25,8 @@ import JsonFormatter from "@/pages/apps/JsonFormatter";
 import ColorPicker from "@/pages/apps/ColorPicker";
 import HashGenerator from "@/pages/apps/HashGenerator";
 import RandomGenerator from "@/pages/apps/RandomGenerator";
+// Temporarily comment out until we fix the component
+// import VideoChat from "@/pages/apps/VideoChat";
 import Snake from "@/pages/games/Snake";
 import Tetris from "@/pages/games/Tetris";
 import PacmanNew from "@/pages/games/PacmanNew";
@@ -55,6 +57,8 @@ function Router() {
       <Route path="/apps/color-picker" component={ColorPicker}/>
       <Route path="/apps/hash-generator" component={HashGenerator}/>
       <Route path="/apps/random-generator" component={RandomGenerator}/>
+      {/* Temporarily comment out until we fix the component */}
+      {/* <Route path="/apps/video-chat" component={VideoChat}/> */}
       <Route path="/downloads" component={Downloads}/>
       <Route path="/downloads/euro-truck-simulator-2" component={EuroTruckSimulator2}/>
       <Route path="/downloads/american-truck-simulator" component={AmericanTruckSimulator}/>
