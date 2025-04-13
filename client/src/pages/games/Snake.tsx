@@ -147,24 +147,35 @@ export default function Snake() {
   
   // Generate food at random position
   const generateFood = () => {
-    let newFood: Cell;
+    // Safety check to prevent infinite loops if snake fills the grid
+    if (snake.current.length >= GRID_SIZE * GRID_SIZE) {
+      // Game is won - can't place more food
+      gameOver();
+      return;
+    }
+    
+    let attempts = 0;
+    let maxAttempts = 100; // Prevent infinite loops
+    let newFood: Cell = { x: 0, y: 0 };
     let foodOnSnake = true;
     
     // Generate food until it's not on the snake
-    while (foodOnSnake) {
+    while (foodOnSnake && attempts < maxAttempts) {
       newFood = {
         x: Math.floor(Math.random() * GRID_SIZE),
         y: Math.floor(Math.random() * GRID_SIZE),
       };
       
+      // Check if the new food position is on any snake segment
       foodOnSnake = snake.current.some(
         segment => segment.x === newFood.x && segment.y === newFood.y
       );
       
-      if (!foodOnSnake) {
-        food.current = newFood;
-      }
+      attempts++;
     }
+    
+    // Assign the new food position
+    food.current = newFood;
   };
   
   // Game over
@@ -206,9 +217,11 @@ export default function Snake() {
       return;
     }
     
-    // Check if snake hit itself
+    // Check if snake hit itself (skip checking the tail since it will be removed)
+    // Only check segments from index 0 to length-2 to avoid self-collision when the snake is moving
+    const snakeWithoutTail = snake.current.slice(0, -1);
     if (
-      snake.current.some(segment => segment.x === head.x && segment.y === head.y)
+      snakeWithoutTail.some(segment => segment.x === head.x && segment.y === head.y)
     ) {
       gameOver();
       return;
@@ -287,27 +300,34 @@ export default function Snake() {
     setScore(0);
     setLevel(1);
     
-    // Generate food
+    // Generate food (must be called after snake is initialized)
     generateFood();
+    
+    // Draw initial state (before setting game state)
+    drawGame();
     
     // Reset time tracker
     lastFrameTimeRef.current = 0;
     
-    // Set game state
-    setGameState(GameState.PLAYING);
-    
-    // Initial draw
-    drawGame();
-    
-    // Start game loop after a small delay to ensure state is updated
+    // Set game state after initialization
     setTimeout(() => {
-      requestAnimationFrame(gameLoop);
+      setGameState(GameState.PLAYING);
+      
+      // Start game loop with a slightly longer delay to ensure all state updates are complete
+      setTimeout(() => {
+        requestAnimationFrame(gameLoop);
+      }, 100);
     }, 50);
   }, [drawGame, gameLoop]);
   
   // Handle keyboard input
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
     if (gameStateRef.current !== GameState.PLAYING) return;
+    
+    // Prevent default scrolling behavior for arrow keys
+    if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(event.key)) {
+      event.preventDefault();
+    }
     
     const currentDir = direction.current;
     
