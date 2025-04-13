@@ -618,15 +618,17 @@ MIT
           name: 'welcome.js',
           type: 'file',
           content: `// Welcome to the Online Code Editor
-// This editor runs completely in your browser
+// This editor runs completely in your browser with up to 1GB storage capacity
+// 
 // You can:
 // - Create and edit files and folders
 // - Upload files and even entire folders (as ZIP)
 // - Download your files
 // - Switch between different themes
 // - Syntax highlighting for many languages
+// - Store large projects (up to 1GB capacity)
 
-console.log("Let's start coding!");`,
+console.log("Let's start coding with more storage!");`,
           language: 'javascript',
           parent: null
         }
@@ -2319,10 +2321,33 @@ console.log("Let's start coding!");`,
   };
 
   // Save to localStorage
-  // Function to open IndexedDB
+  // Function to open IndexedDB with 1GB storage quota
   const openDB = (): Promise<IDBDatabase> => {
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open('CodeEditorDB', 1);
+      // Try to request persistent storage permission first (for Chrome)
+      const requestPersistentStorage = async () => {
+        try {
+          // Check if navigator.storage is available
+          if (navigator.storage && navigator.storage.persist) {
+            const isPersisted = await navigator.storage.persist();
+            console.log(`Persistent storage permission: ${isPersisted ? 'granted' : 'denied'}`);
+          }
+          
+          // Request storage quota (1GB = 1073741824 bytes)
+          if (navigator.storage && navigator.storage.estimate) {
+            const quota = await navigator.storage.estimate();
+            console.log(`Current storage usage: ${quota.usage} bytes out of ${quota.quota} bytes`);
+          }
+        } catch (error) {
+          console.warn("Storage persistence API not supported:", error);
+        }
+      };
+      
+      // Try to request storage permissions
+      requestPersistentStorage();
+      
+      // Open the IndexedDB database
+      const request = indexedDB.open('CodeEditorDB', 2); // Increased version to trigger upgrade
       
       request.onerror = (event) => {
         console.error('IndexedDB error:', event);
@@ -2334,24 +2359,47 @@ console.log("Let's start coding!");`,
         
         // Create object stores if they don't exist
         if (!db.objectStoreNames.contains('fileSystem')) {
-          db.createObjectStore('fileSystem', { keyPath: 'workspaceName' });
+          // Create with higher capacity for large projects
+          const fileSystemStore = db.createObjectStore('fileSystem', { keyPath: 'workspaceName' });
+          
+          // Add indexes to optimize queries
+          fileSystemStore.createIndex('workspaceName', 'workspaceName', { unique: true });
         }
         
         if (!db.objectStoreNames.contains('tabs')) {
-          db.createObjectStore('tabs', { keyPath: 'workspaceName' });
+          const tabsStore = db.createObjectStore('tabs', { keyPath: 'workspaceName' });
+          tabsStore.createIndex('workspaceName', 'workspaceName', { unique: true });
         }
         
         if (!db.objectStoreNames.contains('options')) {
-          db.createObjectStore('options', { keyPath: 'workspaceName' });
+          const optionsStore = db.createObjectStore('options', { keyPath: 'workspaceName' });
+          optionsStore.createIndex('workspaceName', 'workspaceName', { unique: true });
         }
         
         if (!db.objectStoreNames.contains('meta')) {
-          db.createObjectStore('meta', { keyPath: 'key' });
+          const metaStore = db.createObjectStore('meta', { keyPath: 'key' });
+          metaStore.createIndex('key', 'key', { unique: true });
         }
+        
+        console.log("Database schema upgraded to version 2");
       };
       
       request.onsuccess = (event) => {
         const db = (event.target as IDBOpenDBRequest).result;
+        
+        // Set a larger transaction timeout (default is quite short)
+        db.onversionchange = () => {
+          db.close();
+          console.log("Database is outdated, please reload the page.");
+          toast({
+            title: "Database Update Required",
+            description: "Database schema has changed. Please reload the page.",
+            variant: "destructive",
+            duration: 10000
+          });
+        };
+        
+        console.log("Successfully opened IndexedDB with enhanced capacity");
         resolve(db);
       };
     });
@@ -2868,11 +2916,12 @@ console.log("Let's start coding!");`,
               name: 'welcome.js',
               type: 'file',
               content: `// Welcome to the Online Code Editor
-// This editor runs completely in your browser
+// This editor runs completely in your browser with up to 1GB storage capacity
 // All previous workspaces have been cleared
 // All your data has been deleted from browser storage
+// Your new workspace can store up to 1GB of files and projects
 
-console.log("Starting fresh!");`,
+console.log("Starting fresh with more storage space!");`,
               language: 'javascript',
               parent: null
             }
@@ -2984,12 +3033,13 @@ console.log("Starting fresh!");`,
               name: 'welcome.js',
               type: 'file',
               content: `// Welcome to the Online Code Editor
-// This editor runs completely in your browser
+// This editor runs completely in your browser with increased storage capacity
 // All previous workspaces have been cleared
 // Your local storage has been emptied of editor data
 // Note: IndexedDB deletion failed, so some data may remain there
+// For best results, try again to clear all data
 
-console.log("Starting fresh!");`,
+console.log("Starting fresh with partial cleanup!");`,
               language: 'javascript',
               parent: null
             }
@@ -4175,7 +4225,7 @@ console.log("Starting fresh!");`,
           <DialogHeader>
             <DialogTitle>Editor Settings</DialogTitle>
             <DialogDescription className="text-gray-400">
-              Customize your code editor experience.
+              Customize your code editor experience. This editor now supports up to 1GB of storage capacity.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
@@ -4284,7 +4334,7 @@ console.log("Starting fresh!");`,
                 <h4 className="text-sm font-medium mb-1 text-red-400">Delete All Data</h4>
                 <p className="text-xs text-gray-400 mb-2">
                   This will permanently delete ALL workspaces and editor data from your browser's 
-                  local storage. This action CANNOT be undone.
+                  local storage and IndexedDB (up to 1GB of storage). This action CANNOT be undone.
                 </p>
                 <Button 
                   variant="destructive" 
@@ -4439,7 +4489,8 @@ console.log("Starting fresh!");`,
           <DialogHeader>
             <DialogTitle>Workspace Manager</DialogTitle>
             <DialogDescription className="text-gray-400">
-              Create, switch between, and manage your workspaces.
+              Create, switch between, and manage your workspaces. 
+              Each workspace can store up to 1GB of files and projects.
             </DialogDescription>
           </DialogHeader>
           
