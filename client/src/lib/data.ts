@@ -161,11 +161,11 @@ export const educations: Education[] = [
       "Focused on software development and web technologies. Participated in various coding competitions and hackathons. Completed coursework in algorithms, data structures, and web development.",
   },
   {
-    degree: "Web Development Bootcamp",
-    institution: "Coding Academy",
-    period: "2016",
+    degree: "IT Support",
+    institution: "ROC A12",
+    period: "2018 - 2019",
     description:
-      "Intensive program covering front-end and back-end technologies. Developed multiple projects using modern frameworks and best practices in web development.",
+      "Specialized training in system administration, network troubleshooting, and technical support. Gained practical experience in hardware diagnostics, software installation, and customer service. Developed skills in resolving complex IT issues and maintaining system security.",
   },
 ];
 
