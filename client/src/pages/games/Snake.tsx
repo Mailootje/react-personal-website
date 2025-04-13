@@ -148,34 +148,41 @@ export default function Snake() {
   // Generate food at random position
   const generateFood = () => {
     // Safety check to prevent infinite loops if snake fills the grid
-    if (snake.current.length >= GRID_SIZE * GRID_SIZE) {
+    if (snake.current.length >= GRID_SIZE * GRID_SIZE - 1) {
       // Game is won - can't place more food
       gameOver();
       return;
     }
     
-    let attempts = 0;
-    let maxAttempts = 100; // Prevent infinite loops
-    let newFood: Cell = { x: 0, y: 0 };
-    let foodOnSnake = true;
+    // Create a grid to track available cells
+    const grid = Array(GRID_SIZE).fill(0).map(() => Array(GRID_SIZE).fill(true));
     
-    // Generate food until it's not on the snake
-    while (foodOnSnake && attempts < maxAttempts) {
-      newFood = {
-        x: Math.floor(Math.random() * GRID_SIZE),
-        y: Math.floor(Math.random() * GRID_SIZE),
-      };
-      
-      // Check if the new food position is on any snake segment
-      foodOnSnake = snake.current.some(
-        segment => segment.x === newFood.x && segment.y === newFood.y
-      );
-      
-      attempts++;
+    // Mark cells occupied by the snake
+    for (const segment of snake.current) {
+      if (segment.x >= 0 && segment.x < GRID_SIZE && segment.y >= 0 && segment.y < GRID_SIZE) {
+        grid[segment.y][segment.x] = false;
+      }
     }
     
-    // Assign the new food position
-    food.current = newFood;
+    // Collect all available cells
+    const availableCells: Cell[] = [];
+    for (let y = 0; y < GRID_SIZE; y++) {
+      for (let x = 0; x < GRID_SIZE; x++) {
+        if (grid[y][x]) {
+          availableCells.push({ x, y });
+        }
+      }
+    }
+    
+    // If there are no available cells, end the game
+    if (availableCells.length === 0) {
+      gameOver();
+      return;
+    }
+    
+    // Select a random available cell for food
+    const randomIndex = Math.floor(Math.random() * availableCells.length);
+    food.current = availableCells[randomIndex];
   };
   
   // Game over
@@ -190,6 +197,7 @@ export default function Snake() {
     
     // Calculate new head position
     const head = { ...snake.current[0] };
+    const oldHead = { ...head }; // Store original head for collision detection
     
     switch (direction.current) {
       case Direction.UP:
@@ -217,12 +225,19 @@ export default function Snake() {
       return;
     }
     
-    // Check if snake hit itself (skip checking the tail since it will be removed)
-    // Only check segments from index 0 to length-2 to avoid self-collision when the snake is moving
-    const snakeWithoutTail = snake.current.slice(0, -1);
-    if (
-      snakeWithoutTail.some(segment => segment.x === head.x && segment.y === head.y)
-    ) {
+    // Check for self-collision
+    // Check all segments except the tail (since it will be removed unless food is eaten)
+    let selfCollision = false;
+    // Skip index 0 (current head)
+    for (let i = 1; i < snake.current.length - 1; i++) {
+      const segment = snake.current[i];
+      if (head.x === segment.x && head.y === segment.y) {
+        selfCollision = true;
+        break;
+      }
+    }
+    
+    if (selfCollision) {
       gameOver();
       return;
     }
@@ -280,44 +295,56 @@ export default function Snake() {
   
   // Initialize game
   const initGame = useCallback(() => {
-    // Reset snake
+    // Complete reset of the game state
     snake.current = [];
+    
+    // Position the snake in the middle of the grid, moving to the right
+    const centerX = Math.floor(GRID_SIZE / 2);
+    const centerY = Math.floor(GRID_SIZE / 2);
+    
+    // Create the initial snake segments
     for (let i = 0; i < INITIAL_SNAKE_LENGTH; i++) {
-      snake.current.unshift({
-        x: Math.floor(GRID_SIZE / 2) - i,
-        y: Math.floor(GRID_SIZE / 2),
+      snake.current.push({
+        x: centerX - i,
+        y: centerY,
       });
     }
     
-    // Reset direction
+    // Reset direction (starting with RIGHT)
     direction.current = Direction.RIGHT;
     nextDirection.current = Direction.RIGHT;
     
-    // Reset speed
+    // Reset game speed
     speed.current = INITIAL_SPEED;
     
-    // Reset score
+    // Reset score and level
     setScore(0);
+    scoreRef.current = 0;
     setLevel(1);
+    levelRef.current = 1;
     
-    // Generate food (must be called after snake is initialized)
+    // Generate food away from the snake
+    food.current = { x: 0, y: 0 }; // Temporary value
     generateFood();
     
-    // Draw initial state (before setting game state)
+    // Draw initial state
     drawGame();
     
     // Reset time tracker
     lastFrameTimeRef.current = 0;
     
-    // Set game state after initialization
+    // Clear any existing game loops before starting a new one
+    // Transition to PLAYING state with proper delays to ensure initialization is complete
     setTimeout(() => {
       setGameState(GameState.PLAYING);
       
-      // Start game loop with a slightly longer delay to ensure all state updates are complete
+      // Start game loop with a delay to ensure state is properly updated
       setTimeout(() => {
+        // Make absolutely sure we have clean state
+        gameStateRef.current = GameState.PLAYING;
         requestAnimationFrame(gameLoop);
-      }, 100);
-    }, 50);
+      }, 200);
+    }, 100);
   }, [drawGame, gameLoop]);
   
   // Handle keyboard input
