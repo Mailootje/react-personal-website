@@ -302,15 +302,7 @@ export default function SchoolPitch() {
                 <motion.li key={idx} variants={itemVariants} className="flex items-start">
                   <div className="text-primary text-2xl mr-4">•</div>
                   <div>
-                    {'title' in item ? (
-                      <>
-                        <span className="font-bold text-white">{item.title}</span>
-                        <span className="mx-2 text-gray-500">—</span>
-                        <span className="text-gray-300">{item.desc}</span>
-                      </>
-                    ) : (
-                      <span className="text-gray-300">{item}</span>
-                    )}
+                    <span className="text-gray-300">{item}</span>
                   </div>
                 </motion.li>
               ))}
