@@ -5,7 +5,7 @@ import { Hero } from "@/sections/Hero";
 import { About } from "@/sections/About";
 import { Skills } from "@/sections/Skills";
 import { Projects } from "@/sections/Projects";
-import { Resume } from "@/sections/Resume";
+import { Blog } from "@/sections/Blog";
 import { Contact } from "@/sections/Contact";
 
 export default function Home() {
@@ -34,6 +34,19 @@ export default function Home() {
     sections.forEach((section) => {
       observer.observe(section);
     });
+
+    // Implement text animation for js-animate-element classes
+    const animateElements = document.querySelectorAll('.js-animate-element');
+    animateElements.forEach((el, index) => {
+      const element = el as HTMLElement;
+      element.style.opacity = '0';
+      element.style.transform = 'translateY(20px)';
+      setTimeout(() => {
+        element.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        element.style.opacity = '1';
+        element.style.transform = 'translateY(0)';
+      }, 100 * index);
+    });
     
     return () => {
       // Clean up
@@ -45,14 +58,13 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="font-sans bg-background text-foreground">
+    <div className="font-sans bg-background text-foreground scrollbar" data-spy="scroll" data-target=".navbar" data-offset="40" id="home">
       <Header />
       <main>
         <Hero />
         <About />
-        <Skills />
         <Projects />
-        <Resume />
+        <Blog />
         <Contact />
       </main>
       <Footer />
