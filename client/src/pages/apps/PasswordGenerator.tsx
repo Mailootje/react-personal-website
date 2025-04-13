@@ -100,12 +100,13 @@ export default function PasswordGenerator() {
         <section className="py-20 px-6">
           <Container maxWidth="lg">
             <div className="mb-8">
-              <Link href="/apps">
-                <a className="inline-flex items-center text-primary hover:text-primary/80 transition-colors">
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back to Apps
-                </a>
-              </Link>
+              <div 
+                onClick={() => window.location.href = "/apps"}
+                className="inline-flex items-center text-primary hover:text-primary/80 transition-colors cursor-pointer"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Apps
+              </div>
             </div>
             
             <motion.div

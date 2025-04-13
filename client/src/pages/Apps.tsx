@@ -60,38 +60,34 @@ export default function Apps() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                 >
-                  <Link href={`/apps/${app.id}`}>
-                    <a>
-                      <Card className="h-full cursor-pointer hover:shadow-lg transition-shadow">
-                        <CardHeader>
-                          <div className="flex items-center justify-between">
-                            <div className="text-4xl mb-4">{app.icon}</div>
-                            <div className="flex gap-2">
-                              {app.tags.map((tag) => (
-                                <span 
-                                  key={tag} 
-                                  className="inline-flex items-center text-xs font-medium px-2 py-1 rounded-full bg-primary/10 text-primary"
-                                >
-                                  <Tag className="h-3 w-3 mr-1" />
-                                  {tag}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                          <CardTitle>{app.title}</CardTitle>
-                          <CardDescription>{app.description}</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                          {/* Placeholder for app preview */}
-                        </CardContent>
-                        <CardFooter>
-                          <Button className="w-full">
-                            Launch App
-                          </Button>
-                        </CardFooter>
-                      </Card>
-                    </a>
-                  </Link>
+                  <Card className="h-full cursor-pointer hover:shadow-lg transition-shadow" onClick={() => window.location.href = `/apps/${app.id}`}>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div className="text-4xl mb-4">{app.icon}</div>
+                      <div className="flex gap-2">
+                        {app.tags.map((tag) => (
+                          <span 
+                            key={tag} 
+                            className="inline-flex items-center text-xs font-medium px-2 py-1 rounded-full bg-primary/10 text-primary"
+                          >
+                            <Tag className="h-3 w-3 mr-1" />
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    <CardTitle>{app.title}</CardTitle>
+                    <CardDescription>{app.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {/* Placeholder for app preview */}
+                  </CardContent>
+                  <CardFooter>
+                    <Button className="w-full">
+                      Launch App
+                    </Button>
+                  </CardFooter>
+                </Card>
                 </motion.div>
               ))}
             </motion.div>
