@@ -36,18 +36,32 @@ import { VideoBackground } from "@/components/VideoBackground";
 import { Header } from "@/components/Header";
 import { Container } from "@/components/ui/container";
 
-// Image conversion formats supported
+// Image conversion formats supported with categories
 const FORMAT_OPTIONS = [
-  { value: 'jpeg', label: 'JPEG' },
-  { value: 'png', label: 'PNG' },
-  { value: 'webp', label: 'WebP' },
-  { value: 'gif', label: 'GIF' },
-  { value: 'bmp', label: 'BMP' },
-  { value: 'tiff', label: 'TIFF' },
-  { value: 'avif', label: 'AVIF' },
-  { value: 'ico', label: 'ICO (Icon)' },
-  { value: 'svg+xml', label: 'SVG' },
-  { value: 'heic', label: 'HEIC' }
+  // Raster Image Formats
+  { value: 'jpeg', label: 'JPEG / JPG (.jpeg / .jpg)', category: 'Raster' },
+  { value: 'png', label: 'PNG (.png)', category: 'Raster' },
+  { value: 'gif', label: 'GIF (.gif)', category: 'Raster' },
+  { value: 'bmp', label: 'BMP (.bmp)', category: 'Raster' },
+  { value: 'tiff', label: 'TIFF / TIF (.tiff / .tif)', category: 'Raster' },
+  { value: 'webp', label: 'WEBP (.webp)', category: 'Raster' },
+  { value: 'heic', label: 'HEIF / HEIC (.heif / .heic)', category: 'Raster' },
+  { value: 'avif', label: 'AVIF (.avif)', category: 'Raster' },
+  
+  // Vector Image Formats
+  { value: 'svg+xml', label: 'SVG (.svg)', category: 'Vector' },
+  { value: 'pdf', label: 'PDF (.pdf)', category: 'Vector', convertibility: 'limited' },
+  { value: 'eps', label: 'EPS (.eps)', category: 'Vector', convertibility: 'limited' },
+  
+  // Camera & RAW Formats
+  { value: 'raw', label: 'RAW (.raw)', category: 'Camera', convertibility: 'limited' },
+  { value: 'dng', label: 'DNG (.dng)', category: 'Camera', convertibility: 'limited' },
+  
+  // Other / Niche Formats
+  { value: 'ico', label: 'ICO (.ico)', category: 'Other' },
+  { value: 'tga', label: 'TGA (.tga)', category: 'Other', convertibility: 'limited' },
+  { value: 'exr', label: 'EXR (.exr)', category: 'Other', convertibility: 'limited' },
+  { value: 'svgz', label: 'SVGZ (.svgz)', category: 'Other', convertibility: 'limited' }
 ];
 
 // Image processing options
@@ -823,10 +837,39 @@ export default function ImageConverter() {
                       <SelectTrigger className="bg-gray-800 border-gray-700">
                         <SelectValue placeholder="Select format" />
                       </SelectTrigger>
-                      <SelectContent className="bg-gray-800 border-gray-700">
-                        {FORMAT_OPTIONS.map(format => (
+                      <SelectContent className="bg-gray-800 border-gray-700 max-h-[400px]">
+                        {/* Group by category */}
+                        <div className="p-2 text-xs font-bold text-blue-400">Raster Image Formats</div>
+                        {FORMAT_OPTIONS.filter(f => f.category === 'Raster').map(format => (
                           <SelectItem key={format.value} value={format.value}>
                             {format.label}
+                          </SelectItem>
+                        ))}
+                        
+                        <Separator className="my-2" />
+                        <div className="p-2 text-xs font-bold text-green-400">Vector Image Formats</div>
+                        {FORMAT_OPTIONS.filter(f => f.category === 'Vector').map(format => (
+                          <SelectItem key={format.value} value={format.value}>
+                            {format.label} {format.convertibility === 'limited' && 
+                              <span className="text-yellow-500 ml-1">⚠</span>}
+                          </SelectItem>
+                        ))}
+                        
+                        <Separator className="my-2" />
+                        <div className="p-2 text-xs font-bold text-purple-400">Camera & RAW Formats</div>
+                        {FORMAT_OPTIONS.filter(f => f.category === 'Camera').map(format => (
+                          <SelectItem key={format.value} value={format.value}>
+                            {format.label} {format.convertibility === 'limited' && 
+                              <span className="text-yellow-500 ml-1">⚠</span>}
+                          </SelectItem>
+                        ))}
+                        
+                        <Separator className="my-2" />
+                        <div className="p-2 text-xs font-bold text-orange-400">Other / Niche Formats</div>
+                        {FORMAT_OPTIONS.filter(f => f.category === 'Other').map(format => (
+                          <SelectItem key={format.value} value={format.value}>
+                            {format.label} {format.convertibility === 'limited' && 
+                              <span className="text-yellow-500 ml-1">⚠</span>}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -849,6 +892,12 @@ export default function ImageConverter() {
                     />
                     <p className="text-xs text-gray-400">
                       Higher quality means larger file size. For JPEG, WebP, and similar formats.
+                    </p>
+                    
+                    {/* Format compatibility note */}
+                    <p className="text-xs text-gray-400 mt-2 flex items-center">
+                      <span className="text-yellow-500 mr-1">⚠</span> 
+                      <span>Warning icon indicates formats with limited browser support or conversion capabilities.</span>
                     </p>
                   </div>
                   
@@ -1013,7 +1062,10 @@ export default function ImageConverter() {
                     >
                       <FaUpload className="mx-auto text-4xl mb-4 text-gray-500" />
                       <p className="text-lg font-medium">Drop images here or click to browse</p>
-                      <p className="text-sm text-gray-400 mt-2">Supported formats: JPG, PNG, WebP, GIF, BMP, TIFF, AVIF, ICO, SVG, HEIC</p>
+                      <p className="text-sm text-gray-400 mt-2">
+                        Supported input formats: Common raster (JPG, PNG, WebP, GIF, BMP), vector (SVG), 
+                        camera (RAW, DNG), and special formats (HEIC, AVIF, TIFF)
+                      </p>
                       <Button className="mt-4 bg-blue-600 hover:bg-blue-700">
                         Select Images
                       </Button>
