@@ -150,18 +150,46 @@ const slides = [
       "TypeScript",
       "PHP",
       "C#",
+      "C",
       "SQL",
       "Python",
       "Java",
+      "Kotlin",
     ],
-    tools: [
+    frontendTools: [
+      "HTML5",
+      "CSS3",
+      "Bootstrap",
+      "jQuery",
       "React",
+      "Next.js",
+    ],
+    backendTools: [
       "Node.js",
-      "Laravel",
-      "ASP.NET",
+      "Apache",
+      ".Net",
+    ],
+    databaseTools: [
+      "MySQL",
+      "MariaDB",
+      "Microsoft SQL Server",
+      "SQLite",
+    ],
+    devTools: [
+      "Unity",
+      "Android",
+      "Raspberry Pi",
+      "Arduino",
+      "Postman",
       "Git",
       "VS Code",
       "Docker",
+    ],
+    designTools: [
+      "Adobe Illustrator",
+      "Adobe After Effects",
+      "Adobe Photoshop",
+      "Adobe XD",
     ],
   },
   {
@@ -608,149 +636,398 @@ export default function SchoolPitch() {
 
       case "skills":
         return (
-          <div className="h-full w-full flex flex-col justify-center py-12 px-4">
-            <div className="flex items-center mb-8 mx-auto">
-              {slide.icon && (
-                <slide.icon className="text-primary text-4xl mr-4" />
-              )}
-              <h2 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-primary to-white bg-clip-text text-transparent">
-                {slide.title}
-              </h2>
-            </div>
-
-            <div className="space-y-8 max-w-5xl mx-auto w-full">
-              <div>
-                <h3 className="text-xl font-semibold mb-5 text-white px-1 flex items-center">
-                  <div className="h-8 w-1 bg-primary/80 rounded-full mr-3"></div>
-                  Programmeertalen
-                </h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {slide.langs?.map((lang, i) => {
-                    // Assign a specific color based on the programming language
-                    let gradientColors = "";
-                    let icon = null;
-                    
-                    switch(lang) {
-                      case "HTML/CSS": 
-                        gradientColors = "from-orange-600/20 to-blue-600/20 border-orange-500/40"; 
-                        icon = <div className="text-orange-500/80 mb-3 text-3xl">&#60;/&#62;</div>;
-                        break;
-                      case "JavaScript": 
-                        gradientColors = "from-yellow-500/20 to-yellow-700/20 border-yellow-500/40"; 
-                        icon = <div className="text-yellow-500/80 mb-3 text-2xl">JS</div>;
-                        break;
-                      case "TypeScript": 
-                        gradientColors = "from-blue-500/20 to-blue-700/20 border-blue-500/40"; 
-                        icon = <div className="text-blue-500/80 mb-3 text-2xl">TS</div>;
-                        break;
-                      case "PHP": 
-                        gradientColors = "from-indigo-500/20 to-indigo-700/20 border-indigo-500/40"; 
-                        icon = <div className="text-indigo-500/80 mb-3 text-2xl">PHP</div>;
-                        break;
-                      case "C#": 
-                        gradientColors = "from-green-500/20 to-green-700/20 border-green-500/40"; 
-                        icon = <div className="text-green-500/80 mb-3 text-2xl">C#</div>;
-                        break;
-                      case "SQL": 
-                        gradientColors = "from-cyan-500/20 to-cyan-700/20 border-cyan-500/40"; 
-                        icon = <div className="text-cyan-500/80 mb-3 text-2xl">SQL</div>;
-                        break;
-                      case "Python": 
-                        gradientColors = "from-blue-400/20 to-yellow-400/20 border-blue-500/40"; 
-                        icon = <div className="text-blue-400/80 mb-3 text-2xl">Py</div>;
-                        break;
-                      case "Java": 
-                        gradientColors = "from-red-500/20 to-red-700/20 border-red-500/40"; 
-                        icon = <div className="text-red-500/80 mb-3 text-2xl">Java</div>;
-                        break;
-                      default: 
-                        gradientColors = "from-gray-700/40 to-gray-900/40 border-gray-700"; 
-                        break;
-                    }
-                    
-                    return (
-                      <motion.div
-                        key={lang}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.4, delay: 0.1 * i }}
-                        className={`flex flex-col items-center justify-center py-6 px-2 bg-gradient-to-b ${gradientColors} rounded-lg border backdrop-blur-md shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-1`}
-                        whileHover={{ scale: 1.03 }}
-                      >
-                        {icon}
-                        <div className="text-xl font-semibold text-white">
-                          {lang}
-                        </div>
-                      </motion.div>
-                    );
-                  })}
-                </div>
+          <div className="h-full w-full overflow-y-auto">
+            <div className="flex flex-col justify-start py-8 px-4">
+              <div className="flex items-center mb-6 mx-auto">
+                {slide.icon && (
+                  <slide.icon className="text-primary text-4xl mr-4" />
+                )}
+                <h2 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-primary to-white bg-clip-text text-transparent">
+                  {slide.title}
+                </h2>
               </div>
 
-              <div>
-                <h3 className="text-xl font-semibold mb-5 text-white px-1 flex items-center">
-                  <div className="h-8 w-1 bg-primary/80 rounded-full mr-3"></div>
-                  Frameworks & Tools
-                </h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {slide.tools?.map((tool, i) => {
-                    // Assign a specific color based on the tool
-                    let gradientColors = "";
-                    let icon = null;
-                    
-                    switch(tool) {
-                      case "React": 
-                        gradientColors = "from-cyan-500/20 to-cyan-700/20 border-cyan-500/40"; 
-                        icon = <div className="text-cyan-500/80 mb-3 text-3xl">⚛️</div>;
-                        break;
-                      case "Node.js": 
-                        gradientColors = "from-green-500/20 to-green-700/20 border-green-500/40"; 
-                        icon = <div className="text-green-500/80 mb-3 text-xl">Node</div>;
-                        break;
-                      case "Laravel": 
-                        gradientColors = "from-red-500/20 to-red-700/20 border-red-500/40"; 
-                        icon = <div className="text-red-500/80 mb-3 text-xl">Laravel</div>;
-                        break;
-                      case "ASP.NET": 
-                        gradientColors = "from-purple-500/20 to-purple-700/20 border-purple-500/40"; 
-                        icon = <div className="text-purple-500/80 mb-3 text-xl">.NET</div>;
-                        break;
-                      case "Git": 
-                        gradientColors = "from-orange-500/20 to-orange-700/20 border-orange-500/40"; 
-                        icon = <div className="text-orange-500/80 mb-3 text-xl">Git</div>;
-                        break;
-                      case "VS Code": 
-                        gradientColors = "from-blue-500/20 to-blue-700/20 border-blue-500/40"; 
-                        icon = <div className="text-blue-500/80 mb-3 text-xl">VS Code</div>;
-                        break;
-                      case "Docker": 
-                        gradientColors = "from-blue-400/20 to-blue-600/20 border-blue-500/40"; 
-                        icon = <div className="text-blue-400/80 mb-3 text-xl">Docker</div>;
-                        break;
-                      default: 
-                        gradientColors = "from-gray-700/40 to-gray-900/40 border-gray-700"; 
-                        break;
-                    }
-                    
-                    return (
-                      <motion.div
-                        key={tool}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{
-                          duration: 0.4,
-                          delay: 0.1 * (i + (slide.langs?.length || 0)),
-                        }}
-                        className={`flex flex-col items-center justify-center py-6 px-2 bg-gradient-to-b ${gradientColors} rounded-lg border backdrop-blur-md shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-1`}
-                        whileHover={{ scale: 1.03 }}
-                      >
-                        {icon}
-                        <div className="text-xl font-semibold text-white">
-                          {tool}
-                        </div>
-                      </motion.div>
-                    );
-                  })}
+              <div className="space-y-6 max-w-5xl mx-auto w-full">
+                {/* Programming Languages */}
+                <div>
+                  <h3 className="text-xl font-semibold mb-4 text-white px-1 flex items-center">
+                    <div className="h-8 w-1 bg-primary/80 rounded-full mr-3"></div>
+                    Programmeertalen
+                  </h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                    {slide.langs?.map((lang, i) => {
+                      // Assign a specific color based on the programming language
+                      let gradientColors = "";
+                      let icon = null;
+                      
+                      switch(lang) {
+                        case "HTML/CSS": 
+                          gradientColors = "from-orange-600/20 to-blue-600/20 border-orange-500/40"; 
+                          icon = <div className="text-orange-500/80 mb-2 text-2xl">&#60;/&#62;</div>;
+                          break;
+                        case "JavaScript": 
+                          gradientColors = "from-yellow-500/20 to-yellow-700/20 border-yellow-500/40"; 
+                          icon = <div className="text-yellow-500/80 mb-2 text-xl">JS</div>;
+                          break;
+                        case "TypeScript": 
+                          gradientColors = "from-blue-500/20 to-blue-700/20 border-blue-500/40"; 
+                          icon = <div className="text-blue-500/80 mb-2 text-xl">TS</div>;
+                          break;
+                        case "PHP": 
+                          gradientColors = "from-indigo-500/20 to-indigo-700/20 border-indigo-500/40"; 
+                          icon = <div className="text-indigo-500/80 mb-2 text-xl">PHP</div>;
+                          break;
+                        case "C#": 
+                          gradientColors = "from-green-500/20 to-green-700/20 border-green-500/40"; 
+                          icon = <div className="text-green-500/80 mb-2 text-xl">C#</div>;
+                          break;
+                        case "C": 
+                          gradientColors = "from-blue-500/20 to-blue-700/20 border-blue-500/40"; 
+                          icon = <div className="text-blue-500/80 mb-2 text-xl">C</div>;
+                          break;
+                        case "SQL": 
+                          gradientColors = "from-cyan-500/20 to-cyan-700/20 border-cyan-500/40"; 
+                          icon = <div className="text-cyan-500/80 mb-2 text-xl">SQL</div>;
+                          break;
+                        case "Python": 
+                          gradientColors = "from-blue-400/20 to-yellow-400/20 border-blue-500/40"; 
+                          icon = <div className="text-blue-400/80 mb-2 text-xl">Py</div>;
+                          break;
+                        case "Java": 
+                          gradientColors = "from-red-500/20 to-red-700/20 border-red-500/40"; 
+                          icon = <div className="text-red-500/80 mb-2 text-xl">Java</div>;
+                          break;
+                        case "Kotlin": 
+                          gradientColors = "from-purple-500/20 to-purple-700/20 border-purple-500/40"; 
+                          icon = <div className="text-purple-500/80 mb-2 text-xl">Kt</div>;
+                          break;
+                        default: 
+                          gradientColors = "from-gray-700/40 to-gray-900/40 border-gray-700"; 
+                          break;
+                      }
+                      
+                      return (
+                        <motion.div
+                          key={lang}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.3, delay: 0.05 * i }}
+                          className={`flex flex-col items-center justify-center py-4 px-2 bg-gradient-to-b ${gradientColors} rounded-lg border backdrop-blur-md shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-1`}
+                          whileHover={{ scale: 1.03 }}
+                        >
+                          {icon}
+                          <div className="text-lg font-semibold text-white">
+                            {lang}
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Frontend Development */}
+                <div>
+                  <h3 className="text-xl font-semibold mb-4 text-white px-1 flex items-center">
+                    <div className="h-8 w-1 bg-blue-500/80 rounded-full mr-3"></div>
+                    Frontend Development
+                  </h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                    {slide.frontendTools?.map((tool, i) => {
+                      // Assign a specific color based on the frontend tool
+                      let gradientColors = "";
+                      let icon = null;
+                      
+                      switch(tool) {
+                        case "HTML5": 
+                          gradientColors = "from-orange-500/20 to-orange-700/20 border-orange-500/40"; 
+                          icon = <div className="text-orange-500/80 mb-2 text-xl">HTML5</div>;
+                          break;
+                        case "CSS3": 
+                          gradientColors = "from-blue-500/20 to-blue-700/20 border-blue-500/40"; 
+                          icon = <div className="text-blue-500/80 mb-2 text-xl">CSS3</div>;
+                          break;
+                        case "Bootstrap": 
+                          gradientColors = "from-purple-500/20 to-purple-700/20 border-purple-500/40"; 
+                          icon = <div className="text-purple-500/80 mb-2 text-xl">BS</div>;
+                          break;
+                        case "jQuery": 
+                          gradientColors = "from-blue-400/20 to-blue-600/20 border-blue-500/40"; 
+                          icon = <div className="text-blue-400/80 mb-2 text-xl">jQuery</div>;
+                          break;
+                        case "React": 
+                          gradientColors = "from-cyan-500/20 to-cyan-700/20 border-cyan-500/40"; 
+                          icon = <div className="text-cyan-500/80 mb-2 text-2xl">⚛️</div>;
+                          break;
+                        case "Next.js": 
+                          gradientColors = "from-gray-500/20 to-gray-700/20 border-gray-500/40"; 
+                          icon = <div className="text-gray-400/80 mb-2 text-xl">Next</div>;
+                          break;
+                        default: 
+                          gradientColors = "from-gray-700/40 to-gray-900/40 border-gray-700"; 
+                          break;
+                      }
+                      
+                      return (
+                        <motion.div
+                          key={tool}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{
+                            duration: 0.3,
+                            delay: 0.05 * (i + (slide.langs?.length || 0)),
+                          }}
+                          className={`flex flex-col items-center justify-center py-4 px-2 bg-gradient-to-b ${gradientColors} rounded-lg border backdrop-blur-md shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-1`}
+                          whileHover={{ scale: 1.03 }}
+                        >
+                          {icon}
+                          <div className="text-lg font-semibold text-white">
+                            {tool}
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Backend Development */}
+                <div>
+                  <h3 className="text-xl font-semibold mb-4 text-white px-1 flex items-center">
+                    <div className="h-8 w-1 bg-green-500/80 rounded-full mr-3"></div>
+                    Backend Development
+                  </h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-3">
+                    {slide.backendTools?.map((tool, i) => {
+                      // Assign a specific color based on the backend tool
+                      let gradientColors = "";
+                      let icon = null;
+                      
+                      switch(tool) {
+                        case "Node.js": 
+                          gradientColors = "from-green-500/20 to-green-700/20 border-green-500/40"; 
+                          icon = <div className="text-green-500/80 mb-2 text-xl">Node</div>;
+                          break;
+                        case "Apache": 
+                          gradientColors = "from-red-500/20 to-red-700/20 border-red-500/40"; 
+                          icon = <div className="text-red-500/80 mb-2 text-xl">Apache</div>;
+                          break;
+                        case ".Net": 
+                          gradientColors = "from-blue-500/20 to-blue-700/20 border-blue-500/40"; 
+                          icon = <div className="text-blue-500/80 mb-2 text-xl">.NET</div>;
+                          break;
+                        default: 
+                          gradientColors = "from-gray-700/40 to-gray-900/40 border-gray-700"; 
+                          break;
+                      }
+                      
+                      return (
+                        <motion.div
+                          key={tool}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{
+                            duration: 0.3,
+                            delay: 0.05 * (i + (slide.langs?.length || 0) + (slide.frontendTools?.length || 0)),
+                          }}
+                          className={`flex flex-col items-center justify-center py-4 px-2 bg-gradient-to-b ${gradientColors} rounded-lg border backdrop-blur-md shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-1`}
+                          whileHover={{ scale: 1.03 }}
+                        >
+                          {icon}
+                          <div className="text-lg font-semibold text-white">
+                            {tool}
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Databases */}
+                <div>
+                  <h3 className="text-xl font-semibold mb-4 text-white px-1 flex items-center">
+                    <div className="h-8 w-1 bg-yellow-500/80 rounded-full mr-3"></div>
+                    Databases
+                  </h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {slide.databaseTools?.map((tool, i) => {
+                      // Assign a specific color based on the database
+                      let gradientColors = "";
+                      let icon = null;
+                      
+                      switch(tool) {
+                        case "MySQL": 
+                          gradientColors = "from-blue-500/20 to-orange-500/20 border-blue-500/40"; 
+                          icon = <div className="text-blue-500/80 mb-2 text-xl">MySQL</div>;
+                          break;
+                        case "MariaDB": 
+                          gradientColors = "from-blue-400/20 to-blue-600/20 border-blue-500/40"; 
+                          icon = <div className="text-blue-400/80 mb-2 text-xl">MariaDB</div>;
+                          break;
+                        case "Microsoft SQL Server": 
+                          gradientColors = "from-red-500/20 to-red-700/20 border-red-500/40"; 
+                          icon = <div className="text-red-500/80 mb-2 text-xl">MSSQL</div>;
+                          break;
+                        case "SQLite": 
+                          gradientColors = "from-blue-400/20 to-indigo-600/20 border-blue-500/40"; 
+                          icon = <div className="text-blue-400/80 mb-2 text-xl">SQLite</div>;
+                          break;
+                        default: 
+                          gradientColors = "from-gray-700/40 to-gray-900/40 border-gray-700"; 
+                          break;
+                      }
+                      
+                      return (
+                        <motion.div
+                          key={tool}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{
+                            duration: 0.3,
+                            delay: 0.05 * (i + (slide.langs?.length || 0) + 
+                              (slide.frontendTools?.length || 0) + (slide.backendTools?.length || 0)),
+                          }}
+                          className={`flex flex-col items-center justify-center py-4 px-2 bg-gradient-to-b ${gradientColors} rounded-lg border backdrop-blur-md shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-1`}
+                          whileHover={{ scale: 1.03 }}
+                        >
+                          {icon}
+                          <div className="text-lg font-semibold text-white">
+                            {tool}
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Tools & Development Platforms */}
+                <div>
+                  <h3 className="text-xl font-semibold mb-4 text-white px-1 flex items-center">
+                    <div className="h-8 w-1 bg-purple-500/80 rounded-full mr-3"></div>
+                    Tools & Development Platforms
+                  </h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                    {slide.devTools?.map((tool, i) => {
+                      // Assign a specific color based on the dev tool
+                      let gradientColors = "";
+                      let icon = null;
+                      
+                      switch(tool) {
+                        case "Unity": 
+                          gradientColors = "from-gray-500/20 to-gray-700/20 border-gray-500/40"; 
+                          icon = <div className="text-gray-300/80 mb-2 text-xl">Unity</div>;
+                          break;
+                        case "Android": 
+                          gradientColors = "from-green-500/20 to-green-700/20 border-green-500/40"; 
+                          icon = <div className="text-green-500/80 mb-2 text-xl">Android</div>;
+                          break;
+                        case "Raspberry Pi": 
+                          gradientColors = "from-red-500/20 to-red-700/20 border-red-500/40"; 
+                          icon = <div className="text-red-500/80 mb-2 text-xl">Raspberry</div>;
+                          break;
+                        case "Arduino": 
+                          gradientColors = "from-cyan-500/20 to-cyan-700/20 border-cyan-500/40"; 
+                          icon = <div className="text-cyan-500/80 mb-2 text-xl">Arduino</div>;
+                          break;
+                        case "Postman": 
+                          gradientColors = "from-orange-500/20 to-orange-700/20 border-orange-500/40"; 
+                          icon = <div className="text-orange-500/80 mb-2 text-xl">Postman</div>;
+                          break;
+                        case "Git": 
+                          gradientColors = "from-orange-500/20 to-orange-700/20 border-orange-500/40"; 
+                          icon = <div className="text-orange-500/80 mb-2 text-xl">Git</div>;
+                          break;
+                        case "VS Code": 
+                          gradientColors = "from-blue-500/20 to-blue-700/20 border-blue-500/40"; 
+                          icon = <div className="text-blue-500/80 mb-2 text-xl">VS Code</div>;
+                          break;
+                        case "Docker": 
+                          gradientColors = "from-blue-400/20 to-blue-600/20 border-blue-500/40"; 
+                          icon = <div className="text-blue-400/80 mb-2 text-xl">Docker</div>;
+                          break;
+                        default: 
+                          gradientColors = "from-gray-700/40 to-gray-900/40 border-gray-700"; 
+                          break;
+                      }
+                      
+                      return (
+                        <motion.div
+                          key={tool}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{
+                            duration: 0.3,
+                            delay: 0.05 * (i + (slide.langs?.length || 0) + 
+                              (slide.frontendTools?.length || 0) + (slide.backendTools?.length || 0) + 
+                              (slide.databaseTools?.length || 0)),
+                          }}
+                          className={`flex flex-col items-center justify-center py-4 px-2 bg-gradient-to-b ${gradientColors} rounded-lg border backdrop-blur-md shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-1`}
+                          whileHover={{ scale: 1.03 }}
+                        >
+                          {icon}
+                          <div className="text-lg font-semibold text-white">
+                            {tool}
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Design */}
+                <div>
+                  <h3 className="text-xl font-semibold mb-4 text-white px-1 flex items-center">
+                    <div className="h-8 w-1 bg-pink-500/80 rounded-full mr-3"></div>
+                    Design
+                  </h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {slide.designTools?.map((tool, i) => {
+                      // Assign a specific color based on the design tool
+                      let gradientColors = "";
+                      let icon = null;
+                      
+                      switch(tool) {
+                        case "Adobe Illustrator": 
+                          gradientColors = "from-orange-500/20 to-orange-700/20 border-orange-500/40"; 
+                          icon = <div className="text-orange-500/80 mb-2 text-xl">Illustrator</div>;
+                          break;
+                        case "Adobe After Effects": 
+                          gradientColors = "from-indigo-500/20 to-indigo-700/20 border-indigo-500/40"; 
+                          icon = <div className="text-indigo-500/80 mb-2 text-xl">After Effects</div>;
+                          break;
+                        case "Adobe Photoshop": 
+                          gradientColors = "from-blue-500/20 to-blue-700/20 border-blue-500/40"; 
+                          icon = <div className="text-blue-500/80 mb-2 text-xl">Photoshop</div>;
+                          break;
+                        case "Adobe XD": 
+                          gradientColors = "from-pink-500/20 to-pink-700/20 border-pink-500/40"; 
+                          icon = <div className="text-pink-500/80 mb-2 text-xl">XD</div>;
+                          break;
+                        default: 
+                          gradientColors = "from-gray-700/40 to-gray-900/40 border-gray-700"; 
+                          break;
+                      }
+                      
+                      return (
+                        <motion.div
+                          key={tool}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{
+                            duration: 0.3,
+                            delay: 0.05 * (i + (slide.langs?.length || 0) + 
+                              (slide.frontendTools?.length || 0) + (slide.backendTools?.length || 0) + 
+                              (slide.databaseTools?.length || 0) + (slide.devTools?.length || 0)),
+                          }}
+                          className={`flex flex-col items-center justify-center py-4 px-2 bg-gradient-to-b ${gradientColors} rounded-lg border backdrop-blur-md shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-1`}
+                          whileHover={{ scale: 1.03 }}
+                        >
+                          {icon}
+                          <div className="text-lg font-semibold text-white">
+                            {tool}
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             </div>
