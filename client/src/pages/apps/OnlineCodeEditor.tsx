@@ -608,8 +608,25 @@ MIT
     }
   }, []);
   
-  // Initialize with a welcome file
+  // Initialize with a welcome file only if it's the first run
+  const [hasInitializedFileSystem, setHasInitializedFileSystem] = useState(false);
+  
+  // Setup event listeners for browser shortcuts
   useEffect(() => {
+    // Add event listener to prevent browser shortcuts
+    document.addEventListener('keydown', preventBrowserShortcuts);
+    
+    // Clean up event listener when component unmounts
+    return () => {
+      document.removeEventListener('keydown', preventBrowserShortcuts);
+    };
+  }, [preventBrowserShortcuts]);
+  
+  // Create welcome file only on first run (after checking for stored data)
+  const createWelcomeFile = useCallback(() => {
+    if (hasInitializedFileSystem) return;
+    
+    console.log("Creating welcome file for new workspace");
     const welcomeId = generateId();
     const initialFileSystem: FileSystemState = {
       items: {
@@ -644,15 +661,8 @@ console.log("Let's start coding with more storage!");`,
     }]);
     setCurrentContent(initialFileSystem.items[welcomeId].content || '');
     setCurrentLanguage('javascript');
-    
-    // Add event listener to prevent browser shortcuts
-    document.addEventListener('keydown', preventBrowserShortcuts);
-    
-    // Clean up event listener when component unmounts
-    return () => {
-      document.removeEventListener('keydown', preventBrowserShortcuts);
-    };
-  }, [preventBrowserShortcuts]);
+    setHasInitializedFileSystem(true);
+  }, [hasInitializedFileSystem]);
 
   // Handle file/folder tree rendering
   const renderFileSystemItem = (itemId: string, depth: number = 0) => {
@@ -3198,8 +3208,10 @@ console.log("Starting fresh with partial cleanup!");`,
                 console.log("Automatically loading migrated workspace");
                 loadFromLocalStorage('default');
               } else {
-                console.log("No existing workspaces found, saving initial state");
-                // Force save current state to ensure it's initialized properly
+                console.log("No existing workspaces found, creating welcome file");
+                // Create welcome file for initial state
+                createWelcomeFile();
+                // Then save current state to ensure it's initialized properly
                 setTimeout(() => {
                   saveToLocalStorage('default');
                 }, 1000);
@@ -3271,14 +3283,16 @@ console.log("Starting fresh with partial cleanup!");`,
         console.log("Automatically loading migrated workspace");
         loadFromLocalStorage('default');
       } else {
-        console.log("No existing workspaces found, saving initial state");
-        // Force save current state to ensure it's initialized properly
+        console.log("No existing workspaces found, creating welcome file");
+        // Create welcome file for initial state
+        createWelcomeFile();
+        // Then save current state to ensure it's initialized properly
         setTimeout(() => {
           saveToLocalStorage('default');
         }, 1000);
       }
     }
-  }, []);
+  }, [createWelcomeFile]);
 
   // Export the entire workspace as a ZIP file
   const exportWorkspace = async () => {
