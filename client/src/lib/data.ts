@@ -171,10 +171,8 @@ export const educations: Education[] = [
 ];
 
 export const certifications: Certification[] = [
-  { name: "React Developer Certification" },
-  { name: "JavaScript Advanced Concepts" },
-  { name: "Python Programming" },
-  { name: "TailwindCSS Mastery" },
+  { name: "TailwindCSS" },
+  { name: "ICT Topdesk" },
 ];
 
 export const contactInfo: ContactInfo = {
