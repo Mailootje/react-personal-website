@@ -1,10 +1,11 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { FaUpload, FaDownload, FaFileArchive, FaTrash, FaSyncAlt, FaMicrochip, FaImage, FaChartLine, FaClock } from 'react-icons/fa';
+import { FaUpload, FaDownload, FaFileArchive, FaTrash, FaSyncAlt, FaMicrochip, FaImage, FaChartLine, FaClock, FaShieldAlt } from 'react-icons/fa';
 import JSZip from 'jszip';
 import jsPDF from 'jspdf';
 import { Badge } from "@/components/ui/badge";
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { apiRequest, queryClient } from '@/lib/queryClient';
+import CryptoES from 'crypto-es';
 
 // Ensure WebGL context type is available
 declare global {
@@ -107,6 +108,8 @@ interface ConversionCounter {
   lastUpdated: string;
 }
 
+// Note: API key generation is now directly implemented in the mutation function
+
 export default function ImageConverter() {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -141,13 +144,26 @@ export default function ImageConverter() {
   // Mutation to increment the counter
   const incrementCounterMutation = useMutation({
     mutationFn: async (count: number) => {
+      // Generate API key for secure access to the counter increment endpoint
+      const apiKey = CryptoES.SHA256(`counter-security-${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()}`)
+        .toString()
+        .substring(0, 16);
+        
       const response = await fetch('/api/counters/conversions/total_images/increment', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'X-API-Key': apiKey,
+          'Origin': window.location.origin
         },
         body: JSON.stringify({ count })
       });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Failed to increment counter');
+      }
+      
       return response.json();
     },
     onSuccess: () => {
@@ -156,6 +172,8 @@ export default function ImageConverter() {
     },
     onError: (error: Error) => {
       console.error('Failed to increment counter:', error);
+      // Don't show error toast to user since this is a background operation
+      // that doesn't affect the main functionality
     }
   });
   

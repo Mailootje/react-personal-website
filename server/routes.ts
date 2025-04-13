@@ -8,6 +8,7 @@ import { insertShortenedLinkSchema, ShortenedLink } from "@shared/schema";
 import { log } from "./vite";
 import QRCode from 'qrcode';
 import https from 'https';
+import crypto from 'crypto';
 
 interface PhotoItem {
   id: string;
@@ -968,11 +969,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/counters/conversions/:name/increment", async (req, res) => {
     try {
-      const { name } = req.params;
-      const { count = 1 } = req.body;
+      // Security check: Validate request origin
+      const referer = req.headers.referer || '';
+      const origin = req.headers.origin || '';
+      const apiKey = req.headers['x-api-key'] || '';
+      const userAgent = req.headers['user-agent'] || '';
       
-      // Validate count is a positive number
-      const incrementBy = typeof count === 'number' && count > 0 ? count : 1;
+      // Generate a simple check token based on the current day
+      // This changes daily to prevent reuse but doesn't require storing a secret
+      const date = new Date();
+      const dailyTokenBase = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+      
+      // Use the crypto module (imported at the top of the file)
+      const expectedApiKey = crypto
+        .createHash('sha256')
+        .update(`counter-security-${dailyTokenBase}`)
+        .digest('hex')
+        .substring(0, 16); // Use first 16 chars as the API key
+      
+      // Check if valid client connection
+      const isValidOrigin = 
+        // Check if it's a client-side request from our app
+        (referer.includes(req.headers.host || '') || origin.includes(req.headers.host || '')) ||
+        // Or if it has the correct API key
+        (apiKey === expectedApiKey) ||
+        // For browser direct usage, check if this looks like a web request
+        (userAgent.includes('Mozilla') && req.method === 'POST');
+      
+      if (!isValidOrigin) {
+        log(`Unauthorized increment attempt: ${req.ip}, referer: ${referer}, user-agent: ${userAgent}`, "security");
+        return res.status(403).json({ 
+          message: "Unauthorized access",
+          error: "Access denied - API key required or valid origin" 
+        });
+      }
+      
+      const { name } = req.params;
+      let { count = 1 } = req.body;
+      
+      // Validate count is a positive number and limit the maximum increment
+      // to prevent abuse (max 100 per request)
+      const rawCount = Number(count);
+      
+      // Explicit check for large values and set a hard limit of 100
+      if (isNaN(rawCount) || rawCount <= 0) {
+        count = 1; // Default to 1 for invalid values
+      } else if (rawCount > 100) {
+        count = 100; // Cap at 100 for large values
+        log(`Count capped from ${rawCount} to 100`, "security");
+      } else {
+        count = rawCount; // Use the valid number
+      }
+      
+      const incrementBy = count;
       
       const counter = await storage.incrementConversionCounter(name, incrementBy);
       res.status(200).json(counter);

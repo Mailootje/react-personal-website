@@ -148,12 +148,15 @@ export class DbStorage implements IStorage {
 
   async incrementConversionCounter(name: string, incrementBy: number = 1): Promise<ConversionCounter> {
     try {
+      // Ensure the increment is capped at 100
+      const cappedIncrement = Math.min(100, Math.max(1, incrementBy));
+      
       // First check if counter exists
       const counter = await this.getConversionCounter(name);
       
       if (counter) {
         // Counter exists, update it
-        const newCount = counter.count + incrementBy;
+        const newCount = counter.count + cappedIncrement;
         const result = await this.db.update(conversionCounters)
           .set({ 
             count: newCount,
@@ -167,7 +170,7 @@ export class DbStorage implements IStorage {
         const result = await this.db.insert(conversionCounters)
           .values({
             name,
-            count: incrementBy,
+            count: cappedIncrement,
             lastUpdated: new Date()
           })
           .returning();
@@ -279,11 +282,14 @@ export class MemStorage implements IStorage {
   }
 
   async incrementConversionCounter(name: string, incrementBy: number = 1): Promise<ConversionCounter> {
+    // Ensure the increment is capped at 100
+    const cappedIncrement = Math.min(100, Math.max(1, incrementBy));
+    
     const counter = this.conversionCounters.get(name);
     
     if (counter) {
       // Counter exists, update it
-      counter.count += incrementBy;
+      counter.count += cappedIncrement;
       counter.lastUpdated = new Date();
       this.conversionCounters.set(name, counter);
       return counter;
@@ -293,7 +299,7 @@ export class MemStorage implements IStorage {
       const newCounter: ConversionCounter = {
         id,
         name,
-        count: incrementBy,
+        count: cappedIncrement, // Use capped increment here too
         lastUpdated: new Date()
       };
       this.conversionCounters.set(name, newCounter);
