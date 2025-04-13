@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,8 +25,40 @@ import {
   Gauge,
   Calendar,
   Search,
-  Loader2
+  Loader2,
+  MapPin,
+  Clock as ClockIcon
 } from "lucide-react";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
+// Fix Leaflet marker icon issues
+// We'll use a modified component instead of modifying the default icon
+// This avoids TypeScript errors with the Icon.Default prototype
+// Use traditional URL approach
+const ICON_URL = 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png';
+const ICON_RETINA_URL = 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png';
+const SHADOW_URL = 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png';
+
+// Create a custom marker component
+function CustomMarker({ position, children }: { position: [number, number], children?: React.ReactNode }) {
+  const customIcon = new L.Icon({
+    iconUrl: ICON_URL,
+    iconRetinaUrl: ICON_RETINA_URL,
+    shadowUrl: SHADOW_URL,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+  });
+  
+  return (
+    <Marker position={position} icon={customIcon}>
+      {children}
+    </Marker>
+  );
+}
 
 // Types for weather data
 interface WeatherData {
@@ -539,7 +571,7 @@ export default function WeatherDashboard() {
                         Daily Forecast
                       </TabsTrigger>
                       <TabsTrigger value="hourly">
-                        <Clock className="h-4 w-4 mr-2" />
+                        <ClockIcon className="h-4 w-4 mr-2" />
                         Hourly Forecast
                       </TabsTrigger>
                     </TabsList>
@@ -646,6 +678,54 @@ export default function WeatherDashboard() {
                       </Card>
                     </TabsContent>
                   </Tabs>
+                  
+                  {/* Weather Map */}
+                  <Card className="shadow-md mb-6">
+                    <CardHeader>
+                      <CardTitle>Weather Map</CardTitle>
+                      <CardDescription>
+                        Interactive map showing weather conditions
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="p-0 overflow-hidden">
+                      <div className="h-[400px] relative">
+                        <MapContainer 
+                          center={[data.current.coord.lat, data.current.coord.lon] as [number, number]} 
+                          zoom={8} 
+                          style={{ height: '100%', width: '100%' }}
+                        >
+                          <TileLayer
+                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                          />
+                          {/* Add weather layers */}
+                          <TileLayer
+                            url={`https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${process.env.OPENWEATHER_API_KEY}`}
+                          />
+                          <TileLayer
+                            url={`https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=${process.env.OPENWEATHER_API_KEY}`}
+                          />
+                          <CustomMarker position={[data.current.coord.lat, data.current.coord.lon] as [number, number]}>
+                            <Popup>
+                              <div className="text-center">
+                                <h3 className="font-bold">{data.current.name}</h3>
+                                <img 
+                                  src={getWeatherIcon(data.current.weather[0].icon)} 
+                                  alt={data.current.weather[0].description}
+                                  className="w-12 h-12 mx-auto"
+                                />
+                                <p className="capitalize">{data.current.weather[0].description}</p>
+                                <p className="text-lg font-medium">{formatTemp(data.current.main.temp)}</p>
+                              </div>
+                            </Popup>
+                          </CustomMarker>
+                          <MapCenterUpdater coords={[data.current.coord.lat, data.current.coord.lon] as [number, number]} />
+                        </MapContainer>
+                      </div>
+                    </CardContent>
+                    <CardFooter className="bg-slate-50 text-sm text-slate-500">
+                      <p>Map shows live precipitation and cloud coverage data from OpenWeatherMap</p>
+                    </CardFooter>
+                  </Card>
                 </>
               )}
               
@@ -668,21 +748,13 @@ export default function WeatherDashboard() {
   );
 }
 
-// Clock component
-function Clock({ className }: { className?: string }) {
-  return (
-    <svg 
-      xmlns="http://www.w3.org/2000/svg" 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-      className={className}
-    >
-      <circle cx="12" cy="12" r="10" />
-      <polyline points="12 6 12 12 16 14" />
-    </svg>
-  );
+// Map Center Updater component to keep the map centered when location changes
+function MapCenterUpdater({ coords }: { coords: [number, number] }) {
+  const map = useMap();
+  
+  useEffect(() => {
+    map.setView(coords, map.getZoom());
+  }, [coords, map]);
+  
+  return null;
 }

@@ -112,7 +112,7 @@ export const projects: Project[] = [
     type: "Web App",
     typeColor: "secondary",
     technologies: ["React", "OpenWeather API", "TailwindCSS"],
-    detailsLink: "#",
+    detailsLink: "/apps/weather-dashboard",
     githubLink: "https://github.com/mailobedo/weather-app",
   },
   {
