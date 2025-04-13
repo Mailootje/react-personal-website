@@ -1,13 +1,19 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from "react";
 import { Container } from "@/components/ui/container";
-import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { useQuery } from "@tanstack/react-query";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { useToast } from "@/hooks/use-toast";
-import { useQuery } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -312,447 +318,434 @@ export default function WeatherDashboard() {
       <Header />
       
       <main className="flex-1">
-        <Container>
-          <div className="mb-8">
-            <Link
-              to="/apps"
-              className="inline-flex items-center text-primary hover:text-primary/80 transition-colors cursor-pointer"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Apps
-            </Link>
-          </div>
-
-          <SectionHeading
-            subtitle="Check current conditions & forecast"
-            title="Weather Dashboard"
-            center
-            className="mb-10"
-          />
-          
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
-            {/* Search & Settings Sidebar */}
-            <div className="md:col-span-1 space-y-6">
-              <Card className="shadow-md">
-                <CardHeader className="pb-2">
-                  <CardTitle>Search Location</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleSearch} className="flex flex-col space-y-2">
-                    <div className="flex">
-                      <Input
-                        placeholder="City name"
-                        value={searchLocation}
-                        onChange={(e) => setSearchLocation(e.target.value)}
-                        className="flex-1 rounded-r-none"
-                      />
-                      <Button 
-                        type="submit" 
-                        variant="default" 
-                        className="rounded-l-none"
-                        disabled={isLoading || !searchLocation.trim()}
-                      >
-                        {isLoading ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Search className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </div>
-                  </form>
-                </CardContent>
-                
-                <CardHeader className="py-2">
-                  <CardTitle>Units</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex">
-                    <Button
-                      variant={units === 'metric' ? 'default' : 'outline'}
-                      className="flex-1 rounded-r-none"
-                      onClick={() => setUnits('metric')}
-                    >
-                      Celsius
-                    </Button>
-                    <Button
-                      variant={units === 'imperial' ? 'default' : 'outline'}
-                      className="flex-1 rounded-l-none"
-                      onClick={() => setUnits('imperial')}
-                    >
-                      Fahrenheit
-                    </Button>
-                  </div>
-                </CardContent>
-                
-                <CardHeader className="py-2">
-                  <CardTitle>Saved Locations</CardTitle>
-                </CardHeader>
-                <CardContent className="pb-4">
-                  {data?.current && (
-                    <Button 
-                      variant="outline" 
-                      className="w-full mb-2" 
-                      onClick={saveLocation}
-                      disabled={savedLocations.includes(data.current.name)}
-                    >
-                      {savedLocations.includes(data.current.name) 
-                        ? `${data.current.name} already saved` 
-                        : `Save ${data.current.name}`}
-                    </Button>
-                  )}
-                  
-                  <div className="flex flex-col space-y-2 mt-1">
-                    {savedLocations.map((loc) => (
-                      <div key={loc} className="flex items-center justify-between">
-                        <Button 
-                          variant="ghost" 
-                          className="text-left px-2 py-1 h-auto"
-                          onClick={() => loadSavedLocation(loc)}
-                        >
-                          {loc}
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
-                          onClick={() => removeLocation(loc)}
-                        >
-                          ✕
-                        </Button>
-                      </div>
-                    ))}
-                    
-                    {savedLocations.length === 0 && (
-                      <p className="text-sm text-muted-foreground">No saved locations</p>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+        <div className="py-20 px-4 md:px-8">
+          <Container>
+            <div className="mb-8">
+              <Link
+                to="/apps"
+                className="inline-flex items-center text-primary hover:text-primary/80 transition-colors cursor-pointer"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Apps
+              </Link>
             </div>
+
+            <SectionHeading
+              subtitle="Check current conditions & forecast"
+              title="Weather Dashboard"
+              center
+              className="mb-10"
+            />
             
-            {/* Main Content */}
-            <div className="md:col-span-3">
-              {isError && (
-                <Card className="bg-red-50 mb-4 shadow-md">
-                  <CardHeader>
-                    <CardTitle className="text-red-800">Error</CardTitle>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
+              {/* Search & Settings Sidebar */}
+              <div className="md:col-span-1 space-y-6">
+                <Card className="shadow-md">
+                  <CardHeader className="pb-2">
+                    <CardTitle>Search Location</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-red-700">
-                      {(error as any)?.message || 'Failed to fetch weather data. Please try again.'}
-                    </p>
-                  </CardContent>
-                  <CardFooter>
-                    <Button onClick={() => refetch()} variant="outline">Try Again</Button>
-                  </CardFooter>
-                </Card>
-              )}
-              
-              {isLoading && (
-                <div className="flex items-center justify-center p-12">
-                  <Loader2 className="h-12 w-12 animate-spin text-muted-foreground" />
-                </div>
-              )}
-              
-              {data && !isLoading && !isError && (
-                <>
-                  {/* Current Weather Card */}
-                  <Card className="shadow-md overflow-hidden mb-6">
-                    <div className="relative">
-                      <div className="bg-gradient-to-r from-blue-600 to-blue-400 text-white p-6">
-                        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                          <div className="flex items-center mb-4 md:mb-0">
-                            <div className="mr-4">
-                              <img 
-                                src={getWeatherIcon(data.current.weather[0].icon)} 
-                                alt={data.current.weather[0].description}
-                                className="w-16 h-16"
-                              />
-                            </div>
-                            <div>
-                              <h2 className="text-2xl font-bold">
-                                {data.current.name}, {data.current.sys.country}
-                              </h2>
-                              <p className="text-lg font-medium capitalize">
-                                {data.current.weather[0].description}
-                              </p>
-                              <p className="text-sm">
-                                {formatDate(data.current.dt, { 
-                                  weekday: 'long', 
-                                  year: 'numeric', 
-                                  month: 'long', 
-                                  day: 'numeric' 
-                                })}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <div className="text-5xl font-bold">
-                              {formatTemp(data.current.main.temp)}
-                            </div>
-                            <p className="text-lg">
-                              Feels like {formatTemp(data.current.main.feels_like)}
-                            </p>
-                          </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-                          <div className="flex items-center">
-                            <ThermometerSun className="mr-2 h-5 w-5" />
-                            <div>
-                              <p className="text-sm">High</p>
-                              <p className="font-medium">{formatTemp(data.current.main.temp_max)}</p>
-                            </div>
-                          </div>
-                          <div className="flex items-center">
-                            <ThermometerSnowflake className="mr-2 h-5 w-5" />
-                            <div>
-                              <p className="text-sm">Low</p>
-                              <p className="font-medium">{formatTemp(data.current.main.temp_min)}</p>
-                            </div>
-                          </div>
-                          <div className="flex items-center">
-                            <Wind className="mr-2 h-5 w-5" />
-                            <div>
-                              <p className="text-sm">Wind</p>
-                              <p className="font-medium">
-                                {formatWindSpeed(data.current.wind.speed)} {getWindDirection(data.current.wind.deg)}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex items-center">
-                            <Droplets className="mr-2 h-5 w-5" />
-                            <div>
-                              <p className="text-sm">Humidity</p>
-                              <p className="font-medium">{data.current.main.humidity}%</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <CardContent className="p-6">
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div className="flex flex-col items-center justify-center text-center p-3 bg-slate-50 rounded-lg">
-                          <div className="text-slate-500 mb-1">
-                            <Eye className="mx-auto h-5 w-5" />
-                          </div>
-                          <span className="text-sm text-slate-500">Visibility</span>
-                          <span className="font-medium">
-                            {formatVisibility(data.current.visibility)}
-                          </span>
-                        </div>
-                        
-                        <div className="flex flex-col items-center justify-center text-center p-3 bg-slate-50 rounded-lg">
-                          <div className="text-slate-500 mb-1">
-                            <Gauge className="mx-auto h-5 w-5" />
-                          </div>
-                          <span className="text-sm text-slate-500">Pressure</span>
-                          <span className="font-medium">
-                            {data.current.main.pressure} {unitDisplayMap[units].pressureLabel}
-                          </span>
-                        </div>
-                        
-                        <div className="flex flex-col items-center justify-center text-center p-3 bg-slate-50 rounded-lg">
-                          <div className="text-slate-500 mb-1">
-                            <Sun className="mx-auto h-5 w-5" />
-                          </div>
-                          <span className="text-sm text-slate-500">Sunrise</span>
-                          <span className="font-medium">
-                            {formatTime(data.current.sys.sunrise)}
-                          </span>
-                        </div>
-                        
-                        <div className="flex flex-col items-center justify-center text-center p-3 bg-slate-50 rounded-lg">
-                          <div className="text-slate-500 mb-1">
-                            <Cloud className="mx-auto h-5 w-5" />
-                          </div>
-                          <span className="text-sm text-slate-500">Sunset</span>
-                          <span className="font-medium">
-                            {formatTime(data.current.sys.sunset)}
-                          </span>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                  
-                  {/* Forecast Tabs */}
-                  <Tabs defaultValue="daily" className="mb-6">
-                    <TabsList className="mb-4">
-                      <TabsTrigger value="daily">
-                        <Calendar className="h-4 w-4 mr-2" />
-                        Daily Forecast
-                      </TabsTrigger>
-                      <TabsTrigger value="hourly">
-                        <ClockIcon className="h-4 w-4 mr-2" />
-                        Hourly Forecast
-                      </TabsTrigger>
-                    </TabsList>
-                    
-                    <TabsContent value="daily">
-                      <Card className="shadow-md">
-                        <CardHeader>
-                          <CardTitle>5-Day Forecast</CardTitle>
-                          <CardDescription>
-                            Weather forecast for the next 5 days
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="space-y-4">
-                            {data.forecast.daily.slice(0, 5).map((day, index) => (
-                              <div key={day.dt} className={index !== 0 ? "pt-4 border-t" : ""}>
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center">
-                                    <div className="w-10 font-medium">
-                                      {index === 0 ? 'Today' : formatDate(day.dt, { weekday: 'short' })}
-                                    </div>
-                                    <div className="ml-2">
-                                      <img 
-                                        src={getWeatherIcon(day.weather[0].icon)} 
-                                        alt={day.weather[0].description}
-                                        className="w-10 h-10"
-                                      />
-                                    </div>
-                                    <div className="ml-2">
-                                      <span className="capitalize">{day.weather[0].description}</span>
-                                      <div className="flex items-center mt-1 space-x-2">
-                                        {getPrecipitationBadge(day.pop)}
-                                        <div className="flex items-center text-sm">
-                                          <Droplets className="w-3 h-3 mr-1" />
-                                          {day.humidity}%
-                                        </div>
-                                        <div className="flex items-center text-sm">
-                                          <Wind className="w-3 h-3 mr-1" />
-                                          {formatWindSpeed(day.wind_speed)}
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                  <div className="flex items-center space-x-4">
-                                    <div className="text-right">
-                                      <div className="font-medium">
-                                        {formatTemp(day.temp.max)}
-                                      </div>
-                                      <div className="text-sm text-slate-500">
-                                        {formatTemp(day.temp.min)}
-                                      </div>
-                                    </div>
-                                    <Badge 
-                                      className={getTemperatureColor(day.temp.day)}
-                                      variant="outline"
-                                    >
-                                      {formatTemp(day.temp.day)}
-                                    </Badge>
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </TabsContent>
-                    
-                    <TabsContent value="hourly">
-                      <Card className="shadow-md">
-                        <CardHeader>
-                          <CardTitle>Hourly Forecast</CardTitle>
-                          <CardDescription>
-                            Weather forecast for the next 24 hours
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            {data.forecast.hourly.slice(0, 24).map((hour, index) => (
-                              <div 
-                                key={hour.dt}
-                                className="flex flex-col items-center p-3 rounded-lg bg-slate-50"
-                              >
-                                <div className="font-medium text-sm">
-                                  {index === 0 ? 'Now' : formatTime(hour.dt)}
-                                </div>
-                                <img 
-                                  src={getWeatherIcon(hour.weather[0].icon)} 
-                                  alt={hour.weather[0].description}
-                                  className="w-12 h-12"
-                                />
-                                <Badge 
-                                  className={getTemperatureColor(hour.temp)}
-                                  variant="outline"
-                                >
-                                  {formatTemp(hour.temp)}
-                                </Badge>
-                                <div className="text-xs capitalize mt-1">
-                                  {hour.weather[0].description}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </TabsContent>
-                  </Tabs>
-                  
-                  {/* Weather Map */}
-                  <Card className="shadow-md mb-6">
-                    <CardHeader>
-                      <CardTitle>Weather Map</CardTitle>
-                      <CardDescription>
-                        Interactive map showing weather conditions
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="p-0 overflow-hidden">
-                      <div className="h-[400px] relative">
-                        <MapContainer 
-                          center={[data.current.coord.lat, data.current.coord.lon] as [number, number]} 
-                          zoom={8} 
-                          style={{ height: '100%', width: '100%' }}
+                    <form onSubmit={handleSearch} className="flex flex-col space-y-2">
+                      <div className="flex">
+                        <Input
+                          placeholder="City name"
+                          value={searchLocation}
+                          onChange={(e) => setSearchLocation(e.target.value)}
+                          className="flex-1 rounded-r-none"
+                        />
+                        <Button 
+                          type="submit" 
+                          variant="default" 
+                          className="rounded-l-none"
+                          disabled={isLoading || !searchLocation.trim()}
                         >
-                          <TileLayer
-                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                          />
-                          {/* Add weather layers */}
-                          <TileLayer
-                            url="/api/weather/map/precipitation_new/{z}/{x}/{y}"
-                          />
-                          <TileLayer
-                            url="/api/weather/map/clouds_new/{z}/{x}/{y}"
-                          />
-                          <CustomMarker position={[data.current.coord.lat, data.current.coord.lon] as [number, number]}>
-                            <Popup>
-                              <div className="text-center">
-                                <h3 className="font-bold">{data.current.name}</h3>
+                          {isLoading ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Search className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
+                    </form>
+                  </CardContent>
+                  
+                  <CardHeader className="py-2">
+                    <CardTitle>Units</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex">
+                      <Button
+                        variant={units === 'metric' ? 'default' : 'outline'}
+                        className="flex-1 rounded-r-none"
+                        onClick={() => setUnits('metric')}
+                      >
+                        Celsius
+                      </Button>
+                      <Button
+                        variant={units === 'imperial' ? 'default' : 'outline'}
+                        className="flex-1 rounded-l-none"
+                        onClick={() => setUnits('imperial')}
+                      >
+                        Fahrenheit
+                      </Button>
+                    </div>
+                  </CardContent>
+                  
+                  <CardHeader className="py-2">
+                    <CardTitle>Saved Locations</CardTitle>
+                  </CardHeader>
+                  <CardContent className="pb-4">
+                    {data?.current && (
+                      <Button 
+                        variant="outline" 
+                        className="w-full mb-2" 
+                        onClick={saveLocation}
+                        disabled={savedLocations.includes(data.current.name)}
+                      >
+                        {savedLocations.includes(data.current.name) 
+                          ? `${data.current.name} already saved` 
+                          : `Save ${data.current.name}`}
+                      </Button>
+                    )}
+                    
+                    <div className="flex flex-col space-y-2 mt-1">
+                      {savedLocations.map((loc) => (
+                        <div key={loc} className="flex items-center justify-between">
+                          <Button 
+                            variant="ghost" 
+                            className="text-left px-2 py-1 h-auto"
+                            onClick={() => loadSavedLocation(loc)}
+                          >
+                            {loc}
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
+                            onClick={() => removeLocation(loc)}
+                          >
+                            ✕
+                          </Button>
+                        </div>
+                      ))}
+                      
+                      {savedLocations.length === 0 && (
+                        <p className="text-sm text-muted-foreground">No saved locations</p>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+              
+              {/* Main Content */}
+              <div className="md:col-span-3">
+                {isError && (
+                  <Card className="bg-red-50 mb-4 shadow-md">
+                    <CardHeader>
+                      <CardTitle className="text-red-800">Error</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-red-700">
+                        {(error as any)?.message || 'Failed to fetch weather data. Please try again.'}
+                      </p>
+                    </CardContent>
+                    <CardFooter>
+                      <Button onClick={() => refetch()} variant="outline">Try Again</Button>
+                    </CardFooter>
+                  </Card>
+                )}
+                
+                {isLoading && (
+                  <div className="flex items-center justify-center p-12">
+                    <Loader2 className="h-12 w-12 animate-spin text-muted-foreground" />
+                  </div>
+                )}
+                
+                {data && !isLoading && !isError && (
+                  <>
+                    {/* Current Weather Card */}
+                    <Card className="shadow-md overflow-hidden mb-6">
+                      <div className="relative">
+                        <div className="bg-gradient-to-r from-blue-600 to-blue-400 text-white p-6">
+                          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+                            <div className="flex items-center mb-4 md:mb-0">
+                              <div className="mr-4">
                                 <img 
                                   src={getWeatherIcon(data.current.weather[0].icon)} 
                                   alt={data.current.weather[0].description}
-                                  className="w-12 h-12 mx-auto"
+                                  className="w-16 h-16"
                                 />
-                                <p className="capitalize">{data.current.weather[0].description}</p>
-                                <p className="text-lg font-medium">{formatTemp(data.current.main.temp)}</p>
                               </div>
-                            </Popup>
-                          </CustomMarker>
-                          <MapCenterUpdater coords={[data.current.coord.lat, data.current.coord.lon] as [number, number]} />
-                        </MapContainer>
+                              <div>
+                                <h2 className="text-2xl font-bold">
+                                  {data.current.name}, {data.current.sys.country}
+                                </h2>
+                                <p className="text-lg font-medium capitalize">
+                                  {data.current.weather[0].description}
+                                </p>
+                                <p className="text-sm">
+                                  {formatDate(data.current.dt, { 
+                                    weekday: 'long', 
+                                    year: 'numeric', 
+                                    month: 'long', 
+                                    day: 'numeric' 
+                                  })}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-5xl font-bold">
+                                {formatTemp(data.current.main.temp)}
+                              </div>
+                              <p className="text-lg">
+                                Feels like {formatTemp(data.current.main.feels_like)}
+                              </p>
+                            </div>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+                            <div className="flex items-center">
+                              <ThermometerSun className="mr-2 h-5 w-5" />
+                              <div>
+                                <p className="text-sm">High</p>
+                                <p className="font-medium">{formatTemp(data.current.main.temp_max)}</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center">
+                              <ThermometerSnowflake className="mr-2 h-5 w-5" />
+                              <div>
+                                <p className="text-sm">Low</p>
+                                <p className="font-medium">{formatTemp(data.current.main.temp_min)}</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center">
+                              <Wind className="mr-2 h-5 w-5" />
+                              <div>
+                                <p className="text-sm">Wind</p>
+                                <p className="font-medium">
+                                  {formatWindSpeed(data.current.wind.speed)} {getWindDirection(data.current.wind.deg)}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center">
+                              <Droplets className="mr-2 h-5 w-5" />
+                              <div>
+                                <p className="text-sm">Humidity</p>
+                                <p className="font-medium">{data.current.main.humidity}%</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                    </CardContent>
-                    <CardFooter className="bg-slate-50 text-sm text-slate-500">
-                      <p>Map shows live precipitation and cloud coverage data from OpenWeatherMap</p>
-                    </CardFooter>
-                  </Card>
-                </>
-              )}
-              
-              {!data && !isLoading && !isError && (
-                <div className="text-center p-12 bg-slate-50 rounded-lg border border-slate-200">
-                  <Search className="h-12 w-12 mx-auto text-slate-400 mb-4" />
-                  <h3 className="text-lg font-medium mb-2">Search for a location</h3>
-                  <p className="text-sm text-slate-500">
-                    Enter a city name to get the current weather and forecast
-                  </p>
-                </div>
-              )}
+                      
+                      <CardContent className="p-6">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          <div className="flex flex-col items-center justify-center text-center p-3 bg-slate-50 rounded-lg">
+                            <div className="text-slate-500 mb-1">
+                              <Eye className="mx-auto h-5 w-5" />
+                            </div>
+                            <span className="text-sm text-slate-500">Visibility</span>
+                            <span className="font-medium">
+                              {formatVisibility(data.current.visibility)}
+                            </span>
+                          </div>
+                          
+                          <div className="flex flex-col items-center justify-center text-center p-3 bg-slate-50 rounded-lg">
+                            <div className="text-slate-500 mb-1">
+                              <Gauge className="mx-auto h-5 w-5" />
+                            </div>
+                            <span className="text-sm text-slate-500">Pressure</span>
+                            <span className="font-medium">
+                              {data.current.main.pressure} {unitDisplayMap[units].pressureLabel}
+                            </span>
+                          </div>
+                          
+                          <div className="flex flex-col items-center justify-center text-center p-3 bg-slate-50 rounded-lg">
+                            <div className="text-slate-500 mb-1">
+                              <Sun className="mx-auto h-5 w-5" />
+                            </div>
+                            <span className="text-sm text-slate-500">Sunrise</span>
+                            <span className="font-medium">
+                              {formatTime(data.current.sys.sunrise)}
+                            </span>
+                          </div>
+                          
+                          <div className="flex flex-col items-center justify-center text-center p-3 bg-slate-50 rounded-lg">
+                            <div className="text-slate-500 mb-1">
+                              <Cloud className="mx-auto h-5 w-5" />
+                            </div>
+                            <span className="text-sm text-slate-500">Sunset</span>
+                            <span className="font-medium">
+                              {formatTime(data.current.sys.sunset)}
+                            </span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    {/* Forecast Tabs */}
+                    <Tabs defaultValue="daily" className="mb-6">
+                      <TabsList className="mb-4">
+                        <TabsTrigger value="daily">
+                          <Calendar className="h-4 w-4 mr-2" />
+                          Daily Forecast
+                        </TabsTrigger>
+                        <TabsTrigger value="hourly">
+                          <ClockIcon className="h-4 w-4 mr-2" />
+                          Hourly Forecast
+                        </TabsTrigger>
+                      </TabsList>
+                      
+                      <TabsContent value="daily">
+                        <Card className="shadow-md">
+                          <CardHeader>
+                            <CardTitle>5-Day Forecast</CardTitle>
+                            <CardDescription>
+                              Weather forecast for the next 5 days
+                            </CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-4">
+                              {data.forecast.daily.slice(0, 5).map((day, index) => (
+                                <div key={day.dt} className={index !== 0 ? "pt-4 border-t" : ""}>
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center">
+                                      <div className="w-10 font-medium">
+                                        {index === 0 ? 'Today' : formatDate(day.dt, { weekday: 'short' })}
+                                      </div>
+                                      <div className="ml-2">
+                                        <img 
+                                          src={getWeatherIcon(day.weather[0].icon)} 
+                                          alt={day.weather[0].description}
+                                          className="w-10 h-10"
+                                        />
+                                      </div>
+                                      <div className="ml-2">
+                                        <span className="capitalize">{day.weather[0].description}</span>
+                                        <div className="flex items-center mt-1 space-x-2">
+                                          {getPrecipitationBadge(day.pop)}
+                                          <div className="flex items-center text-sm">
+                                            <Droplets className="w-3 h-3 mr-1" />
+                                            {day.humidity}%
+                                          </div>
+                                          <div className="flex items-center text-sm">
+                                            <Wind className="w-3 h-3 mr-1" />
+                                            {formatWindSpeed(day.wind_speed)}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center space-x-4">
+                                      <div className="text-right">
+                                        <div className="font-medium">
+                                          {formatTemp(day.temp.max)}
+                                        </div>
+                                        <div className="text-sm text-slate-500">
+                                          {formatTemp(day.temp.min)}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </TabsContent>
+                      
+                      <TabsContent value="hourly">
+                        <Card className="shadow-md">
+                          <CardHeader>
+                            <CardTitle>Hourly Forecast</CardTitle>
+                            <CardDescription>
+                              Weather forecast for the next 24 hours
+                            </CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="flex overflow-x-auto pb-4 space-x-4">
+                              {data.forecast.hourly.slice(0, 24).map((hour) => (
+                                <div 
+                                  key={hour.dt} 
+                                  className="flex flex-col items-center min-w-[80px] p-3 rounded-lg bg-slate-50"
+                                >
+                                  <div className="text-sm font-medium">
+                                    {new Date(hour.dt * 1000).getHours()}:00
+                                  </div>
+                                  <img 
+                                    src={getWeatherIcon(hour.weather[0].icon)} 
+                                    alt={hour.weather[0].description}
+                                    className="w-10 h-10 my-1"
+                                  />
+                                  <div className="font-medium">
+                                    {formatTemp(hour.temp)}
+                                  </div>
+                                  <div className="text-xs text-slate-500 capitalize">
+                                    {hour.weather[0].description}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </TabsContent>
+                    </Tabs>
+                    
+                    {/* Weather Map */}
+                    <Card className="shadow-md mb-6">
+                      <CardHeader>
+                        <CardTitle>Weather Map</CardTitle>
+                        <CardDescription>
+                          Interactive map showing weather conditions
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="p-0 overflow-hidden">
+                        <div className="h-[400px] relative">
+                          <MapContainer 
+                            center={[data.current.coord.lat, data.current.coord.lon] as [number, number]} 
+                            zoom={8} 
+                            style={{ height: '100%', width: '100%' }}
+                          >
+                            <TileLayer
+                              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                            />
+                            {/* Add weather layers */}
+                            <TileLayer
+                              url="/api/weather/map/precipitation_new/{z}/{x}/{y}"
+                            />
+                            <TileLayer
+                              url="/api/weather/map/clouds_new/{z}/{x}/{y}"
+                            />
+                            <CustomMarker position={[data.current.coord.lat, data.current.coord.lon] as [number, number]}>
+                              <Popup>
+                                <div className="text-center">
+                                  <div className="font-bold">{data.current.name}</div>
+                                  <div>{formatTemp(data.current.main.temp)}</div>
+                                  <div className="capitalize">{data.current.weather[0].description}</div>
+                                </div>
+                              </Popup>
+                            </CustomMarker>
+                            <MapCenterUpdater coords={[data.current.coord.lat, data.current.coord.lon] as [number, number]} />
+                          </MapContainer>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </>
+                )}
+                
+                {!location && !isLoading && (
+                  <div className="text-center p-12 bg-slate-50 rounded-lg">
+                    <Search className="mx-auto h-12 w-12 text-slate-400 mb-4" />
+                    <h3 className="text-xl font-medium mb-2">
+                      Search for a Location
+                    </h3>
+                    <p className="text-muted-foreground">
+                      Enter a city name to get the current weather and forecast
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        </Container>
+          </Container>
+        </div>
       </main>
       
       <Footer />
