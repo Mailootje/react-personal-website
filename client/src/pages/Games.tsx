@@ -22,8 +22,15 @@ export default function Games() {
       id: "snake",
       title: "Snake Game",
       description: "Classic snake game where you eat food and grow longer without hitting the walls or yourself.",
-      icon: "🎮",
+      icon: "🐍",
       tags: ["Game", "Arcade", "Classic"],
+    },
+    {
+      id: "tetris",
+      title: "Tetris",
+      description: "The classic block-stacking game. Arrange the falling tetrominos to create complete lines.",
+      icon: "🧩",
+      tags: ["Game", "Puzzle", "Classic"],
     },
     // You can add more games here in the future
   ]);

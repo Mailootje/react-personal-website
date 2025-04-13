@@ -12,6 +12,7 @@ import PasswordGenerator from "@/pages/apps/PasswordGenerator";
 import LinkShortener from "@/pages/apps/LinkShortener";
 import QRCodeGenerator from "@/pages/apps/QRCodeGenerator";
 import Snake from "@/pages/games/Snake";
+import Tetris from "@/pages/games/Tetris";
 import EuroTruckSimulator2 from "@/pages/downloads/EuroTruckSimulator2";
 
 function Router() {
@@ -27,6 +28,7 @@ function Router() {
       <Route path="/downloads/euro-truck-simulator-2" component={EuroTruckSimulator2}/>
       <Route path="/games" component={Games}/>
       <Route path="/games/snake" component={Snake}/>
+      <Route path="/games/tetris" component={Tetris}/>
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
