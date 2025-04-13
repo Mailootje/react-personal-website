@@ -205,7 +205,7 @@ export default function Photography() {
                 {photos.map((photo) => (
                   <motion.div
                     key={photo.id}
-                    className="overflow-hidden rounded-lg shadow-md cursor-pointer flex flex-col"
+                    className="overflow-hidden rounded-lg shadow-md cursor-pointer h-64 md:h-80"
                     onClick={() => openPhotoModal(photo)}
                     whileHover={{ 
                       scale: 1.03,
@@ -215,25 +215,19 @@ export default function Photography() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
                   >
-                    <div className="h-56 md:h-64 overflow-hidden">
-                      <img
-                        src={getProxiedImageUrl(photo.url)}
-                        alt={photo.title}
-                        className="w-full h-full object-cover transition-transform duration-500"
-                        onError={(e) => {
-                          console.error(`Failed to load image: ${photo.url}`);
-                          // If image fails to load, replace with placeholder
-                          (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x300?text=Image+Not+Available';
-                          // Add a class to indicate error
-                          (e.target as HTMLImageElement).classList.add('image-error');
-                        }}
-                        crossOrigin="anonymous"
-                      />
-                    </div>
-                    <div className="p-3 bg-white">
-                      <h3 className="font-medium text-sm truncate">{photo.title}</h3>
-                      <p className="text-xs text-gray-500 truncate">{photo.category}{photo.subcategory && ` • ${photo.subcategory}`}</p>
-                    </div>
+                    <img
+                      src={getProxiedImageUrl(photo.url)}
+                      alt={photo.title}
+                      className="w-full h-64 md:h-80 object-cover transition-transform duration-500"
+                      onError={(e) => {
+                        console.error(`Failed to load image: ${photo.url}`);
+                        // If image fails to load, replace with placeholder
+                        (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x300?text=Image+Not+Available';
+                        // Add a class to indicate error
+                        (e.target as HTMLImageElement).classList.add('image-error');
+                      }}
+                      crossOrigin="anonymous"
+                    />
                   </motion.div>
                 ))}
               </motion.div>
