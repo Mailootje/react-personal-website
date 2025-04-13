@@ -116,6 +116,12 @@ const OnlineCodeEditor: React.FC = () => {
   const [newItemName, setNewItemName] = useState<string>('');
   const [newItemParent, setNewItemParent] = useState<string | null>(null);
   const [editorTheme, setEditorTheme] = useState<string>('vs-dark');
+  
+  // Drag and drop state
+  const [draggedItem, setDraggedItem] = useState<string | null>(null);
+  const [dropTarget, setDropTarget] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+  
   const [editorOptions, setEditorOptions] = useState({
     minimap: { enabled: true },
     fontSize: 14,
@@ -136,6 +142,7 @@ const OnlineCodeEditor: React.FC = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState<boolean>(false);
   const [deleteConfirmInput, setDeleteConfirmInput] = useState<string>("");
+  
   const [isKeyboardShortcutsOpen, setIsKeyboardShortcutsOpen] = useState<boolean>(false);
   const [isSnippetsOpen, setIsSnippetsOpen] = useState<boolean>(false);
   const [autoSaveEnabled, setAutoSaveEnabled] = useState<boolean>(true);
@@ -620,12 +627,17 @@ console.log("Let's start coding!");`,
     
     const isFolder = item.type === 'folder';
     const hasChildren = isFolder && item.children && item.children.length > 0;
+    const isBeingDragged = draggedItem === itemId;
+    const isDropTarget = dropTarget === itemId;
     
     return (
       <div key={item.id} className="fileSystemItem" style={{ paddingLeft: `${depth * 12}px` }}>
         <div 
           className={classNames("flex items-center py-1 px-2 hover:bg-gray-700 rounded cursor-pointer", {
-            'bg-gray-700/50': tabs.some(tab => tab.fileId === item.id && tab.isActive)
+            'bg-gray-700/50': tabs.some(tab => tab.fileId === item.id && tab.isActive),
+            'opacity-50': isBeingDragged,
+            'bg-blue-900/30': isDropTarget && isFolder,
+            'border border-blue-500': isDropTarget && isFolder
           })}
           onClick={() => {
             if (isFolder) {
@@ -633,6 +645,61 @@ console.log("Let's start coding!");`,
             } else {
               openFile(item.id);
             }
+          }}
+          draggable={true}
+          onDragStart={(e) => {
+            e.stopPropagation();
+            setDraggedItem(itemId);
+            setIsDragging(true);
+            e.dataTransfer.setData('text/plain', itemId);
+            e.dataTransfer.effectAllowed = 'move';
+          }}
+          onDragEnd={() => {
+            setDraggedItem(null);
+            setDropTarget(null);
+            setIsDragging(false);
+          }}
+          onDragOver={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Only set as drop target if it's a folder and not the item being dragged
+            if (isFolder && itemId !== draggedItem) {
+              setDropTarget(itemId);
+              e.dataTransfer.dropEffect = 'move';
+            }
+          }}
+          onDragEnter={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Only set as drop target if it's a folder and not the item being dragged
+            if (isFolder && itemId !== draggedItem) {
+              setDropTarget(itemId);
+            }
+          }}
+          onDragLeave={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            if (dropTarget === itemId) {
+              setDropTarget(null);
+            }
+          }}
+          onDrop={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const droppedItemId = e.dataTransfer.getData('text/plain');
+            
+            // Only process if it's a folder and not the item being dragged
+            if (isFolder && droppedItemId !== itemId) {
+              moveItem(droppedItemId, itemId);
+            }
+            
+            setDraggedItem(null);
+            setDropTarget(null);
+            setIsDragging(false);
           }}
         >
           {isFolder ? (
@@ -915,6 +982,98 @@ console.log("Let's start coding!");`,
     setIsCreatingFolder(false);
     setNewItemName('');
     setNewItemParent(null);
+  };
+
+  // Move file or folder to another folder
+  const moveItem = (itemId: string, targetFolderId: string | null) => {
+    console.log(`Moving item ${itemId} to folder ${targetFolderId}`);
+    
+    // Get the item being moved
+    const item = fileSystem.items[itemId];
+    if (!item) {
+      console.error("Item not found:", itemId);
+      return;
+    }
+    
+    // Don't move a folder into itself or its descendants
+    if (item.type === 'folder') {
+      let currentFolder = targetFolderId;
+      while (currentFolder) {
+        if (currentFolder === itemId) {
+          console.error("Cannot move a folder into itself or its descendants");
+          toast({
+            title: "Move Failed",
+            description: "Cannot move a folder into itself or its descendants",
+            variant: "destructive"
+          });
+          return;
+        }
+        const folder = fileSystem.items[currentFolder];
+        currentFolder = folder?.parent || null;
+      }
+    }
+    
+    // Update the file system
+    setFileSystem(prev => {
+      const newFileSystem = { ...prev };
+      
+      // Remove from the previous parent's children list
+      if (item.parent === null) {
+        // Item was in root, remove from rootItems
+        newFileSystem.rootItems = newFileSystem.rootItems.filter(id => id !== itemId);
+      } else {
+        // Item was in a folder, remove from that folder's children
+        const parentFolder = { ...newFileSystem.items[item.parent] };
+        if (parentFolder.children) {
+          parentFolder.children = parentFolder.children.filter(id => id !== itemId);
+          newFileSystem.items = {
+            ...newFileSystem.items,
+            [parentFolder.id]: parentFolder
+          };
+        }
+      }
+      
+      // Add to the new parent
+      if (targetFolderId === null) {
+        // Move to root
+        newFileSystem.rootItems = [...newFileSystem.rootItems, itemId];
+      } else {
+        // Move to a folder
+        const targetFolder = { ...newFileSystem.items[targetFolderId] };
+        if (!targetFolder) {
+          console.error("Target folder not found:", targetFolderId);
+          return prev;
+        }
+        
+        targetFolder.children = targetFolder.children || [];
+        targetFolder.children = [...targetFolder.children, itemId];
+        
+        newFileSystem.items = {
+          ...newFileSystem.items,
+          [targetFolderId]: targetFolder
+        };
+      }
+      
+      // Update the item's parent
+      newFileSystem.items = {
+        ...newFileSystem.items,
+        [itemId]: {
+          ...newFileSystem.items[itemId],
+          parent: targetFolderId
+        }
+      };
+      
+      console.log("Updated file system:", newFileSystem);
+      return newFileSystem;
+    });
+    
+    toast({
+      title: "Item Moved",
+      description: `${item.name} has been moved successfully`,
+    });
+    
+    // Save the updated file system to localStorage
+    setTimeout(() => saveToLocalStorage(workspaceName, false), 100);
   };
 
   // Delete a file or folder
