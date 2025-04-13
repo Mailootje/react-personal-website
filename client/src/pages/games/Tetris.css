@@ -1,0 +1,51 @@
+/* Game block styles */
+.game-block {
+  margin: 0;
+  padding: 0;
+  width: 1.5em;
+  height: 1.5em;
+  border: 1px solid #ddd;
+}
+
+/* Piece colors */
+.piece-i {
+  background-color: #ec858b; /* Light red */
+}
+.piece-j {
+  background-color: #f1b598; /* Light orange */
+}
+.piece-l {
+  background-color: #f8efae; /* Light yellow */
+}
+.piece-o {
+  background-color: #b5a677; /* Light brown */
+}
+.piece-s {
+  background-color: #816e56; /* Brown */
+}
+.piece-t {
+  background-color: #b77c72; /* Terra cotta */
+}
+.piece-z {
+  background-color: #e3be58; /* Gold */
+}
+.piece-preview {
+  background-color: #eee; /* Light gray */
+}
+
+/* Game board styling */
+.tetris-gameboard {
+  border: 2px solid #ddd;
+  margin: 0 auto;
+  max-width: 100%;
+}
+
+/* Queue and held piece styling */
+.tetris-piece-queue-container,
+.tetris-held-piece-container {
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem;
+  background-color: #f9f9f9;
+  border-radius: 0.25rem;
+}
