@@ -178,11 +178,18 @@ export default function Tetris() {
   
   // Draw the game board
   const drawBoard = useCallback(() => {
+    console.log("Drawing board, currentTetromino:", currentTetromino);
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) {
+      console.error("Canvas ref is null");
+      return;
+    }
     
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      console.error("Failed to get canvas context");
+      return;
+    }
     
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -224,6 +231,7 @@ export default function Tetris() {
     
     // Draw current tetromino
     if (currentTetromino) {
+      console.log("Drawing tetromino:", currentTetromino);
       const { shape, color, position } = currentTetromino;
       
       ctx.fillStyle = color;
@@ -231,22 +239,16 @@ export default function Tetris() {
       for (let y = 0; y < shape.length; y++) {
         for (let x = 0; x < shape[y].length; x++) {
           if (shape[y][x] && position.y + y >= 0) {
-            ctx.fillRect(
-              (position.x + x) * CELL_SIZE,
-              (position.y + y) * CELL_SIZE,
-              CELL_SIZE,
-              CELL_SIZE
-            );
+            const drawX = (position.x + x) * CELL_SIZE;
+            const drawY = (position.y + y) * CELL_SIZE;
+            console.log(`Drawing block at (${drawX}, ${drawY})`);
+            
+            ctx.fillRect(drawX, drawY, CELL_SIZE, CELL_SIZE);
             
             // Draw cell border
             ctx.strokeStyle = '#000000';
             ctx.lineWidth = 1;
-            ctx.strokeRect(
-              (position.x + x) * CELL_SIZE,
-              (position.y + y) * CELL_SIZE,
-              CELL_SIZE,
-              CELL_SIZE
-            );
+            ctx.strokeRect(drawX, drawY, CELL_SIZE, CELL_SIZE);
           }
         }
       }
@@ -763,7 +765,10 @@ export default function Tetris() {
                           <div className="text-center p-6">
                             <h3 className="text-2xl font-bold mb-4">Tetris</h3>
                             <p className="mb-6">Arrange falling blocks to create complete horizontal lines.</p>
-                            <Button onClick={initGame} size="lg">
+                            <Button onClick={() => {
+                              console.log("Start button clicked");
+                              initGame();
+                            }} size="lg">
                               Start Game
                             </Button>
                           </div>
