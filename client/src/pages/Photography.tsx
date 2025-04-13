@@ -205,7 +205,7 @@ export default function Photography() {
                 {photos.map((photo) => (
                   <motion.div
                     key={photo.id}
-                    className="overflow-hidden rounded-lg shadow-md cursor-pointer h-64 md:h-80"
+                    className="overflow-hidden rounded-lg shadow-md cursor-pointer flex flex-col"
                     onClick={() => openPhotoModal(photo)}
                     whileHover={{ 
                       scale: 1.03,
@@ -215,19 +215,25 @@ export default function Photography() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
                   >
-                    <img
-                      src={getProxiedImageUrl(photo.url)}
-                      alt={photo.title}
-                      className="w-full h-full object-cover transition-transform duration-500"
-                      onError={(e) => {
-                        console.error(`Failed to load image: ${photo.url}`);
-                        // If image fails to load, replace with placeholder
-                        (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x300?text=Image+Not+Available';
-                        // Add a class to indicate error
-                        (e.target as HTMLImageElement).classList.add('image-error');
-                      }}
-                      crossOrigin="anonymous"
-                    />
+                    <div className="h-56 md:h-64 overflow-hidden">
+                      <img
+                        src={getProxiedImageUrl(photo.url)}
+                        alt={photo.title}
+                        className="w-full h-full object-cover transition-transform duration-500"
+                        onError={(e) => {
+                          console.error(`Failed to load image: ${photo.url}`);
+                          // If image fails to load, replace with placeholder
+                          (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x300?text=Image+Not+Available';
+                          // Add a class to indicate error
+                          (e.target as HTMLImageElement).classList.add('image-error');
+                        }}
+                        crossOrigin="anonymous"
+                      />
+                    </div>
+                    <div className="p-3 bg-white">
+                      <h3 className="font-medium text-sm truncate">{photo.title}</h3>
+                      <p className="text-xs text-gray-500 truncate">{photo.category}{photo.subcategory && ` • ${photo.subcategory}`}</p>
+                    </div>
                   </motion.div>
                 ))}
               </motion.div>
@@ -249,16 +255,30 @@ export default function Photography() {
               className="relative max-w-5xl max-h-[90vh] w-full"
               onClick={(e) => e.stopPropagation()}
             >
-              <img 
-                src={getProxiedImageUrl(selectedPhoto.url)} 
-                alt={selectedPhoto.title} 
-                className="w-full h-auto max-h-[90vh] object-contain rounded-lg"
-                onError={(e) => {
-                  console.error(`Failed to load modal image: ${selectedPhoto.url}`);
-                  (e.target as HTMLImageElement).src = 'https://via.placeholder.com/800x600?text=Image+Not+Available';
-                }}
-                crossOrigin="anonymous"
-              />
+              <div className="flex flex-col bg-white rounded-lg overflow-hidden">
+                <img 
+                  src={getProxiedImageUrl(selectedPhoto.url)} 
+                  alt={selectedPhoto.title} 
+                  className="w-full h-auto max-h-[80vh] object-contain"
+                  onError={(e) => {
+                    console.error(`Failed to load modal image: ${selectedPhoto.url}`);
+                    (e.target as HTMLImageElement).src = 'https://via.placeholder.com/800x600?text=Image+Not+Available';
+                  }}
+                  crossOrigin="anonymous"
+                />
+                <div className="p-4 bg-white">
+                  <h3 className="font-bold text-lg">{selectedPhoto.title}</h3>
+                  <div className="flex flex-wrap gap-2 text-gray-600 text-sm mt-1">
+                    <span>Category: {categoryDisplayNames[selectedPhoto.category as keyof typeof categoryDisplayNames] || selectedPhoto.category}</span>
+                    {selectedPhoto.subcategory && (
+                      <span className="flex items-center">
+                        <span className="mx-2 text-gray-400">•</span>
+                        <span>Location: {selectedPhoto.subcategory}</span>
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
               <button
                 onClick={closePhotoModal}
                 className="absolute top-4 right-4 bg-black/50 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/70 transition-colors"
@@ -266,18 +286,6 @@ export default function Photography() {
               >
                 <span className="text-2xl">&times;</span>
               </button>
-              <div className="bg-white p-4 absolute bottom-0 left-0 right-0 bg-opacity-90 backdrop-blur-sm">
-                <h3 className="font-bold text-lg">{selectedPhoto.title}</h3>
-                <div className="flex flex-wrap gap-2 text-gray-600 text-sm">
-                  <span>Category: {categoryDisplayNames[selectedPhoto.category as keyof typeof categoryDisplayNames] || selectedPhoto.category}</span>
-                  {selectedPhoto.subcategory && (
-                    <span className="flex items-center">
-                      <span className="mx-2 text-gray-400">•</span>
-                      <span>Location: {selectedPhoto.subcategory}</span>
-                    </span>
-                  )}
-                </div>
-              </div>
             </motion.div>
           </div>
         )}
