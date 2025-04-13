@@ -509,6 +509,66 @@ MIT
     }
   ];
 
+  // Prevent browser shortcuts
+  const preventBrowserShortcuts = (e: KeyboardEvent) => {
+    // Keys we want to prevent browser behavior for
+    const editorShortcuts = [
+      // Ctrl+F (Find/Search)
+      { key: 'f', ctrl: true, alt: false, shift: false },
+      // Ctrl+S (Save)
+      { key: 's', ctrl: true, alt: false, shift: false },
+      // Ctrl+P (Print)
+      { key: 'p', ctrl: true, alt: false, shift: false },
+      // Ctrl+G (Go to line)
+      { key: 'g', ctrl: true, alt: false, shift: false },
+      // Ctrl+/ (Comment)
+      { key: '/', ctrl: true, alt: false, shift: false },
+      // Ctrl+D (Bookmark)
+      { key: 'd', ctrl: true, alt: false, shift: false },
+      // Ctrl+K (Link)
+      { key: 'k', ctrl: true, alt: false, shift: false },
+      // Ctrl+B (Bold)
+      { key: 'b', ctrl: true, alt: false, shift: false },
+      // Ctrl+I (Italic)
+      { key: 'i', ctrl: true, alt: false, shift: false },
+      // Ctrl+W (Close tab)
+      { key: 'w', ctrl: true, alt: false, shift: false },
+      // Ctrl+J (Download)
+      { key: 'j', ctrl: true, alt: false, shift: false },
+      // Ctrl+H (History)
+      { key: 'h', ctrl: true, alt: false, shift: false },
+      // Ctrl+U (View Source)
+      { key: 'u', ctrl: true, alt: false, shift: false },
+      // Shift+Alt+F (Format)
+      { key: 'f', ctrl: false, alt: true, shift: true },
+      // Alt+Left/Right (Browser back/forward)
+      { key: 'ArrowLeft', ctrl: false, alt: true, shift: false },
+      { key: 'ArrowRight', ctrl: false, alt: true, shift: false },
+      // Alt+Up/Down (Move line)
+      { key: 'ArrowUp', ctrl: false, alt: true, shift: false },
+      { key: 'ArrowDown', ctrl: false, alt: true, shift: false },
+      // Ctrl+Shift+K (Delete line)
+      { key: 'k', ctrl: true, alt: false, shift: true },
+      // Ctrl+Plus/Minus (Zoom)
+      { key: '+', ctrl: true, alt: false, shift: false },
+      { key: '-', ctrl: true, alt: false, shift: false },
+      { key: '=', ctrl: true, alt: false, shift: false }
+    ];
+    
+    // Check if the current key combination matches any of our shortcuts
+    const isEditorShortcut = editorShortcuts.some(shortcut => 
+      e.key.toLowerCase() === shortcut.key.toLowerCase() &&
+      e.ctrlKey === shortcut.ctrl &&
+      e.altKey === shortcut.alt &&
+      e.shiftKey === shortcut.shift
+    );
+    
+    // If it's one of our editor shortcuts, prevent the browser from handling it
+    if (isEditorShortcut) {
+      e.preventDefault();
+    }
+  };
+  
   // Initialize with a welcome file
   useEffect(() => {
     const welcomeId = generateId();
@@ -543,6 +603,14 @@ console.log("Let's start coding!");`,
     }]);
     setCurrentContent(initialFileSystem.items[welcomeId].content || '');
     setCurrentLanguage('javascript');
+    
+    // Add event listener to prevent browser shortcuts
+    document.addEventListener('keydown', preventBrowserShortcuts);
+    
+    // Clean up event listener when component unmounts
+    return () => {
+      document.removeEventListener('keydown', preventBrowserShortcuts);
+    };
   }, []);
 
   // Handle file/folder tree rendering
