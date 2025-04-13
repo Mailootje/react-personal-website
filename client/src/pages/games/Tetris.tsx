@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Container } from '@/components/ui/container';
 import { Header } from '@/components/Header';
@@ -7,6 +7,24 @@ import Tetris from 'react-tetris';
 import './Tetris.css';
 
 export default function TetrisGame() {
+  // Prevent arrow keys from scrolling the page
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Prevent default behavior for arrow keys, space, and other game control keys
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'p', 'z', 'x', 'c'].includes(e.key)) {
+        e.preventDefault();
+      }
+    };
+
+    // Add event listener
+    window.addEventListener('keydown', handleKeyDown);
+    
+    // Remove event listener on cleanup
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -42,7 +60,6 @@ export default function TetrisGame() {
                     }}
                   >
                     {({
-                      HeldPiece,
                       Gameboard,
                       PieceQueue,
                       points,
@@ -54,7 +71,7 @@ export default function TetrisGame() {
                         <div className="grid grid-cols-3 gap-4 mb-6">
                           <div className="bg-gray-100 p-3 rounded-md text-center">
                             <div className="text-sm text-gray-500 mb-1">Score</div>
-                            <div className="font-bold text-xl">{points}</div>
+                            <div className="font-bold text-xl">{points * 100}</div>
                           </div>
                           <div className="bg-gray-100 p-3 rounded-md text-center">
                             <div className="text-sm text-gray-500 mb-1">Lines</div>
@@ -76,13 +93,6 @@ export default function TetrisGame() {
                               <h3 className="font-bold text-lg mb-2">Next Piece</h3>
                               <div className="border-2 border-gray-200 rounded-md overflow-hidden bg-gray-50">
                                 <PieceQueue />
-                              </div>
-                            </div>
-                            
-                            <div>
-                              <h3 className="font-bold text-lg mb-2">Held Piece</h3>
-                              <div className="border-2 border-gray-200 rounded-md overflow-hidden bg-gray-50">
-                                <HeldPiece />
                               </div>
                             </div>
                             
@@ -142,7 +152,6 @@ export default function TetrisGame() {
                         <li>Arrow Down / S: Drop tetromino by one row</li>
                         <li>Arrow Up / W: Rotate tetromino</li>
                         <li>Spacebar: Hard drop (instantly drop to bottom)</li>
-                        <li>C / Shift: Hold piece</li>
                         <li>P: Pause/Resume game</li>
                         <li>Z: Rotate counter-clockwise</li>
                       </ul>
@@ -151,7 +160,6 @@ export default function TetrisGame() {
                     <div>
                       <h4 className="font-semibold mb-2">Special Features</h4>
                       <ul className="list-disc pl-5 space-y-1">
-                        <li><strong>Hold Piece:</strong> Store a piece for later use (press C or Shift)</li>
                         <li><strong>Ghost Piece:</strong> Shows where your piece will land</li>
                         <li><strong>Next Queue:</strong> See upcoming pieces</li>
                       </ul>
@@ -162,7 +170,6 @@ export default function TetrisGame() {
                       <ul className="list-disc pl-5 space-y-1">
                         <li>Plan ahead using the next piece queue</li>
                         <li>Leave a column open for I-pieces (Tetris clears)</li>
-                        <li>Use the hold feature strategically</li>
                         <li>Keep the stack as low as possible</li>
                       </ul>
                     </div>

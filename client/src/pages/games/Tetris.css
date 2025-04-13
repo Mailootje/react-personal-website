@@ -4,33 +4,35 @@
   padding: 0;
   width: 1.5em;
   height: 1.5em;
-  border: 1px solid #ddd;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.5);
 }
 
-/* Piece colors */
+/* Piece colors with more vibrant colors */
 .piece-i {
-  background-color: #ec858b; /* Light red */
+  background-color: #00FFFF; /* Cyan */
 }
 .piece-j {
-  background-color: #f1b598; /* Light orange */
+  background-color: #0000FF; /* Blue */
 }
 .piece-l {
-  background-color: #f8efae; /* Light yellow */
+  background-color: #FF7F00; /* Orange */
 }
 .piece-o {
-  background-color: #b5a677; /* Light brown */
+  background-color: #FFFF00; /* Yellow */
 }
 .piece-s {
-  background-color: #816e56; /* Brown */
+  background-color: #00FF00; /* Green */
 }
 .piece-t {
-  background-color: #b77c72; /* Terra cotta */
+  background-color: #800080; /* Purple */
 }
 .piece-z {
-  background-color: #e3be58; /* Gold */
+  background-color: #FF0000; /* Red */
 }
 .piece-preview {
   background-color: #eee; /* Light gray */
+  opacity: 0.5;
 }
 
 /* Game board styling */
@@ -38,14 +40,29 @@
   border: 2px solid #ddd;
   margin: 0 auto;
   max-width: 100%;
+  background-color: rgba(240, 240, 240, 0.5);
 }
 
-/* Queue and held piece styling */
-.tetris-piece-queue-container,
-.tetris-held-piece-container {
+/* Queue styling */
+.tetris-piece-queue-container {
   display: flex;
   justify-content: center;
   padding: 0.5rem;
   background-color: #f9f9f9;
   border-radius: 0.25rem;
+  width: 100%;
+}
+
+/* Make the game more responsive */
+@media (max-width: 768px) {
+  .game-block {
+    width: 1.2em;
+    height: 1.2em;
+  }
+}
+
+/* Style ghost piece */
+.game-block.ghost {
+  opacity: 0.3;
+  box-shadow: none;
 }
