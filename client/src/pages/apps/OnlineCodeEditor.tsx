@@ -6,7 +6,7 @@ import {
   FaUpload, FaSave, FaTrash, FaTimes, FaSearch, FaExchangeAlt, FaCode, 
   FaMinus, FaPlus as FaPlusIcon, FaList, FaMap, FaPlay, FaInfoCircle,
   FaKeyboard, FaClock, FaCheck, FaSun, FaMoon, FaCut, FaCopy, FaPaste,
-  FaEdit, FaRedo, FaUndo, FaFileExport, FaDownload, FaPen, FaFileImport
+  FaEdit, FaRedo, FaUndo, FaFileExport, FaDownload, FaPen, FaFileImport, FaFileArchive
 } from 'react-icons/fa';
 import { Button } from '@/components/ui/button';
 import { Tooltip } from '@/components/ui/tooltip';
@@ -69,6 +69,11 @@ interface ContextMenuState {
   position: ContextMenuPosition;
   itemId: string | null;
 }
+
+// Function to check if a file is a ZIP file
+const isZipFile = (filename: string): boolean => {
+  return filename.toLowerCase().endsWith('.zip');
+};
 
 // Language detection by file extension
 const getLanguageByFilename = (filename: string): string => {
@@ -1313,6 +1318,186 @@ console.log("Let's start coding!");`,
   };
 
   // Process a ZIP file upload
+  // Process zip file from blob content
+  const processZipFileContent = async (blob: Blob, parentId: string | null, folderName?: string) => {
+    try {
+      const zip = new JSZip();
+      const loaded = await zip.loadAsync(blob);
+      
+      // Create folder for extracted files if name is provided
+      let extractFolderId = parentId;
+      
+      if (folderName) {
+        // Create a parent folder for all extracted content
+        const folderId = generateId();
+        setFileSystem(prev => {
+          const newFileSystem = { ...prev };
+          
+          newFileSystem.items = {
+            ...newFileSystem.items,
+            [folderId]: {
+              id: folderId,
+              name: folderName,
+              type: 'folder',
+              parent: parentId,
+              children: [],
+              isOpen: true
+            }
+          };
+          
+          // Add to parent's children or root
+          if (parentId) {
+            const parent = { ...newFileSystem.items[parentId] };
+            if (parent.children) {
+              parent.children = [...parent.children, folderId];
+            } else {
+              parent.children = [folderId];
+            }
+            newFileSystem.items[parentId] = parent;
+          } else {
+            newFileSystem.rootItems = [...newFileSystem.rootItems, folderId];
+          }
+          
+          return newFileSystem;
+        });
+        
+        // Set the extract folder ID to the new folder
+        extractFolderId = folderId;
+      }
+      
+      // Map to store folders by path for quick lookup
+      const folderMap: Record<string, string> = { '': extractFolderId || '' }; // Empty string is the root or parent
+
+      // First create all folders
+      for (const relativePath in loaded.files) {
+        const entry = loaded.files[relativePath];
+        
+        // Skip directories and empty files that are automatically added by JSZip
+        if (entry.dir || relativePath.endsWith('/')) {
+          // Create folder hierarchy
+          const pathParts = relativePath.split('/').filter(Boolean);
+          let currentPath = '';
+          let parentId: string | null = extractFolderId;
+          
+          for (let i = 0; i < pathParts.length; i++) {
+            const folderName = pathParts[i];
+            const newPath = currentPath ? `${currentPath}/${folderName}` : folderName;
+            
+            // Check if this folder already exists
+            if (!folderMap[newPath]) {
+              const folderId = generateId();
+              folderMap[newPath] = folderId;
+              
+              // Create the folder in our file system
+              setFileSystem(prev => {
+                const newFileSystem = { ...prev };
+                
+                newFileSystem.items = {
+                  ...newFileSystem.items,
+                  [folderId]: {
+                    id: folderId,
+                    name: folderName,
+                    type: 'folder',
+                    parent: parentId,
+                    children: [],
+                    isOpen: true
+                  }
+                };
+                
+                // Add to parent's children or root
+                if (parentId) {
+                  const parent = { ...newFileSystem.items[parentId] };
+                  if (parent.children) {
+                    parent.children = [...parent.children, folderId];
+                  } else {
+                    parent.children = [folderId];
+                  }
+                  newFileSystem.items[parentId] = parent;
+                } else {
+                  newFileSystem.rootItems = [...newFileSystem.rootItems, folderId];
+                }
+                
+                return newFileSystem;
+              });
+            }
+            
+            // Update parent for next iteration
+            parentId = folderMap[newPath];
+            currentPath = newPath;
+          }
+        }
+      }
+      
+      // Then create files
+      for (const relativePath in loaded.files) {
+        const entry = loaded.files[relativePath];
+        
+        // Skip directories
+        if (!entry.dir && !relativePath.endsWith('/')) {
+          try {
+            // Get file content
+            const content = await entry.async('text');
+            
+            // Get file parent folder
+            const pathParts = relativePath.split('/');
+            const fileName = pathParts.pop() || '';
+            const parentPath = pathParts.join('/');
+            const parentId = folderMap[parentPath] || extractFolderId;
+            
+            // Create file
+            const fileId = generateId();
+            setFileSystem(prev => {
+              const newFileSystem = { ...prev };
+              
+              newFileSystem.items = {
+                ...newFileSystem.items,
+                [fileId]: {
+                  id: fileId,
+                  name: fileName,
+                  type: 'file',
+                  parent: parentId,
+                  content: btoa(content),
+                  language: getLanguageByFilename(fileName)
+                }
+              };
+              
+              // Add to parent's children or root
+              if (parentId) {
+                const parent = { ...newFileSystem.items[parentId] };
+                if (parent.children) {
+                  parent.children = [...parent.children, fileId];
+                } else {
+                  parent.children = [fileId];
+                }
+                newFileSystem.items[parentId] = parent;
+              } else {
+                newFileSystem.rootItems = [...newFileSystem.rootItems, fileId];
+              }
+              
+              return newFileSystem;
+            });
+          } catch (error) {
+            console.error(`Failed to extract file: ${relativePath}`, error);
+          }
+        }
+      }
+      
+      toast({
+        title: "ZIP Extracted",
+        description: `${Object.keys(loaded.files).length} files extracted successfully.`,
+        duration: 3000
+      });
+    } catch (error) {
+      console.error("Failed to process ZIP file: ", error);
+      toast({
+        title: "Error",
+        description: "Failed to extract ZIP file.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Processes an uploaded zip file
   const processZipFile = (file: File) => {
     const reader = new FileReader();
     
@@ -2564,6 +2749,63 @@ console.log("Starting fresh!");`,
     });
   };
   
+  // Function to extract a ZIP file
+  const unzipFile = (fileId: string) => {
+    const file = fileSystem.items[fileId];
+    if (!file || file.type !== 'file' || !file.content) {
+      toast({
+        title: "Error",
+        description: "Cannot extract this file.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (!isZipFile(file.name)) {
+      toast({
+        title: "Error",
+        description: "Selected file is not a ZIP file.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    try {
+      // Extract the parent folder where the zip file is located
+      const parentFolderId = file.parent;
+      
+      // Create a blob from the file content
+      const binaryContent = atob(file.content);
+      const arrayBuffer = new ArrayBuffer(binaryContent.length);
+      const uint8Array = new Uint8Array(arrayBuffer);
+      
+      for (let i = 0; i < binaryContent.length; i++) {
+        uint8Array[i] = binaryContent.charCodeAt(i);
+      }
+      
+      // Create a blob and extract its contents
+      const blob = new Blob([uint8Array], { type: 'application/zip' });
+      
+      // Create a folder name from the zip file name (remove .zip extension)
+      const extractFolderName = file.name.replace(/\.zip$/i, '');
+      
+      // Process the ZIP file content in a new folder
+      processZipFileContent(blob, parentFolderId, extractFolderName);
+      
+      toast({
+        title: "Extracting ZIP",
+        description: "ZIP file extraction started.",
+      });
+    } catch (error) {
+      console.error("Error unzipping file:", error);
+      toast({
+        title: "Extraction Failed",
+        description: "Could not extract the ZIP file.",
+        variant: "destructive"
+      });
+    }
+  };
+  
   // Function to download a folder (future implementation)
   const downloadFolder = (folderId: string) => {
     const folder = fileSystem.items[folderId];
@@ -2708,6 +2950,9 @@ console.log("Starting fresh!");`,
           downloadFolder(item.id);
         }
         break;
+      case 'extract':
+        unzipFile(item.id);
+        break;
       default:
         break;
     }
@@ -2736,6 +2981,7 @@ console.log("Starting fresh!");`,
             if (!item) return null;
             
             const isFolder = item.type === 'folder';
+            const isZip = !isFolder && isZipFile(item.name);
             
             return (
               <>
@@ -2788,6 +3034,16 @@ console.log("Starting fresh!");`,
                   <FaDownload className="mr-2 text-purple-400" />
                   Download
                 </button>
+                
+                {isZip && (
+                  <button 
+                    className="flex items-center w-full px-4 py-1.5 text-sm hover:bg-gray-700 text-left"
+                    onClick={() => handleContextMenuAction('extract')}
+                  >
+                    <FaFileArchive className="mr-2 text-orange-400" />
+                    Extract
+                  </button>
+                )}
                 
                 <div className="border-t border-gray-700 my-1"></div>
                 
