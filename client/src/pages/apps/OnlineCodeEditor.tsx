@@ -3067,11 +3067,11 @@ console.log("Starting fresh!");`,
     return () => clearInterval(interval);
   }, [autoSaveEnabled, autoSaveInterval, tabs, currentContent, workspaceName]);
 
-  // Check for localStorage data on first load
+  // Check for storage data on first load (IndexedDB and localStorage)
   useEffect(() => {
-    console.log("Running initial localStorage check effect");
+    console.log("Running initial storage check effect");
     
-    // Make sure localStorage is available
+    // Basic availability check for localStorage
     try {
       const testKey = "codeEditor_testKey";
       localStorage.setItem(testKey, "test");
@@ -3080,57 +3080,153 @@ console.log("Starting fresh!");`,
     } catch (error) {
       console.error("localStorage is not available:", error);
       toast({
-        title: "Storage Unavailable",
-        description: "Your browser's localStorage is not available. Your data won't be saved between sessions.",
+        title: "localStorage Unavailable",
+        description: "Your browser's localStorage is not available. Falling back to IndexedDB only.",
         variant: "destructive",
-        duration: 10000
+        duration: 5000
       });
-      return;
+      // Continue anyway since we have IndexedDB
     }
     
-    // Load list of available workspaces
-    loadWorkspaceList();
-    
-    // Get the current workspace name (if any)
-    const currentWorkspace = localStorage.getItem('codeEditor_currentWorkspace') || 'default';
-    console.log("Current workspace from localStorage:", currentWorkspace);
-    
-    // Check if there's saved data for the current workspace
-    const hasWorkspaceData = localStorage.getItem(`codeEditor_fileSystem_${currentWorkspace}`);
-    console.log("Has workspace data:", !!hasWorkspaceData);
-    
-    if (hasWorkspaceData) {
-      // We have saved data, automatically load workspace without prompting
-      console.log("Found workspace data, automatically loading workspace:", currentWorkspace);
-      setWorkspaceToRestore(currentWorkspace);
-      loadFromLocalStorage(currentWorkspace);
+    // Check for IndexedDB availability
+    try {
+      // Load list of available workspaces from IndexedDB first
+      loadWorkspaceList();
+      
+      // Then check for current workspace in IndexedDB
+      openDB().then(db => {
+        console.log("Checking IndexedDB for current workspace");
+        const transaction = db.transaction(['meta'], 'readonly');
+        const request = transaction.objectStore('meta').get('currentWorkspace');
+        
+        request.onsuccess = (event) => {
+          const result = request.result;
+          const currentWorkspace = result && result.value ? result.value : 'default';
+          console.log("Current workspace from IndexedDB:", currentWorkspace);
+          
+          // Now check if we have this workspace's data in IndexedDB
+          const fsTransaction = db.transaction(['fileSystem'], 'readonly');
+          const fsRequest = fsTransaction.objectStore('fileSystem').get(currentWorkspace);
+          
+          fsRequest.onsuccess = (event) => {
+            const result = fsRequest.result;
+            if (result && result.data) {
+              // We have workspace data in IndexedDB, load it
+              console.log("Found workspace data in IndexedDB, loading workspace:", currentWorkspace);
+              setWorkspaceToRestore(currentWorkspace);
+              loadFromLocalStorage(currentWorkspace);
+            } else {
+              // Check in localStorage as fallback
+              console.log("No workspace data in IndexedDB, checking localStorage");
+              const hasWorkspaceData = localStorage.getItem(`codeEditor_fileSystem_${currentWorkspace}`);
+              console.log("Has workspace data in localStorage:", !!hasWorkspaceData);
+              
+              if (hasWorkspaceData) {
+                // We have saved data in localStorage, load and migrate it to IndexedDB
+                console.log("Found workspace data in localStorage, loading and migrating to IndexedDB:", currentWorkspace);
+                setWorkspaceToRestore(currentWorkspace);
+                loadFromLocalStorage(currentWorkspace);
+              }
+              // If we have old format data, migrate it to the new format
+              else if (localStorage.getItem('codeEditor_fileSystem')) {
+                console.log("Found old format data, migrating to new format");
+                // Migrate old data to default workspace
+                const oldFileSystem = localStorage.getItem('codeEditor_fileSystem');
+                const oldTabs = localStorage.getItem('codeEditor_tabs');
+                const oldOptions = localStorage.getItem('codeEditor_options');
+                
+                if (oldFileSystem) localStorage.setItem('codeEditor_fileSystem_default', oldFileSystem);
+                if (oldTabs) localStorage.setItem('codeEditor_tabs_default', oldTabs);
+                if (oldOptions) localStorage.setItem('codeEditor_options_default', oldOptions);
+                
+                // Clean up old format
+                localStorage.removeItem('codeEditor_fileSystem');
+                localStorage.removeItem('codeEditor_tabs');
+                localStorage.removeItem('codeEditor_options');
+                
+                // Automatically load the migrated workspace without prompting
+                console.log("Automatically loading migrated workspace");
+                loadFromLocalStorage('default');
+              } else {
+                console.log("No existing workspaces found, saving initial state");
+                // Force save current state to ensure it's initialized properly
+                setTimeout(() => {
+                  saveToLocalStorage('default');
+                }, 1000);
+              }
+            }
+          };
+          
+          fsRequest.onerror = (event) => {
+            console.error("Error checking workspace data in IndexedDB:", event);
+            // Fallback to localStorage
+            checkLocalStorage(currentWorkspace);
+          };
+        };
+        
+        request.onerror = (event) => {
+          console.error("Error getting current workspace from IndexedDB:", event);
+          // Fallback to localStorage
+          const currentWorkspace = localStorage.getItem('codeEditor_currentWorkspace') || 'default';
+          checkLocalStorage(currentWorkspace);
+        };
+        
+        // Close the database when done
+        transaction.oncomplete = () => {
+          db.close();
+        };
+      }).catch(error => {
+        console.error("Error opening IndexedDB:", error);
+        // Fallback to localStorage entirely
+        const currentWorkspace = localStorage.getItem('codeEditor_currentWorkspace') || 'default';
+        checkLocalStorage(currentWorkspace);
+      });
+    } catch (error) {
+      console.error("Error checking IndexedDB:", error);
+      
+      // Fallback to localStorage entirely
+      const currentWorkspace = localStorage.getItem('codeEditor_currentWorkspace') || 'default';
+      checkLocalStorage(currentWorkspace);
     }
-    // If we have old format data, migrate it to the new format
-    else if (localStorage.getItem('codeEditor_fileSystem')) {
-      console.log("Found old format data, migrating to new format");
-      // Migrate old data to default workspace
-      const oldFileSystem = localStorage.getItem('codeEditor_fileSystem');
-      const oldTabs = localStorage.getItem('codeEditor_tabs');
-      const oldOptions = localStorage.getItem('codeEditor_options');
+    
+    // Helper function to check localStorage as fallback
+    function checkLocalStorage(currentWorkspace: string) {
+      console.log("Falling back to localStorage check for workspace:", currentWorkspace);
+      const hasWorkspaceData = localStorage.getItem(`codeEditor_fileSystem_${currentWorkspace}`);
       
-      if (oldFileSystem) localStorage.setItem('codeEditor_fileSystem_default', oldFileSystem);
-      if (oldTabs) localStorage.setItem('codeEditor_tabs_default', oldTabs);
-      if (oldOptions) localStorage.setItem('codeEditor_options_default', oldOptions);
-      
-      // Clean up old format
-      localStorage.removeItem('codeEditor_fileSystem');
-      localStorage.removeItem('codeEditor_tabs');
-      localStorage.removeItem('codeEditor_options');
-      
-      // Automatically load the migrated workspace without prompting
-      console.log("Automatically loading migrated workspace");
-      loadFromLocalStorage('default');
-    } else {
-      console.log("No existing workspaces found, saving initial state");
-      // Force save current state to ensure it's initialized properly
-      setTimeout(() => {
-        saveToLocalStorage('default');
-      }, 1000);
+      if (hasWorkspaceData) {
+        // We have saved data, automatically load workspace without prompting
+        console.log("Found workspace data in localStorage, loading workspace:", currentWorkspace);
+        setWorkspaceToRestore(currentWorkspace);
+        loadFromLocalStorage(currentWorkspace);
+      }
+      // If we have old format data, migrate it to the new format
+      else if (localStorage.getItem('codeEditor_fileSystem')) {
+        console.log("Found old format data, migrating to new format");
+        // Migrate old data to default workspace
+        const oldFileSystem = localStorage.getItem('codeEditor_fileSystem');
+        const oldTabs = localStorage.getItem('codeEditor_tabs');
+        const oldOptions = localStorage.getItem('codeEditor_options');
+        
+        if (oldFileSystem) localStorage.setItem('codeEditor_fileSystem_default', oldFileSystem);
+        if (oldTabs) localStorage.setItem('codeEditor_tabs_default', oldTabs);
+        if (oldOptions) localStorage.setItem('codeEditor_options_default', oldOptions);
+        
+        // Clean up old format
+        localStorage.removeItem('codeEditor_fileSystem');
+        localStorage.removeItem('codeEditor_tabs');
+        localStorage.removeItem('codeEditor_options');
+        
+        // Automatically load the migrated workspace without prompting
+        console.log("Automatically loading migrated workspace");
+        loadFromLocalStorage('default');
+      } else {
+        console.log("No existing workspaces found, saving initial state");
+        // Force save current state to ensure it's initialized properly
+        setTimeout(() => {
+          saveToLocalStorage('default');
+        }, 1000);
+      }
     }
   }, []);
 
