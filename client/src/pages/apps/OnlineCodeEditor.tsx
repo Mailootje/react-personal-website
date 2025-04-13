@@ -1313,11 +1313,89 @@ console.log("Let's start coding!");`,
   const saveCurrentFile = () => {
     console.log("Save button clicked - saveCurrentFile function called");
     console.log("Current workspace name:", workspaceName);
-    console.log("Active tabs:", tabs);
+    console.log("Current content length:", currentContent?.length || 0);
+    console.log("Tabs:", tabs);
+    console.log("FileSystem rootItems:", fileSystem.rootItems);
+    console.log("FileSystem items count:", Object.keys(fileSystem.items).length);
     
+    // If there are no tabs but we have content, create a new file and tab
+    if (tabs.length === 0 && currentContent) {
+      console.log("No tabs exist but we have content - creating new file");
+      
+      // Create a new file
+      const newFileId = generateId();
+      const newFileName = "untitled.txt";
+      const language = "plaintext";
+      
+      // Create the file in the file system
+      setFileSystem(prev => {
+        const newFileSystem = { ...prev };
+        
+        newFileSystem.items = {
+          ...newFileSystem.items,
+          [newFileId]: {
+            id: newFileId,
+            name: newFileName,
+            type: 'file',
+            content: currentContent,
+            language: language,
+            parent: null
+          }
+        };
+        
+        newFileSystem.rootItems = [...newFileSystem.rootItems, newFileId];
+        
+        return newFileSystem;
+      });
+      
+      // Create a new tab for this file
+      const newTab: EditorTab = {
+        id: generateId(),
+        fileId: newFileId,
+        isActive: true
+      };
+      
+      setTabs([newTab]);
+      setCurrentLanguage(language);
+      
+      // Save to current workspace's localStorage
+      setTimeout(() => {
+        console.log("Saving newly created file to localStorage");
+        saveToLocalStorage(workspaceName, true);
+        setLastSaveTime(new Date());
+      }, 100);
+      
+      toast({
+        title: "File Created and Saved",
+        description: `New file "${newFileName}" has been created and saved`,
+      });
+      
+      return;
+    }
+    
+    // Find active tab
     const activeTab = tabs.find(tab => tab.isActive);
     if (!activeTab) {
-      console.log("No active tab found, returning without saving");
+      console.log("No active tab found, checking if we have any tabs at all");
+      
+      // If we have tabs, but none are active, activate the first one
+      if (tabs.length > 0) {
+        console.log("We have tabs but none are active - activating first tab");
+        const firstTab = tabs[0];
+        
+        setTabs(prev => 
+          prev.map((tab, index) => ({
+            ...tab,
+            isActive: index === 0
+          }))
+        );
+        
+        // After setting the first tab as active, try to save again
+        setTimeout(saveCurrentFile, 100);
+        return;
+      }
+      
+      console.log("No tabs found at all, returning without saving");
       toast({
         title: "Save Failed",
         description: "No active file to save",
@@ -1334,6 +1412,7 @@ console.log("Let's start coding!");`,
       
       if (!file) {
         console.log("File not found in fileSystem:", fileId);
+        console.log("Available file IDs:", Object.keys(prev.items));
         return prev;
       }
       
@@ -1370,12 +1449,37 @@ console.log("Let's start coding!");`,
     setCurrentContent(value || '');
   };
 
+  // Prevent default browser shortcuts that conflict with editor
+  const preventDefaultHandler = useCallback((e: KeyboardEvent) => {
+    // Prevent browser's save dialog when Ctrl+S is pressed
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+      e.preventDefault();
+    }
+    // Prevent browser's find dialog when Ctrl+F is pressed
+    if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+      e.preventDefault();
+    }
+  }, []);
+
+  // Add event listener when editor is mounted and remove when unmounted
+  useEffect(() => {
+    window.addEventListener('keydown', preventDefaultHandler);
+    return () => {
+      window.removeEventListener('keydown', preventDefaultHandler);
+    };
+  }, [preventDefaultHandler]);
+
   // Handle editor mount
   const handleEditorDidMount = (editor: any, monaco: any) => {
     editorRef.current = editor;
     // Setup editor keybindings
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, saveCurrentFile);
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyF, () => setIsSearchOpen(true));
+    
+    // Focus the editor
+    setTimeout(() => {
+      editor.focus();
+    }, 100);
   };
 
   // Format current code
