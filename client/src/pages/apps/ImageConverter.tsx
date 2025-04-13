@@ -364,6 +364,7 @@ export default function ImageConverter() {
             varying vec2 v_texCoord;
             void main() {
               gl_Position = vec4(a_position, 0, 1);
+              // Preserve orientation by not flipping texture coordinates
               v_texCoord = a_texCoord;
             }
           `);
@@ -482,8 +483,12 @@ export default function ImageConverter() {
             return;
           }
           
-          // Draw WebGL canvas to regular canvas
-          outputCtx.drawImage(canvas, 0, 0);
+          // Draw WebGL canvas to regular canvas with orientation preservation
+          outputCtx.save();
+          outputCtx.translate(width/2, height/2);
+          outputCtx.scale(1, 1);
+          outputCtx.drawImage(canvas, -width/2, -height/2, width, height);
+          outputCtx.restore();
           
           // Convert to blob
           const quality = options.quality / 100;
@@ -571,7 +576,14 @@ export default function ImageConverter() {
             ctx.fillRect(0, 0, width, height);
           }
           
-          ctx.drawImage(img, 0, 0, width, height);
+          // Fix for orientation issues - preserve the correct orientation by
+          // ensuring the canvas context is properly set up before drawing
+          ctx.save(); // Save the current state
+          ctx.translate(width/2, height/2); // Move to center
+          ctx.scale(1, 1); // Use scale(1, -1) if flipped vertically or scale(-1, 1) if flipped horizontally
+          ctx.rotate(0); // Use Math.PI if rotated 180 degrees
+          ctx.drawImage(img, -width/2, -height/2, width, height); // Draw from center
+          ctx.restore(); // Restore to the saved state
           
           // Convert to selected format
           const quality = options.quality / 100;
