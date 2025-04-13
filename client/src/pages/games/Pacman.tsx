@@ -185,448 +185,8 @@ export default function PacmanGame() {
     setDotsRemaining(dots);
   }, []);
   
-  // Handle keyboard input
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Prevent default behavior for arrow keys, space, and other game control keys
-      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'p'].includes(e.key)) {
-        e.preventDefault();
-      }
-      
-      if (gameState === GameState.PLAYING) {
-        switch (e.key) {
-          case 'ArrowUp':
-          case 'w':
-          case 'W':
-            setPacman(prev => {
-              // Set both direction and nextDirection to immediately start moving
-              if (prev.y > 0 && level1[prev.y - 1][prev.x] !== EntityType.WALL) {
-                return { ...prev, direction: Direction.UP, nextDirection: Direction.UP };
-              } else {
-                return { ...prev, nextDirection: Direction.UP };
-              }
-            });
-            break;
-          case 'ArrowRight':
-          case 'd':
-          case 'D':
-            setPacman(prev => {
-              if (prev.x < GRID_WIDTH - 1 && level1[prev.y][prev.x + 1] !== EntityType.WALL) {
-                return { ...prev, direction: Direction.RIGHT, nextDirection: Direction.RIGHT };
-              } else {
-                return { ...prev, nextDirection: Direction.RIGHT };
-              }
-            });
-            break;
-          case 'ArrowDown':
-          case 's':
-          case 'S':
-            setPacman(prev => {
-              if (prev.y < GRID_HEIGHT - 1 && level1[prev.y + 1][prev.x] !== EntityType.WALL) {
-                return { ...prev, direction: Direction.DOWN, nextDirection: Direction.DOWN };
-              } else {
-                return { ...prev, nextDirection: Direction.DOWN };
-              }
-            });
-            break;
-          case 'ArrowLeft':
-          case 'a':
-          case 'A':
-            setPacman(prev => {
-              if (prev.x > 0 && level1[prev.y][prev.x - 1] !== EntityType.WALL) {
-                return { ...prev, direction: Direction.LEFT, nextDirection: Direction.LEFT };
-              } else {
-                return { ...prev, nextDirection: Direction.LEFT };
-              }
-            });
-            break;
-          case 'p':
-          case 'P':
-            setGameState(GameState.PAUSED);
-            break;
-        }
-      } else if (gameState === GameState.PAUSED && (e.key === 'p' || e.key === 'P')) {
-        setGameState(GameState.PLAYING);
-      }
-    };
-    
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [gameState, level1]);
-  
-  // Handle touch controls
-  const handleTouchControl = (direction: Direction) => {
-    if (gameState === GameState.PLAYING) {
-      setPacman(prev => {
-        // Check if we can move in the requested direction right away
-        switch (direction) {
-          case Direction.UP:
-            if (prev.y > 0 && level1[prev.y - 1][prev.x] !== EntityType.WALL) {
-              return { ...prev, direction: Direction.UP, nextDirection: Direction.UP };
-            }
-            break;
-          case Direction.RIGHT:
-            if (prev.x < GRID_WIDTH - 1 && level1[prev.y][prev.x + 1] !== EntityType.WALL) {
-              return { ...prev, direction: Direction.RIGHT, nextDirection: Direction.RIGHT };
-            }
-            break;
-          case Direction.DOWN:
-            if (prev.y < GRID_HEIGHT - 1 && level1[prev.y + 1][prev.x] !== EntityType.WALL) {
-              return { ...prev, direction: Direction.DOWN, nextDirection: Direction.DOWN };
-            }
-            break;
-          case Direction.LEFT:
-            if (prev.x > 0 && level1[prev.y][prev.x - 1] !== EntityType.WALL) {
-              return { ...prev, direction: Direction.LEFT, nextDirection: Direction.LEFT };
-            }
-            break;
-        }
-        
-        // If we can't move in that direction right away, just queue it up
-        return { ...prev, nextDirection: direction };
-      });
-    }
-  };
-  
-  // Toggle pause
-  const togglePause = () => {
-    if (gameState === GameState.PLAYING) {
-      setGameState(GameState.PAUSED);
-    } else if (gameState === GameState.PAUSED) {
-      setGameState(GameState.PLAYING);
-    }
-  };
-  
-  // Start a new game
-  const startGame = () => {
-    // Reset the game state
-    setScore(0);
-    setLives(3);
-    
-    // Reset Pacman position with no initial direction
-    setPacman({
-      x: 14,
-      y: 23,
-      type: EntityType.PACMAN,
-      direction: Direction.NONE,
-      nextDirection: Direction.NONE,
-      mouthOpen: true,
-      mouthAngle: 0.2
-    });
-    
-    // After making sure everything is reset, set game state to PLAYING
-    // This explicit ordering ensures that Pac-Man doesn't move before the player
-    // provides input
-    setGameState(GameState.PLAYING);
-    
-    // Reset ghost positions
-    setGhosts([
-      {
-        x: 14, y: 11, type: EntityType.GHOST, name: GhostName.BLINKY, 
-        direction: Direction.UP, frightened: false, eaten: false, frightenedTimer: 0
-      },
-      {
-        x: 12, y: 14, type: EntityType.GHOST, name: GhostName.PINKY, 
-        direction: Direction.UP, frightened: false, eaten: false, frightenedTimer: 0
-      },
-      {
-        x: 14, y: 14, type: EntityType.GHOST, name: GhostName.INKY, 
-        direction: Direction.UP, frightened: false, eaten: false, frightenedTimer: 0
-      },
-      {
-        x: 16, y: 14, type: EntityType.GHOST, name: GhostName.CLYDE, 
-        direction: Direction.UP, frightened: false, eaten: false, frightenedTimer: 0
-      }
-    ]);
-    
-    // Count dots
-    let dots = 0;
-    level1.forEach(row => {
-      row.forEach(cell => {
-        if (cell === EntityType.DOT || cell === EntityType.POWER_PELLET) {
-          dots++;
-        }
-      });
-    });
-    setDotsRemaining(dots);
-    
-    // Reset the game level
-    setLevel1(prevLevel => [...prevLevel.map(row => [...row])]);
-  };
-  
-  // Draw the game
-  const draw = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    
-    // Clear canvas
-    ctx.fillStyle = 'black';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    // Draw the maze
-    for (let y = 0; y < GRID_HEIGHT; y++) {
-      for (let x = 0; x < GRID_WIDTH; x++) {
-        const cell = level1[y][x];
-        
-        switch (cell) {
-          case EntityType.WALL:
-            ctx.fillStyle = COLORS.WALL;
-            ctx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
-            break;
-          case EntityType.DOT:
-            ctx.fillStyle = COLORS.DOT;
-            ctx.beginPath();
-            ctx.arc(
-              x * CELL_SIZE + CELL_SIZE / 2,
-              y * CELL_SIZE + CELL_SIZE / 2,
-              CELL_SIZE / 6,
-              0,
-              Math.PI * 2
-            );
-            ctx.fill();
-            break;
-          case EntityType.POWER_PELLET:
-            ctx.fillStyle = COLORS.POWER_PELLET;
-            ctx.beginPath();
-            ctx.arc(
-              x * CELL_SIZE + CELL_SIZE / 2,
-              y * CELL_SIZE + CELL_SIZE / 2,
-              CELL_SIZE / 3,
-              0,
-              Math.PI * 2
-            );
-            ctx.fill();
-            break;
-        }
-      }
-    }
-    
-    // Draw Pacman
-    ctx.fillStyle = COLORS.PACMAN;
-    ctx.beginPath();
-    
-    // Calculate Pacman mouth angle based on direction
-    let startAngle = 0.2;
-    let endAngle = 2 * Math.PI - 0.2;
-    
-    // Adjust angles based on direction
-    switch (pacman.direction) {
-      case Direction.RIGHT:
-        startAngle = 0.2;
-        endAngle = 2 * Math.PI - 0.2;
-        break;
-      case Direction.DOWN:
-        startAngle = Math.PI / 2 + 0.2;
-        endAngle = Math.PI / 2 - 0.2 + 2 * Math.PI;
-        break;
-      case Direction.LEFT:
-        startAngle = Math.PI + 0.2;
-        endAngle = Math.PI - 0.2 + 2 * Math.PI;
-        break;
-      case Direction.UP:
-        startAngle = 3 * Math.PI / 2 + 0.2;
-        endAngle = 3 * Math.PI / 2 - 0.2 + 2 * Math.PI;
-        break;
-    }
-    
-    // If mouth is closed (animation), adjust angles
-    if (!pacman.mouthOpen) {
-      startAngle = 0;
-      endAngle = 2 * Math.PI;
-    }
-    
-    ctx.arc(
-      pacman.x * CELL_SIZE + CELL_SIZE / 2,
-      pacman.y * CELL_SIZE + CELL_SIZE / 2,
-      CELL_SIZE / 2,
-      startAngle,
-      endAngle
-    );
-    ctx.lineTo(
-      pacman.x * CELL_SIZE + CELL_SIZE / 2,
-      pacman.y * CELL_SIZE + CELL_SIZE / 2
-    );
-    ctx.fill();
-    
-    // Draw ghosts
-    ghosts.forEach(ghost => {
-      // Skip rendering if ghost is in the "eaten" state and returning to home
-      if (ghost.eaten) return;
-      
-      // Determine ghost color
-      let ghostColor;
-      if (ghost.frightened) {
-        ghostColor = COLORS.FRIGHTENED;
-      } else {
-        switch (ghost.name) {
-          case GhostName.BLINKY: ghostColor = COLORS.BLINKY; break;
-          case GhostName.PINKY: ghostColor = COLORS.PINKY; break;
-          case GhostName.INKY: ghostColor = COLORS.INKY; break;
-          case GhostName.CLYDE: ghostColor = COLORS.CLYDE; break;
-        }
-      }
-      
-      // Draw ghost body
-      ctx.fillStyle = ghostColor;
-      ctx.beginPath();
-      
-      // Draw the semi-circle top
-      ctx.arc(
-        ghost.x * CELL_SIZE + CELL_SIZE / 2,
-        ghost.y * CELL_SIZE + CELL_SIZE / 2,
-        CELL_SIZE / 2,
-        Math.PI,
-        0
-      );
-      
-      // Draw the wavy bottom
-      const bottomY = ghost.y * CELL_SIZE + CELL_SIZE;
-      ctx.lineTo(ghost.x * CELL_SIZE + CELL_SIZE, bottomY);
-      
-      // Create the wavy bottom effect with 3 waves
-      const waveSections = 3;
-      const waveWidth = CELL_SIZE / waveSections;
-      
-      for (let i = 0; i < waveSections; i++) {
-        const startX = ghost.x * CELL_SIZE + CELL_SIZE - i * waveWidth;
-        const middleX = startX - waveWidth / 2;
-        const endX = startX - waveWidth;
-        
-        ctx.lineTo(middleX, bottomY - CELL_SIZE / 4);
-        ctx.lineTo(endX, bottomY);
-      }
-      
-      ctx.closePath();
-      ctx.fill();
-      
-      // Draw ghost eyes
-      ctx.fillStyle = 'white';
-      
-      // Left eye
-      ctx.beginPath();
-      ctx.arc(
-        ghost.x * CELL_SIZE + CELL_SIZE / 3,
-        ghost.y * CELL_SIZE + CELL_SIZE / 2.5,
-        CELL_SIZE / 6,
-        0,
-        Math.PI * 2
-      );
-      ctx.fill();
-      
-      // Right eye
-      ctx.beginPath();
-      ctx.arc(
-        ghost.x * CELL_SIZE + CELL_SIZE * 2/3,
-        ghost.y * CELL_SIZE + CELL_SIZE / 2.5,
-        CELL_SIZE / 6,
-        0,
-        Math.PI * 2
-      );
-      ctx.fill();
-      
-      // Draw pupils (look in the direction the ghost is moving)
-      ctx.fillStyle = 'black';
-      
-      // Calculate pupil positions based on ghost direction
-      let leftPupilX = ghost.x * CELL_SIZE + CELL_SIZE / 3;
-      let leftPupilY = ghost.y * CELL_SIZE + CELL_SIZE / 2.5;
-      let rightPupilX = ghost.x * CELL_SIZE + CELL_SIZE * 2/3;
-      let rightPupilY = ghost.y * CELL_SIZE + CELL_SIZE / 2.5;
-      
-      // Adjust pupils based on direction
-      const pupilOffset = CELL_SIZE / 12;
-      
-      switch (ghost.direction) {
-        case Direction.UP:
-          leftPupilY -= pupilOffset;
-          rightPupilY -= pupilOffset;
-          break;
-        case Direction.RIGHT:
-          leftPupilX += pupilOffset;
-          rightPupilX += pupilOffset;
-          break;
-        case Direction.DOWN:
-          leftPupilY += pupilOffset;
-          rightPupilY += pupilOffset;
-          break;
-        case Direction.LEFT:
-          leftPupilX -= pupilOffset;
-          rightPupilX -= pupilOffset;
-          break;
-      }
-      
-      // Left pupil
-      ctx.beginPath();
-      ctx.arc(
-        leftPupilX,
-        leftPupilY,
-        CELL_SIZE / 12,
-        0,
-        Math.PI * 2
-      );
-      ctx.fill();
-      
-      // Right pupil
-      ctx.beginPath();
-      ctx.arc(
-        rightPupilX,
-        rightPupilY,
-        CELL_SIZE / 12,
-        0,
-        Math.PI * 2
-      );
-      ctx.fill();
-    });
-    
-    // Draw overlay messages
-    if (gameState === GameState.READY) {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      
-      ctx.fillStyle = COLORS.TEXT;
-      ctx.font = '24px Arial';
-      ctx.textAlign = 'center';
-      ctx.fillText('READY!', canvas.width / 2, canvas.height / 2 - 20);
-      ctx.font = '16px Arial';
-      ctx.fillText('Press Start to Play', canvas.width / 2, canvas.height / 2 + 20);
-    } else if (gameState === GameState.PAUSED) {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      
-      ctx.fillStyle = COLORS.TEXT;
-      ctx.font = '24px Arial';
-      ctx.textAlign = 'center';
-      ctx.fillText('PAUSED', canvas.width / 2, canvas.height / 2);
-    } else if (gameState === GameState.GAME_OVER) {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      
-      ctx.fillStyle = COLORS.TEXT;
-      ctx.font = '24px Arial';
-      ctx.textAlign = 'center';
-      ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 20);
-      ctx.font = '16px Arial';
-      ctx.fillText(`Score: ${score}`, canvas.width / 2, canvas.height / 2 + 20);
-    } else if (gameState === GameState.WIN) {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      
-      ctx.fillStyle = COLORS.TEXT;
-      ctx.font = '24px Arial';
-      ctx.textAlign = 'center';
-      ctx.fillText('YOU WIN!', canvas.width / 2, canvas.height / 2 - 20);
-      ctx.font = '16px Arial';
-      ctx.fillText(`Score: ${score}`, canvas.width / 2, canvas.height / 2 + 20);
-    }
-  };
-  
-  // Update game logic
-  const update = (deltaTime: number) => {
+  // Update game logic - moving it here to avoid initialization issues
+  const update = React.useCallback((deltaTime: number) => {
     // Double-check that game state is PLAYING
     if (gameState !== GameState.PLAYING) return;
     
@@ -951,7 +511,469 @@ export default function PacmanGame() {
         localStorage.setItem('pacman-high-score', score.toString());
       }
     }
+  }, [gameState, pacman, ghosts, level1, dotsRemaining, score, lives, highScore]);
+
+  // Handle keyboard input with memoized callback
+  const handleKeyDown = React.useCallback((e: KeyboardEvent) => {
+    // Prevent default behavior for arrow keys, space, and other game control keys
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'p'].includes(e.key)) {
+      e.preventDefault();
+    }
+    
+    if (gameState === GameState.PLAYING) {
+      let directionChanged = false;
+      
+      switch (e.key) {
+        case 'ArrowUp':
+        case 'w':
+        case 'W':
+          setPacman(prev => {
+            // Set both direction and nextDirection to immediately start moving
+            if (prev.y > 0 && level1[prev.y - 1][prev.x] !== EntityType.WALL) {
+              directionChanged = true;
+              return { ...prev, direction: Direction.UP, nextDirection: Direction.UP };
+            } else {
+              return { ...prev, nextDirection: Direction.UP };
+            }
+          });
+          break;
+        case 'ArrowRight':
+        case 'd':
+        case 'D':
+          setPacman(prev => {
+            if (prev.x < GRID_WIDTH - 1 && level1[prev.y][prev.x + 1] !== EntityType.WALL) {
+              directionChanged = true;
+              return { ...prev, direction: Direction.RIGHT, nextDirection: Direction.RIGHT };
+            } else {
+              return { ...prev, nextDirection: Direction.RIGHT };
+            }
+          });
+          break;
+        case 'ArrowDown':
+        case 's':
+        case 'S':
+          setPacman(prev => {
+            if (prev.y < GRID_HEIGHT - 1 && level1[prev.y + 1][prev.x] !== EntityType.WALL) {
+              directionChanged = true;
+              return { ...prev, direction: Direction.DOWN, nextDirection: Direction.DOWN };
+            } else {
+              return { ...prev, nextDirection: Direction.DOWN };
+            }
+          });
+          break;
+        case 'ArrowLeft':
+        case 'a':
+        case 'A':
+          setPacman(prev => {
+            if (prev.x > 0 && level1[prev.y][prev.x - 1] !== EntityType.WALL) {
+              directionChanged = true;
+              return { ...prev, direction: Direction.LEFT, nextDirection: Direction.LEFT };
+            } else {
+              return { ...prev, nextDirection: Direction.LEFT };
+            }
+          });
+          break;
+        case 'p':
+        case 'P':
+          setGameState(GameState.PAUSED);
+          break;
+      }
+      
+      // Force an immediate update if Pacman wasn't moving
+      if (directionChanged && pacman.direction === Direction.NONE) {
+        update(0);
+      }
+    } else if (gameState === GameState.PAUSED && (e.key === 'p' || e.key === 'P')) {
+      setGameState(GameState.PLAYING);
+    }
+  }, [gameState, level1, pacman, update]);
+  
+  // Set up keyboard event listener
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [handleKeyDown]);
+  
+  // Handle touch controls
+  const handleTouchControl = React.useCallback((direction: Direction) => {
+    if (gameState === GameState.PLAYING) {
+      // Immediately force the direction change and update
+      setPacman(prev => {
+        // Check if we can move in the requested direction right away
+        switch (direction) {
+          case Direction.UP:
+            if (prev.y > 0 && level1[prev.y - 1][prev.x] !== EntityType.WALL) {
+              return { ...prev, direction: Direction.UP, nextDirection: Direction.UP };
+            }
+            break;
+          case Direction.RIGHT:
+            if (prev.x < GRID_WIDTH - 1 && level1[prev.y][prev.x + 1] !== EntityType.WALL) {
+              return { ...prev, direction: Direction.RIGHT, nextDirection: Direction.RIGHT };
+            }
+            break;
+          case Direction.DOWN:
+            if (prev.y < GRID_HEIGHT - 1 && level1[prev.y + 1][prev.x] !== EntityType.WALL) {
+              return { ...prev, direction: Direction.DOWN, nextDirection: Direction.DOWN };
+            }
+            break;
+          case Direction.LEFT:
+            if (prev.x > 0 && level1[prev.y][prev.x - 1] !== EntityType.WALL) {
+              return { ...prev, direction: Direction.LEFT, nextDirection: Direction.LEFT };
+            }
+            break;
+        }
+        
+        // If we can't move in that direction right away, just queue it up
+        return { ...prev, nextDirection: direction };
+      });
+      
+      // Force an immediate update cycle if pacman is not currently moving
+      if (pacman.direction === Direction.NONE) {
+        // This will kickstart movement if pacman is currently static
+        update(0);
+      }
+    }
+  }, [gameState, level1, pacman.direction, update]);
+  
+  // Toggle pause
+  const togglePause = () => {
+    if (gameState === GameState.PLAYING) {
+      setGameState(GameState.PAUSED);
+    } else if (gameState === GameState.PAUSED) {
+      setGameState(GameState.PLAYING);
+    }
   };
+  
+  // Start a new game
+  const startGame = () => {
+    // Reset the game state
+    setScore(0);
+    setLives(3);
+    
+    // Reset Pacman position with RIGHT as initial direction
+    // This ensures Pac-Man starts moving immediately
+    setPacman({
+      x: 14,
+      y: 23,
+      type: EntityType.PACMAN,
+      direction: Direction.RIGHT, // Set an initial direction so it starts moving
+      nextDirection: Direction.RIGHT,
+      mouthOpen: true,
+      mouthAngle: 0.2
+    });
+    
+    // After making sure everything is reset, set game state to PLAYING
+    setGameState(GameState.PLAYING);
+    
+    // Reset ghost positions
+    setGhosts([
+      {
+        x: 14, y: 11, type: EntityType.GHOST, name: GhostName.BLINKY, 
+        direction: Direction.UP, frightened: false, eaten: false, frightenedTimer: 0
+      },
+      {
+        x: 12, y: 14, type: EntityType.GHOST, name: GhostName.PINKY, 
+        direction: Direction.UP, frightened: false, eaten: false, frightenedTimer: 0
+      },
+      {
+        x: 14, y: 14, type: EntityType.GHOST, name: GhostName.INKY, 
+        direction: Direction.UP, frightened: false, eaten: false, frightenedTimer: 0
+      },
+      {
+        x: 16, y: 14, type: EntityType.GHOST, name: GhostName.CLYDE, 
+        direction: Direction.UP, frightened: false, eaten: false, frightenedTimer: 0
+      }
+    ]);
+    
+    // Count dots
+    let dots = 0;
+    level1.forEach(row => {
+      row.forEach(cell => {
+        if (cell === EntityType.DOT || cell === EntityType.POWER_PELLET) {
+          dots++;
+        }
+      });
+    });
+    setDotsRemaining(dots);
+    
+    // Reset the game level
+    setLevel1(prevLevel => [...prevLevel.map(row => [...row])]);
+  };
+  
+  // Draw the game
+  const draw = React.useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    // Clear canvas
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Draw the maze
+    for (let y = 0; y < GRID_HEIGHT; y++) {
+      for (let x = 0; x < GRID_WIDTH; x++) {
+        const cell = level1[y][x];
+        
+        switch (cell) {
+          case EntityType.WALL:
+            ctx.fillStyle = COLORS.WALL;
+            ctx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+            break;
+          case EntityType.DOT:
+            ctx.fillStyle = COLORS.DOT;
+            ctx.beginPath();
+            ctx.arc(
+              x * CELL_SIZE + CELL_SIZE / 2,
+              y * CELL_SIZE + CELL_SIZE / 2,
+              CELL_SIZE / 6,
+              0,
+              Math.PI * 2
+            );
+            ctx.fill();
+            break;
+          case EntityType.POWER_PELLET:
+            ctx.fillStyle = COLORS.POWER_PELLET;
+            ctx.beginPath();
+            ctx.arc(
+              x * CELL_SIZE + CELL_SIZE / 2,
+              y * CELL_SIZE + CELL_SIZE / 2,
+              CELL_SIZE / 3,
+              0,
+              Math.PI * 2
+            );
+            ctx.fill();
+            break;
+        }
+      }
+    }
+    
+    // Draw Pacman
+    ctx.fillStyle = COLORS.PACMAN;
+    ctx.beginPath();
+    
+    // Calculate Pacman mouth angle based on direction
+    let startAngle = 0.2;
+    let endAngle = 2 * Math.PI - 0.2;
+    
+    // Adjust angles based on direction
+    switch (pacman.direction) {
+      case Direction.RIGHT:
+        startAngle = 0.2;
+        endAngle = 2 * Math.PI - 0.2;
+        break;
+      case Direction.DOWN:
+        startAngle = Math.PI / 2 + 0.2;
+        endAngle = Math.PI / 2 - 0.2 + 2 * Math.PI;
+        break;
+      case Direction.LEFT:
+        startAngle = Math.PI + 0.2;
+        endAngle = Math.PI - 0.2 + 2 * Math.PI;
+        break;
+      case Direction.UP:
+        startAngle = 3 * Math.PI / 2 + 0.2;
+        endAngle = 3 * Math.PI / 2 - 0.2 + 2 * Math.PI;
+        break;
+    }
+    
+    // If mouth is closed (animation), adjust angles
+    if (!pacman.mouthOpen) {
+      startAngle = 0;
+      endAngle = 2 * Math.PI;
+    }
+    
+    ctx.arc(
+      pacman.x * CELL_SIZE + CELL_SIZE / 2,
+      pacman.y * CELL_SIZE + CELL_SIZE / 2,
+      CELL_SIZE / 2,
+      startAngle,
+      endAngle
+    );
+    ctx.lineTo(
+      pacman.x * CELL_SIZE + CELL_SIZE / 2,
+      pacman.y * CELL_SIZE + CELL_SIZE / 2
+    );
+    ctx.fill();
+    
+    // Draw ghosts
+    ghosts.forEach(ghost => {
+      // Skip rendering if ghost is in the "eaten" state and returning to home
+      if (ghost.eaten) return;
+      
+      // Determine ghost color
+      let ghostColor;
+      if (ghost.frightened) {
+        ghostColor = COLORS.FRIGHTENED;
+      } else {
+        switch (ghost.name) {
+          case GhostName.BLINKY: ghostColor = COLORS.BLINKY; break;
+          case GhostName.PINKY: ghostColor = COLORS.PINKY; break;
+          case GhostName.INKY: ghostColor = COLORS.INKY; break;
+          case GhostName.CLYDE: ghostColor = COLORS.CLYDE; break;
+        }
+      }
+      
+      // Draw ghost body
+      ctx.fillStyle = ghostColor;
+      ctx.beginPath();
+      
+      // Draw the semi-circle top
+      ctx.arc(
+        ghost.x * CELL_SIZE + CELL_SIZE / 2,
+        ghost.y * CELL_SIZE + CELL_SIZE / 2,
+        CELL_SIZE / 2,
+        Math.PI,
+        0
+      );
+      
+      // Draw the wavy bottom
+      const bottomY = ghost.y * CELL_SIZE + CELL_SIZE;
+      ctx.lineTo(ghost.x * CELL_SIZE + CELL_SIZE, bottomY);
+      
+      // Create the wavy bottom effect with 3 waves
+      const waveSections = 3;
+      const waveWidth = CELL_SIZE / waveSections;
+      
+      for (let i = 0; i < waveSections; i++) {
+        const startX = ghost.x * CELL_SIZE + CELL_SIZE - i * waveWidth;
+        const middleX = startX - waveWidth / 2;
+        const endX = startX - waveWidth;
+        
+        ctx.lineTo(middleX, bottomY - CELL_SIZE / 4);
+        ctx.lineTo(endX, bottomY);
+      }
+      
+      ctx.closePath();
+      ctx.fill();
+      
+      // Draw ghost eyes
+      ctx.fillStyle = 'white';
+      
+      // Left eye
+      ctx.beginPath();
+      ctx.arc(
+        ghost.x * CELL_SIZE + CELL_SIZE / 3,
+        ghost.y * CELL_SIZE + CELL_SIZE / 2.5,
+        CELL_SIZE / 6,
+        0,
+        Math.PI * 2
+      );
+      ctx.fill();
+      
+      // Right eye
+      ctx.beginPath();
+      ctx.arc(
+        ghost.x * CELL_SIZE + CELL_SIZE * 2/3,
+        ghost.y * CELL_SIZE + CELL_SIZE / 2.5,
+        CELL_SIZE / 6,
+        0,
+        Math.PI * 2
+      );
+      ctx.fill();
+      
+      // Draw pupils (look in the direction the ghost is moving)
+      ctx.fillStyle = 'black';
+      
+      // Calculate pupil positions based on ghost direction
+      let leftPupilX = ghost.x * CELL_SIZE + CELL_SIZE / 3;
+      let leftPupilY = ghost.y * CELL_SIZE + CELL_SIZE / 2.5;
+      let rightPupilX = ghost.x * CELL_SIZE + CELL_SIZE * 2/3;
+      let rightPupilY = ghost.y * CELL_SIZE + CELL_SIZE / 2.5;
+      
+      // Adjust pupils based on direction
+      const pupilOffset = CELL_SIZE / 12;
+      
+      switch (ghost.direction) {
+        case Direction.UP:
+          leftPupilY -= pupilOffset;
+          rightPupilY -= pupilOffset;
+          break;
+        case Direction.RIGHT:
+          leftPupilX += pupilOffset;
+          rightPupilX += pupilOffset;
+          break;
+        case Direction.DOWN:
+          leftPupilY += pupilOffset;
+          rightPupilY += pupilOffset;
+          break;
+        case Direction.LEFT:
+          leftPupilX -= pupilOffset;
+          rightPupilX -= pupilOffset;
+          break;
+      }
+      
+      // Left pupil
+      ctx.beginPath();
+      ctx.arc(
+        leftPupilX,
+        leftPupilY,
+        CELL_SIZE / 12,
+        0,
+        Math.PI * 2
+      );
+      ctx.fill();
+      
+      // Right pupil
+      ctx.beginPath();
+      ctx.arc(
+        rightPupilX,
+        rightPupilY,
+        CELL_SIZE / 12,
+        0,
+        Math.PI * 2
+      );
+      ctx.fill();
+    });
+    
+    // Draw overlay messages
+    if (gameState === GameState.READY) {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      ctx.fillStyle = COLORS.TEXT;
+      ctx.font = '24px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('READY!', canvas.width / 2, canvas.height / 2 - 20);
+      ctx.font = '16px Arial';
+      ctx.fillText('Press Start to Play', canvas.width / 2, canvas.height / 2 + 20);
+    } else if (gameState === GameState.PAUSED) {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      ctx.fillStyle = COLORS.TEXT;
+      ctx.font = '24px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('PAUSED', canvas.width / 2, canvas.height / 2);
+    } else if (gameState === GameState.GAME_OVER) {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      ctx.fillStyle = COLORS.TEXT;
+      ctx.font = '24px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 20);
+      ctx.font = '16px Arial';
+      ctx.fillText(`Score: ${score}`, canvas.width / 2, canvas.height / 2 + 20);
+    } else if (gameState === GameState.WIN) {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      ctx.fillStyle = COLORS.TEXT;
+      ctx.font = '24px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('YOU WIN!', canvas.width / 2, canvas.height / 2 - 20);
+      ctx.font = '16px Arial';
+      ctx.fillText(`Score: ${score}`, canvas.width / 2, canvas.height / 2 + 20);
+    }
+  }, [canvasRef, gameState, level1, pacman, ghosts, score]);
+
+  // Update game logic - already defined above
+  
+  // The update function is now declared above with useCallback
   
   // Game loop
   useEffect(() => {
@@ -998,7 +1020,7 @@ export default function PacmanGame() {
         cancelAnimationFrame(gameLoopRef.current);
       }
     };
-  }, [gameState, pacman, ghosts, level1, dotsRemaining, score, lives, highScore]);
+  }, [gameState, draw, update]);
   
   return (
     <div className="min-h-screen flex flex-col">
