@@ -1,17 +1,15 @@
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import SectionHeading from "@/components/SectionHeading";
-import { VideoBackground } from "@/components/VideoBackground";
 import { projects } from "@/lib/data";
 import { motion } from "framer-motion";
 import { staggerContainer } from "@/lib/utils";
 
 export function Projects() {
   return (
-    <VideoBackground opacity={0.15} className="bg-black">
-      <section id="projects" className="py-20 px-6">
-        <Container maxWidth="6xl">
-          <SectionHeading subtitle="My Work" title="Recent Projects" isDark={true} />
+    <section id="projects" className="py-20 px-6 bg-black">
+      <Container maxWidth="6xl">
+        <SectionHeading subtitle="My Work" title="Recent Projects" isDark={true} />
           
           <motion.div 
             className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
@@ -85,6 +83,5 @@ export function Projects() {
           </div>
         </Container>
       </section>
-    </VideoBackground>
   );
 }
