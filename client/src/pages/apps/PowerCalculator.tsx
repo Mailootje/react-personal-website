@@ -623,10 +623,10 @@ export default function PowerCalculator() {
                       ))}
                       <div 
                         className="flex items-center justify-center p-3 bg-blue-600 rounded-lg cursor-pointer text-white text-sm font-medium"
-                        onClick={() => document.getElementById('mobileCategoryDrawer')?.scrollIntoView({behavior: 'smooth'})}
+                        onClick={() => addDevice()}
                       >
                         <PlusCircle className="h-4 w-4 mr-1" />
-                        More
+                        Add Custom
                       </div>
                     </div>
                   </TabsContent>
@@ -1124,52 +1124,7 @@ export default function PowerCalculator() {
                           </Button>
                         </div>
                         
-                        {/* Mobile-specific full preset listing */}
-                        <div id="mobileCategoryDrawer" className="mt-8 md:hidden">
-                          <Tabs 
-                            value={selectedCategory} 
-                            onValueChange={setSelectedCategory}
-                            className="mt-0"
-                          >
-                            <TabsList className="flex overflow-x-auto whitespace-nowrap w-full bg-gray-800 p-1 max-w-full no-scrollbar">
-                              {categories.map(category => (
-                                <TabsTrigger 
-                                  key={category} 
-                                  value={category}
-                                  className="text-xs data-[state=active]:bg-blue-600 data-[state=active]:text-white py-1 px-3 flex-shrink-0"
-                                >
-                                  {category.split(" ")[0]}
-                                </TabsTrigger>
-                              ))}
-                            </TabsList>
-                            
-                            {categories.map(category => (
-                              <TabsContent key={category} value={category} className="mt-2">
-                                <div className="grid grid-cols-1 gap-2">
-                                  {devicePresetsByCategory[category].map(preset => (
-                                    <div 
-                                      key={preset.name}
-                                      className="flex justify-between items-center p-3 bg-gray-800 rounded-lg active:bg-gray-700 cursor-pointer"
-                                      onClick={() => addPresetDevice(preset)}
-                                    >
-                                      <div>
-                                        <div className="font-medium text-sm">{preset.name}</div>
-                                        <div className="text-xs text-blue-400">{preset.powerWatts} Watts</div>
-                                      </div>
-                                      <Button 
-                                        size="sm" 
-                                        variant="ghost"
-                                        className="text-blue-400"
-                                      >
-                                        <PlusCircle className="h-4 w-4" />
-                                      </Button>
-                                    </div>
-                                  ))}
-                                </div>
-                              </TabsContent>
-                            ))}
-                          </Tabs>
-                        </div>
+
                       </CardContent>
                     </Card>
                   </motion.div>
