@@ -1120,7 +1120,7 @@ export default function PowerCalculator() {
                             onClick={generatePDFReport}
                           >
                             <FileDown className="h-4 w-4 mr-2" />
-                            Download PDF Report with Branding
+                            Download PDF Report
                           </Button>
                         </div>
                         
