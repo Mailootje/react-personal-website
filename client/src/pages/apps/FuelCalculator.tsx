@@ -8,13 +8,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import jsPDF from "jspdf";
 import { 
   ArrowLeft, 
   Calculator, 
   Fuel, 
   Navigation, 
   DollarSign, 
-  FileBarChart
+  FileBarChart,
+  FileDown
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { VideoBackground } from "@/components/VideoBackground";
@@ -117,6 +119,137 @@ export default function FuelCalculator() {
   const formatDistanceUnit = () => calculationMode === "european" ? "km" : "miles";
   const formatVolumeUnit = () => calculationMode === "european" ? "liters" : "gallons";
   const formatCurrencySymbol = () => calculationMode === "european" ? "€" : "$";
+  
+  // Generate and download PDF report
+  const generatePDFReport = () => {
+    if (!calculationResult) return;
+    
+    try {
+      // Create a new PDF document
+      const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+      
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const margin = 15;
+      const textWidth = pageWidth - (margin * 2);
+      
+      // Add custom branding
+      // Header with logo and title
+      doc.setFillColor(20, 20, 30);
+      doc.rect(0, 0, pageWidth, 35, 'F');
+      
+      // Title
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(22);
+      doc.text('Fuel Consumption Report', margin, 15);
+      
+      // Subtitle with date
+      doc.setFontSize(10);
+      doc.setTextColor(150, 180, 255);
+      doc.text(`Generated on ${new Date().toLocaleDateString()} by Mailo Bedo Fuel Calculator`, margin, 22);
+      
+      // Line separator
+      doc.setDrawColor(50, 100, 200);
+      doc.setLineWidth(0.5);
+      doc.line(margin, 35, pageWidth - margin, 35);
+      
+      // Summary section
+      doc.setTextColor(50, 50, 50);
+      doc.setFontSize(16);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Trip Fuel Report', margin, 45);
+      
+      // Method info
+      const methodDescription = calculationMode === 'european' 
+        ? `European (Metric) - ${fuelUnit === 'kmPerLiter' ? 'km/L' : 'L/100km'}`
+        : 'American (Imperial) - MPG';
+      
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(100, 100, 100);
+      doc.text(`Calculation Method: ${methodDescription}`, margin, 52);
+      
+      // Trip cost highlight
+      doc.setFillColor(230, 240, 255);
+      doc.rect(margin, 60, textWidth, 20, 'F');
+      
+      doc.setTextColor(50, 100, 180);
+      doc.setFontSize(12);
+      doc.text('Total Fuel Cost:', margin + 2, 68);
+      
+      doc.setFontSize(16);
+      doc.setFont('helvetica', 'bold');
+      doc.text(`${formatCurrencySymbol()}${calculationResult.totalCost.toFixed(2)}`, pageWidth - margin - 30, 68);
+      
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(80, 80, 80);
+      doc.text(`(${calculationResult.totalFuelUsed.toFixed(2)} ${formatVolumeUnit()})`, pageWidth - margin - 30, 75);
+      
+      // Details section
+      const detailsY = 90;
+      doc.setTextColor(50, 50, 50);
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Trip Details', margin, detailsY);
+      
+      // Details table
+      doc.setDrawColor(200, 200, 200);
+      doc.setLineWidth(0.2);
+      doc.line(margin, detailsY + 5, pageWidth - margin, detailsY + 5);
+      
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.setTextColor(70, 70, 70);
+      
+      // Distance
+      const distanceLabel = formatDistanceUnit() === 'km' ? 'Kilometers' : 'Miles';
+      doc.text(`${distanceLabel} Traveled:`, margin, detailsY + 15);
+      doc.text(`${parseFloat(distance).toFixed(1)} ${formatDistanceUnit()}`, margin + 80, detailsY + 15);
+      
+      // Efficiency
+      doc.text('Fuel Efficiency:', margin, detailsY + 25);
+      doc.text(calculationResult.fuelEfficiency, margin + 80, detailsY + 25);
+      
+      // Fuel price
+      doc.text('Fuel Price:', margin, detailsY + 35);
+      doc.text(`${formatCurrencySymbol()}${parseFloat(fuelPrice).toFixed(2)} per ${formatVolumeUnit()}`, margin + 80, detailsY + 35);
+      
+      // Total fuel
+      doc.text('Total Fuel Used:', margin, detailsY + 45);
+      doc.text(`${calculationResult.totalFuelUsed.toFixed(2)} ${formatVolumeUnit()}`, margin + 80, detailsY + 45);
+      
+      // Total cost
+      doc.text('Total Cost:', margin, detailsY + 55);
+      doc.setFont('helvetica', 'bold');
+      doc.text(`${formatCurrencySymbol()}${calculationResult.totalCost.toFixed(2)}`, margin + 80, detailsY + 55);
+      
+      // Cost per distance
+      doc.setFont('helvetica', 'normal');
+      doc.text('Cost per Distance:', margin, detailsY + 65);
+      doc.text(calculationResult.costPerDistance, margin + 80, detailsY + 65);
+      
+      // Save the PDF
+      const filename = `Fuel-Report-${new Date().toISOString().split('T')[0]}.pdf`;
+      doc.save(filename);
+      
+      toast({
+        title: "PDF Generated Successfully",
+        description: `Your fuel report has been saved as ${filename}`,
+      });
+    } catch (error) {
+      console.error("PDF generation error:", error);
+      toast({
+        title: "PDF Generation Error",
+        description: error instanceof Error ? error.message : "An error occurred generating the PDF",
+        variant: "destructive",
+      });
+    }
+  };
   
   return (
     <div className="min-h-screen bg-black text-white flex flex-col">
@@ -345,6 +478,17 @@ export default function FuelCalculator() {
                           <div className="text-xl font-semibold text-white">
                             {calculationResult.costPerDistance}
                           </div>
+                        </div>
+                        
+                        {/* Download PDF Button */}
+                        <div className="col-span-1 md:col-span-2 mt-4">
+                          <Button 
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white" 
+                            onClick={generatePDFReport}
+                          >
+                            <FileDown className="h-4 w-4 mr-2" />
+                            Download Fuel Report
+                          </Button>
                         </div>
                       </div>
                     </div>
