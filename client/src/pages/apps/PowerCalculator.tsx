@@ -364,17 +364,7 @@ export default function PowerCalculator() {
                 className="mb-4"
               >
                 <TabsList className="flex overflow-x-auto whitespace-nowrap w-full bg-gray-800 p-1 max-w-full no-scrollbar">
-                  {/* Set Computer & Electronics as the text for the first category */}
-                  <TabsTrigger 
-                    key={categories[0]} 
-                    value={categories[0]}
-                    className="text-xs data-[state=active]:bg-blue-600 data-[state=active]:text-white py-1 px-3 flex-shrink-0"
-                  >
-                    Computer
-                  </TabsTrigger>
-                  
-                  {/* Show remaining categories */}
-                  {categories.slice(1).map(category => (
+                  {categories.map(category => (
                     <TabsTrigger 
                       key={category} 
                       value={category}
@@ -446,17 +436,7 @@ export default function PowerCalculator() {
                       className="mb-4"
                     >
                       <TabsList className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-3 w-full bg-gray-800 p-1">
-                        {/* First category explicitly labeled */}
-                        <TabsTrigger 
-                          key={categories[0]} 
-                          value={categories[0]}
-                          className="text-xs data-[state=active]:bg-blue-600 data-[state=active]:text-white py-1"
-                        >
-                          Computer
-                        </TabsTrigger>
-                        
-                        {/* Remaining categories */}
-                        {categories.slice(1).map(category => (
+                        {categories.map(category => (
                           <TabsTrigger 
                             key={category} 
                             value={category}
@@ -921,17 +901,7 @@ export default function PowerCalculator() {
                             className="mt-4"
                           >
                             <TabsList className="flex overflow-x-auto whitespace-nowrap w-full bg-gray-800 p-1 max-w-full no-scrollbar">
-                              {/* Set Computer & Electronics as the text for the first category */}
-                              <TabsTrigger 
-                                key={categories[0]} 
-                                value={categories[0]}
-                                className="text-xs data-[state=active]:bg-blue-600 data-[state=active]:text-white py-1 px-3 flex-shrink-0"
-                              >
-                                Computer
-                              </TabsTrigger>
-                              
-                              {/* Show remaining categories */}
-                              {categories.slice(1).map(category => (
+                              {categories.map(category => (
                                 <TabsTrigger 
                                   key={category} 
                                   value={category}
