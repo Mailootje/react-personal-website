@@ -86,6 +86,22 @@ const devicePresets: DevicePreset[] = [
   { name: "Wi-Fi Router", category: "Computer & Electronics", powerWatts: 5 },
   { name: "Mobile Phone Charger", category: "Computer & Electronics", powerWatts: 5 },
   
+  // Servers & Network
+  { name: "1U Rack Server (idle)", category: "Servers & Network", powerWatts: 100 },
+  { name: "1U Rack Server (full load)", category: "Servers & Network", powerWatts: 350 },
+  { name: "2U Rack Server (idle)", category: "Servers & Network", powerWatts: 150 },
+  { name: "2U Rack Server (full load)", category: "Servers & Network", powerWatts: 500 },
+  { name: "Network Switch (8-port)", category: "Servers & Network", powerWatts: 10 },
+  { name: "Network Switch (24-port)", category: "Servers & Network", powerWatts: 50 },
+  { name: "Network Switch (48-port)", category: "Servers & Network", powerWatts: 150 },
+  { name: "NAS Storage (4-bay)", category: "Servers & Network", powerWatts: 30 },
+  { name: "NAS Storage (8-bay)", category: "Servers & Network", powerWatts: 80 },
+  { name: "Blade Server Chassis", category: "Servers & Network", powerWatts: 800 },
+  { name: "Enterprise Router", category: "Servers & Network", powerWatts: 100 },
+  { name: "Firewall Appliance", category: "Servers & Network", powerWatts: 80 },
+  { name: "Rack UPS (1500VA)", category: "Servers & Network", powerWatts: 60 },
+  { name: "Small Server Room AC", category: "Servers & Network", powerWatts: 1500 },
+  
   // Kitchen Appliances
   { name: "Refrigerator", category: "Kitchen Appliances", powerWatts: 150 },
   { name: "Freezer", category: "Kitchen Appliances", powerWatts: 100 },
