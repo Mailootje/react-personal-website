@@ -1126,15 +1126,10 @@ export default function PowerCalculator() {
                         
                         {/* Mobile-specific full preset listing */}
                         <div id="mobileCategoryDrawer" className="mt-8 md:hidden">
-                          <h4 className="font-medium mb-3 text-white flex items-center text-base">
-                            <Lightbulb className="h-4 w-4 mr-2 text-blue-400" />
-                            All Available Devices
-                          </h4>
-                          
                           <Tabs 
                             value={selectedCategory} 
                             onValueChange={setSelectedCategory}
-                            className="mt-4"
+                            className="mt-0"
                           >
                             <TabsList className="flex overflow-x-auto whitespace-nowrap w-full bg-gray-800 p-1 max-w-full no-scrollbar">
                               {categories.map(category => (
