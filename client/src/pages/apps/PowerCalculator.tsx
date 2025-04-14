@@ -16,6 +16,8 @@ import {
   Lightbulb,
   Zap,
   Clock,
+  Calendar,
+  Layers,
   BarChart3,
   PlusCircle,
   Trash2,
@@ -354,13 +356,66 @@ export default function PowerCalculator() {
               </p>
             </motion.div>
             
+            {/* Mobile-specific layout for smaller screens */}
+            <div className="block md:hidden mb-6">
+              <Tabs 
+                value={selectedCategory} 
+                onValueChange={setSelectedCategory}
+                className="mb-4"
+              >
+                <TabsList className="flex overflow-x-auto whitespace-nowrap w-full bg-gray-800 p-1 max-w-full no-scrollbar">
+                  {categories.map(category => (
+                    <TabsTrigger 
+                      key={category} 
+                      value={category}
+                      className="text-xs data-[state=active]:bg-blue-600 data-[state=active]:text-white py-1 px-3 flex-shrink-0"
+                    >
+                      {category.split(" ")[0]}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+                
+                {categories.map(category => (
+                  <TabsContent key={category} value={category} className="mt-2">
+                    <div className="grid grid-cols-2 gap-2">
+                      {devicePresetsByCategory[category].slice(0, 6).map(preset => (
+                        <div 
+                          key={preset.name}
+                          className="flex flex-col justify-between p-3 bg-gray-800 rounded-lg active:bg-gray-700 cursor-pointer"
+                          onClick={() => addPresetDevice(preset)}
+                        >
+                          <div className="font-medium text-sm line-clamp-1">{preset.name}</div>
+                          <div className="text-xs text-blue-400 mt-1">{preset.powerWatts}W</div>
+                        </div>
+                      ))}
+                      <div 
+                        className="flex items-center justify-center p-3 bg-blue-600 rounded-lg cursor-pointer text-white text-sm font-medium"
+                        onClick={() => document.getElementById('mobileCategoryDrawer')?.scrollIntoView({behavior: 'smooth'})}
+                      >
+                        <PlusCircle className="h-4 w-4 mr-1" />
+                        More
+                      </div>
+                    </div>
+                  </TabsContent>
+                ))}
+              </Tabs>
+              
+              <Button 
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white mt-2"
+                onClick={() => addDevice()}
+              >
+                <PlusCircle className="h-4 w-4 mr-2" />
+                Add Custom Device
+              </Button>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {/* Sidebar: Device Presets */}
+              {/* Sidebar: Device Presets - Hidden on mobile, visible on desktop */}
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.1 }}
-                className="md:col-span-1"
+                className="hidden md:block md:col-span-1"
               >
                 <Card className="bg-gray-900 border-gray-800 shadow-lg shadow-blue-900/10 h-full">
                   <CardHeader className="border-b border-gray-800 pb-4">
@@ -452,32 +507,33 @@ export default function PowerCalculator() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {/* Electricity Rate */}
                       <div className="space-y-2">
-                        <Label htmlFor="electricity-rate" className="text-gray-300 flex items-center">
+                        <Label htmlFor="electricity-rate" className="text-gray-300 flex items-center text-sm">
                           <Zap className="h-4 w-4 mr-2 text-blue-400" />
                           Electricity Rate
                         </Label>
-                        <div className="flex gap-4">
+                        <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
                           <div className="relative flex-grow">
                             <Input
                               id="electricity-rate"
                               type="number"
+                              inputMode="decimal"
                               value={electricityRate}
                               onChange={(e) => setElectricityRate(e.target.value)}
-                              className="bg-gray-800 border-gray-700 focus:border-blue-500 focus:ring-blue-500 text-white pr-16"
+                              className="bg-gray-800 border-gray-700 focus:border-blue-500 focus:ring-blue-500 text-white pr-16 h-9 text-sm"
                               step="0.01"
                               min="0.01"
                             />
-                            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
+                            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400 text-xs">
                               per kWh
                             </div>
                           </div>
                           
-                          <div className="w-28">
+                          <div className="w-full sm:w-28">
                             <Select
                               value={currency}
                               onValueChange={setCurrency}
                             >
-                              <SelectTrigger className="bg-gray-800 border-gray-700 text-white focus:ring-blue-500">
+                              <SelectTrigger className="bg-gray-800 border-gray-700 text-white focus:ring-blue-500 h-9 text-sm">
                                 <SelectValue placeholder="Currency" />
                               </SelectTrigger>
                               <SelectContent className="bg-gray-800 border-gray-700 text-white">
@@ -497,7 +553,7 @@ export default function PowerCalculator() {
                       
                       {/* CO2 Emissions */}
                       <div className="space-y-2">
-                        <Label htmlFor="co2-factor" className="text-gray-300 flex items-center">
+                        <Label htmlFor="co2-factor" className="text-gray-300 flex items-center text-sm">
                           <BarChart3 className="h-4 w-4 mr-2 text-blue-400" />
                           CO₂ Emission Factor
                         </Label>
@@ -505,13 +561,14 @@ export default function PowerCalculator() {
                           <Input
                             id="co2-factor"
                             type="number"
+                            inputMode="decimal"
                             value={co2PerKwh}
                             onChange={(e) => setCo2PerKwh(e.target.value)}
-                            className="bg-gray-800 border-gray-700 focus:border-blue-500 focus:ring-blue-500 text-white pr-16"
+                            className="bg-gray-800 border-gray-700 focus:border-blue-500 focus:ring-blue-500 text-white pr-16 h-9 text-sm"
                             step="0.01"
                             min="0"
                           />
-                          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
+                          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400 text-xs">
                             kg/kWh
                           </div>
                         </div>
@@ -522,13 +579,14 @@ export default function PowerCalculator() {
                     </div>
                     
                     {/* Include Standby Power */}
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2 bg-gray-800 p-3 rounded-md">
                       <Switch 
                         id="standby-power" 
                         checked={includeStandby}
                         onCheckedChange={setIncludeStandby}
+                        className="data-[state=checked]:bg-blue-600"
                       />
-                      <Label htmlFor="standby-power" className="text-gray-300">
+                      <Label htmlFor="standby-power" className="text-gray-300 text-sm">
                         Include standby power consumption
                       </Label>
                     </div>
@@ -567,15 +625,19 @@ export default function PowerCalculator() {
                                   placeholder="Device name"
                                 />
                                 
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3">
                                   {/* Power Rating */}
                                   <div className="space-y-1">
-                                    <Label className="text-xs text-gray-400">Power (Watts)</Label>
+                                    <Label className="text-xs text-gray-400 flex items-center">
+                                      <Zap className="h-3 w-3 mr-1 text-blue-400" />
+                                      Power (Watts)
+                                    </Label>
                                     <Input
                                       type="number"
+                                      inputMode="decimal"
                                       value={device.powerWatts}
                                       onChange={(e) => updateDevice(device.id, 'powerWatts', e.target.value)}
-                                      className="bg-gray-800 border-gray-700 text-white"
+                                      className="bg-gray-800 border-gray-700 text-white h-9 text-sm"
                                       min="0"
                                       step="1"
                                     />
@@ -583,12 +645,16 @@ export default function PowerCalculator() {
                                   
                                   {/* Hours per Day */}
                                   <div className="space-y-1">
-                                    <Label className="text-xs text-gray-400">Hours/Day</Label>
+                                    <Label className="text-xs text-gray-400 flex items-center">
+                                      <Clock className="h-3 w-3 mr-1 text-blue-400" />
+                                      Hours/Day
+                                    </Label>
                                     <Input
                                       type="number"
+                                      inputMode="decimal"
                                       value={device.hoursPerDay}
                                       onChange={(e) => updateDevice(device.id, 'hoursPerDay', e.target.value)}
-                                      className="bg-gray-800 border-gray-700 text-white"
+                                      className="bg-gray-800 border-gray-700 text-white h-9 text-sm"
                                       min="0"
                                       max="24"
                                       step="0.5"
@@ -597,12 +663,16 @@ export default function PowerCalculator() {
                                   
                                   {/* Days per Week */}
                                   <div className="space-y-1">
-                                    <Label className="text-xs text-gray-400">Days/Week</Label>
+                                    <Label className="text-xs text-gray-400 flex items-center">
+                                      <Calendar className="h-3 w-3 mr-1 text-blue-400" />
+                                      Days/Week
+                                    </Label>
                                     <Input
                                       type="number"
+                                      inputMode="decimal"
                                       value={device.daysPerWeek}
                                       onChange={(e) => updateDevice(device.id, 'daysPerWeek', e.target.value)}
-                                      className="bg-gray-800 border-gray-700 text-white"
+                                      className="bg-gray-800 border-gray-700 text-white h-9 text-sm"
                                       min="0"
                                       max="7"
                                       step="1"
@@ -611,12 +681,16 @@ export default function PowerCalculator() {
                                   
                                   {/* Quantity */}
                                   <div className="space-y-1">
-                                    <Label className="text-xs text-gray-400">Quantity</Label>
+                                    <Label className="text-xs text-gray-400 flex items-center">
+                                      <Layers className="h-3 w-3 mr-1 text-blue-400" />
+                                      Quantity
+                                    </Label>
                                     <Input
                                       type="number"
+                                      inputMode="decimal"
                                       value={device.quantity}
                                       onChange={(e) => updateDevice(device.id, 'quantity', e.target.value)}
-                                      className="bg-gray-800 border-gray-700 text-white"
+                                      className="bg-gray-800 border-gray-700 text-white h-9 text-sm"
                                       min="1"
                                       step="1"
                                     />
@@ -696,33 +770,46 @@ export default function PowerCalculator() {
                       </CardHeader>
                       
                       <CardContent className="pt-6">
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {/* Monthly Highlight for Mobile */}
+                        <div className="md:hidden mb-6 bg-gradient-to-r from-blue-900/40 to-purple-900/40 rounded-lg border border-blue-600/20 p-4">
+                          <div className="text-center">
+                            <div className="text-sm font-medium text-gray-300 mb-1">Estimated Monthly Cost</div>
+                            <div className="text-3xl font-bold text-white">
+                              {formatCurrency(calculationResult.monthlyUsage.cost)}
+                            </div>
+                            <div className="text-xs text-blue-400 mt-1 font-medium">
+                              {calculationResult.monthlyUsage.kWh.toFixed(2)} kWh
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                           {/* Daily */}
-                          <div className="bg-gray-800 p-4 rounded-lg">
+                          <div className="bg-gray-800 p-3 rounded-lg">
                             <div className="text-xs font-medium text-gray-400 mb-1">Daily</div>
-                            <div className="font-semibold text-white">
+                            <div className="font-semibold text-white text-sm">
                               {calculationResult.dailyUsage.kWh.toFixed(2)} kWh
                             </div>
-                            <div className="text-sm text-blue-400 font-medium">
+                            <div className="text-xs text-blue-400 font-medium">
                               {formatCurrency(calculationResult.dailyUsage.cost)}
                             </div>
                           </div>
                           
                           {/* Weekly */}
-                          <div className="bg-gray-800 p-4 rounded-lg">
+                          <div className="bg-gray-800 p-3 rounded-lg">
                             <div className="text-xs font-medium text-gray-400 mb-1">Weekly</div>
-                            <div className="font-semibold text-white">
+                            <div className="font-semibold text-white text-sm">
                               {calculationResult.weeklyUsage.kWh.toFixed(2)} kWh
                             </div>
-                            <div className="text-sm text-blue-400 font-medium">
+                            <div className="text-xs text-blue-400 font-medium">
                               {formatCurrency(calculationResult.weeklyUsage.cost)}
                             </div>
                           </div>
                           
-                          {/* Monthly */}
-                          <div className="bg-gray-800 p-4 rounded-lg border-2 border-blue-600/20">
+                          {/* Monthly - Hidden on mobile (shown above) */}
+                          <div className="hidden md:block bg-gray-800 p-3 rounded-lg border-2 border-blue-600/20">
                             <div className="text-xs font-medium text-gray-400 mb-1">Monthly</div>
-                            <div className="font-semibold text-white text-lg">
+                            <div className="font-semibold text-white text-base">
                               {calculationResult.monthlyUsage.kWh.toFixed(2)} kWh
                             </div>
                             <div className="text-blue-400 font-bold">
@@ -731,37 +818,37 @@ export default function PowerCalculator() {
                           </div>
                           
                           {/* Yearly */}
-                          <div className="bg-gray-800 p-4 rounded-lg">
+                          <div className="bg-gray-800 p-3 rounded-lg">
                             <div className="text-xs font-medium text-gray-400 mb-1">Yearly</div>
-                            <div className="font-semibold text-white">
+                            <div className="font-semibold text-white text-sm">
                               {calculationResult.yearlyUsage.kWh.toFixed(2)} kWh
                             </div>
-                            <div className="text-sm text-blue-400 font-medium">
+                            <div className="text-xs text-blue-400 font-medium">
                               {formatCurrency(calculationResult.yearlyUsage.cost)}
                             </div>
                           </div>
                         </div>
                         
                         {/* Environmental Impact */}
-                        <div className="mt-6 bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+                        <div className="mt-5 bg-gray-800/50 rounded-lg p-4 border border-gray-700">
                           <h4 className="font-medium mb-2 text-white flex items-center text-sm">
                             <BarChart3 className="h-4 w-4 mr-2 text-blue-400" />
                             Environmental Impact
                           </h4>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             <div className="bg-gray-800 p-3 rounded-lg">
                               <div className="text-xs font-medium text-gray-400 mb-1">CO₂ Emissions (Yearly)</div>
-                              <div className="font-semibold text-white">
+                              <div className="font-semibold text-white text-sm">
                                 {calculationResult.co2Emissions.yearly.toFixed(2)} kg CO₂
                               </div>
                               <div className="text-xs text-gray-500 mt-1">
-                                Equivalent to approx. {(calculationResult.co2Emissions.yearly / 120).toFixed(1)} trees needed to offset
+                                ≈ {(calculationResult.co2Emissions.yearly / 120).toFixed(1)} trees needed to offset
                               </div>
                             </div>
                             
                             <div className="bg-gray-800 p-3 rounded-lg">
                               <div className="text-xs font-medium text-gray-400 mb-1">Energy Consumption</div>
-                              <div className="font-semibold text-white">
+                              <div className="font-semibold text-white text-sm">
                                 {(calculationResult.monthlyUsage.kWh / (devices.length || 1)).toFixed(2)} kWh/device/month
                               </div>
                               <div className="text-xs text-gray-500 mt-1">
@@ -772,33 +859,85 @@ export default function PowerCalculator() {
                         </div>
                         
                         {/* Saving Tips */}
-                        <div className="mt-6 bg-blue-600/10 rounded-lg p-4 border border-blue-600/20">
-                          <h4 className="font-medium mb-2 text-white flex items-center">
+                        <div className="mt-5 bg-blue-600/10 rounded-lg p-4 border border-blue-600/20">
+                          <h4 className="font-medium mb-2 text-white flex items-center text-sm">
                             <Lightbulb className="h-4 w-4 mr-2 text-blue-400" />
                             Energy Saving Tips
                           </h4>
-                          <ul className="text-sm text-gray-300 space-y-1">
+                          <ul className="text-xs sm:text-sm text-gray-300 space-y-1">
                             <li className="flex items-start">
-                              <span className="text-blue-400 mr-2">•</span>
-                              <span>Unplug devices when not in use to eliminate standby power consumption</span>
+                              <span className="text-blue-400 mr-2 mt-0.5">•</span>
+                              <span>Unplug devices when not in use to eliminate standby power</span>
                             </li>
                             <li className="flex items-start">
-                              <span className="text-blue-400 mr-2">•</span>
-                              <span>Replace old appliances with energy-efficient models with lower wattage</span>
+                              <span className="text-blue-400 mr-2 mt-0.5">•</span>
+                              <span>Replace old appliances with energy-efficient models</span>
                             </li>
                             <li className="flex items-start">
-                              <span className="text-blue-400 mr-2">•</span>
-                              <span>Use smart power strips to automatically cut power to devices in standby mode</span>
+                              <span className="text-blue-400 mr-2 mt-0.5">•</span>
+                              <span>Use smart power strips to cut power to devices in standby mode</span>
                             </li>
                           </ul>
                         </div>
                         
                         {/* Save Results Button */}
-                        <div className="mt-6">
-                          <Button className="w-full bg-gray-800 hover:bg-gray-700 text-white">
+                        <div className="mt-5">
+                          <Button className="w-full bg-gray-800 hover:bg-gray-700 text-white h-10">
                             <Save className="h-4 w-4 mr-2" />
                             Save as PDF Report
                           </Button>
+                        </div>
+                        
+                        {/* Mobile-specific full preset listing */}
+                        <div id="mobileCategoryDrawer" className="mt-8 md:hidden">
+                          <h4 className="font-medium mb-3 text-white flex items-center text-base">
+                            <Lightbulb className="h-4 w-4 mr-2 text-blue-400" />
+                            All Available Devices
+                          </h4>
+                          
+                          <Tabs 
+                            value={selectedCategory} 
+                            onValueChange={setSelectedCategory}
+                            className="mt-4"
+                          >
+                            <TabsList className="flex overflow-x-auto whitespace-nowrap w-full bg-gray-800 p-1 max-w-full no-scrollbar">
+                              {categories.map(category => (
+                                <TabsTrigger 
+                                  key={category} 
+                                  value={category}
+                                  className="text-xs data-[state=active]:bg-blue-600 data-[state=active]:text-white py-1 px-3 flex-shrink-0"
+                                >
+                                  {category.split(" ")[0]}
+                                </TabsTrigger>
+                              ))}
+                            </TabsList>
+                            
+                            {categories.map(category => (
+                              <TabsContent key={category} value={category} className="mt-2">
+                                <div className="grid grid-cols-1 gap-2">
+                                  {devicePresetsByCategory[category].map(preset => (
+                                    <div 
+                                      key={preset.name}
+                                      className="flex justify-between items-center p-3 bg-gray-800 rounded-lg active:bg-gray-700 cursor-pointer"
+                                      onClick={() => addPresetDevice(preset)}
+                                    >
+                                      <div>
+                                        <div className="font-medium text-sm">{preset.name}</div>
+                                        <div className="text-xs text-blue-400">{preset.powerWatts} Watts</div>
+                                      </div>
+                                      <Button 
+                                        size="sm" 
+                                        variant="ghost"
+                                        className="text-blue-400"
+                                      >
+                                        <PlusCircle className="h-4 w-4" />
+                                      </Button>
+                                    </div>
+                                  ))}
+                                </div>
+                              </TabsContent>
+                            ))}
+                          </Tabs>
                         </div>
                       </CardContent>
                     </Card>
