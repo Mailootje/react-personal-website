@@ -1,0 +1,815 @@
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { Container } from "@/components/ui/container";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
+import { 
+  ArrowLeft, 
+  Lightbulb,
+  Zap,
+  Clock,
+  BarChart3,
+  PlusCircle,
+  Trash2,
+  Calculator,
+  DollarSign,
+  Settings,
+  Save,
+  BadgePlus
+} from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { VideoBackground } from "@/components/VideoBackground";
+
+// Common device power ratings in watts
+interface DevicePreset {
+  name: string;
+  category: string;
+  powerWatts: number;
+}
+
+interface Device {
+  id: string;
+  name: string;
+  powerWatts: number;
+  hoursPerDay: number;
+  daysPerWeek: number;
+  quantity: number;
+  standbyWatts?: number;
+  efficiency?: number;
+}
+
+interface PowerCalculationResult {
+  dailyUsage: {
+    kWh: number;
+    cost: number;
+  };
+  weeklyUsage: {
+    kWh: number;
+    cost: number;
+  };
+  monthlyUsage: {
+    kWh: number;
+    cost: number;
+  };
+  yearlyUsage: {
+    kWh: number;
+    cost: number;
+  };
+  co2Emissions: {
+    yearly: number; // in kg
+  };
+}
+
+// Common device presets
+const devicePresets: DevicePreset[] = [
+  // Computer & Electronics
+  { name: "Desktop Computer (idle)", category: "Computer & Electronics", powerWatts: 100 },
+  { name: "Desktop Computer (gaming)", category: "Computer & Electronics", powerWatts: 350 },
+  { name: "Laptop Computer", category: "Computer & Electronics", powerWatts: 60 },
+  { name: "Monitor (24-inch LCD)", category: "Computer & Electronics", powerWatts: 30 },
+  { name: "Gaming Console", category: "Computer & Electronics", powerWatts: 150 },
+  { name: "Printer (inkjet)", category: "Computer & Electronics", powerWatts: 30 },
+  { name: "Printer (laser)", category: "Computer & Electronics", powerWatts: 500 },
+  { name: "Wi-Fi Router", category: "Computer & Electronics", powerWatts: 5 },
+  { name: "Mobile Phone Charger", category: "Computer & Electronics", powerWatts: 5 },
+  
+  // Kitchen Appliances
+  { name: "Refrigerator", category: "Kitchen Appliances", powerWatts: 150 },
+  { name: "Freezer", category: "Kitchen Appliances", powerWatts: 100 },
+  { name: "Microwave Oven", category: "Kitchen Appliances", powerWatts: 1000 },
+  { name: "Electric Oven", category: "Kitchen Appliances", powerWatts: 2400 },
+  { name: "Cooktop (per element)", category: "Kitchen Appliances", powerWatts: 1500 },
+  { name: "Dishwasher", category: "Kitchen Appliances", powerWatts: 1800 },
+  { name: "Coffee Maker", category: "Kitchen Appliances", powerWatts: 1000 },
+  { name: "Toaster", category: "Kitchen Appliances", powerWatts: 850 },
+  { name: "Blender", category: "Kitchen Appliances", powerWatts: 300 },
+  
+  // Home Appliances
+  { name: "Washing Machine", category: "Home Appliances", powerWatts: 500 },
+  { name: "Clothes Dryer", category: "Home Appliances", powerWatts: 3000 },
+  { name: "Vacuum Cleaner", category: "Home Appliances", powerWatts: 1400 },
+  { name: "Iron", category: "Home Appliances", powerWatts: 1800 },
+  { name: "Hair Dryer", category: "Home Appliances", powerWatts: 1800 },
+  
+  // HVAC & Climate Control
+  { name: "Air Conditioner (window)", category: "HVAC & Climate Control", powerWatts: 1000 },
+  { name: "Air Conditioner (central)", category: "HVAC & Climate Control", powerWatts: 3500 },
+  { name: "Electric Heater (portable)", category: "HVAC & Climate Control", powerWatts: 1500 },
+  { name: "Ceiling Fan", category: "HVAC & Climate Control", powerWatts: 75 },
+  { name: "Dehumidifier", category: "HVAC & Climate Control", powerWatts: 280 },
+  
+  // Lighting
+  { name: "LED Light Bulb", category: "Lighting", powerWatts: 10 },
+  { name: "CFL Light Bulb", category: "Lighting", powerWatts: 15 },
+  { name: "Incandescent Light Bulb", category: "Lighting", powerWatts: 60 },
+  
+  // Entertainment
+  { name: "TV (LED, 32-inch)", category: "Entertainment", powerWatts: 50 },
+  { name: "TV (LED, 50-inch)", category: "Entertainment", powerWatts: 100 },
+  { name: "TV (OLED, 55-inch)", category: "Entertainment", powerWatts: 130 },
+  { name: "Home Theater System", category: "Entertainment", powerWatts: 100 },
+  { name: "Stereo System", category: "Entertainment", powerWatts: 80 },
+  
+  // Other
+  { name: "Electric Vehicle Charger (Level 1)", category: "Other", powerWatts: 1400 },
+  { name: "Electric Vehicle Charger (Level 2)", category: "Other", powerWatts: 7200 },
+  { name: "Pool Pump", category: "Other", powerWatts: 1500 },
+  { name: "Water Heater", category: "Other", powerWatts: 4000 },
+];
+
+// Group presets by category
+const devicePresetsByCategory = devicePresets.reduce((acc, device) => {
+  if (!acc[device.category]) {
+    acc[device.category] = [];
+  }
+  acc[device.category].push(device);
+  return acc;
+}, {} as Record<string, DevicePreset[]>);
+
+// All categories
+const categories = Object.keys(devicePresetsByCategory);
+
+export default function PowerCalculator() {
+  const { toast } = useToast();
+  const [devices, setDevices] = useState<Device[]>([
+    {
+      id: '1',
+      name: 'Desktop Computer',
+      powerWatts: 150,
+      hoursPerDay: 8,
+      daysPerWeek: 5,
+      quantity: 1,
+      standbyWatts: 5
+    }
+  ]);
+  const [electricityRate, setElectricityRate] = useState<string>("0.15");
+  const [currency, setCurrency] = useState<string>("USD");
+  const [calculationResult, setCalculationResult] = useState<PowerCalculationResult | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>(categories[0]);
+  const [includeStandby, setIncludeStandby] = useState<boolean>(true);
+  const [co2PerKwh, setCo2PerKwh] = useState<string>("0.5");
+  
+  // Generate unique ID
+  const generateId = () => Math.random().toString(36).substring(2, 10);
+  
+  // Add a new device
+  const addDevice = (preset?: DevicePreset) => {
+    const newDevice: Device = {
+      id: generateId(),
+      name: preset?.name || 'New Device',
+      powerWatts: preset?.powerWatts || 100,
+      hoursPerDay: 1,
+      daysPerWeek: 7,
+      quantity: 1,
+      standbyWatts: 0
+    };
+    
+    setDevices([...devices, newDevice]);
+  };
+  
+  // Add device from preset
+  const addPresetDevice = (preset: DevicePreset) => {
+    addDevice(preset);
+    toast({
+      title: `Added ${preset.name}`,
+      description: `${preset.powerWatts} watts added to your calculation.`,
+    });
+  };
+  
+  // Remove a device
+  const removeDevice = (id: string) => {
+    setDevices(devices.filter(device => device.id !== id));
+  };
+  
+  // Update device property
+  const updateDevice = (id: string, property: keyof Device, value: number | string) => {
+    setDevices(devices.map(device => {
+      if (device.id === id) {
+        return {
+          ...device,
+          [property]: typeof value === 'string' && property !== 'name' ? parseFloat(value) : value
+        };
+      }
+      return device;
+    }));
+  };
+  
+  // Calculate electricity usage and cost
+  const calculatePowerUsage = () => {
+    try {
+      // Validate inputs
+      const rate = parseFloat(electricityRate);
+      if (isNaN(rate) || rate <= 0) {
+        throw new Error("Please enter a valid electricity rate");
+      }
+      
+      const co2EmissionFactor = parseFloat(co2PerKwh);
+      if (isNaN(co2EmissionFactor) || co2EmissionFactor < 0) {
+        throw new Error("Please enter a valid CO2 emission factor");
+      }
+      
+      // Calculate total kWh and cost
+      let totalDailyKwh = 0;
+      
+      devices.forEach(device => {
+        // Validate device inputs
+        if (isNaN(device.powerWatts) || device.powerWatts < 0 ||
+            isNaN(device.hoursPerDay) || device.hoursPerDay < 0 ||
+            isNaN(device.daysPerWeek) || device.daysPerWeek < 0 || device.daysPerWeek > 7 ||
+            isNaN(device.quantity) || device.quantity < 1) {
+          throw new Error(`Invalid values for device: ${device.name}`);
+        }
+        
+        // Calculate active power usage
+        const dailyActiveHours = device.hoursPerDay;
+        const dailyKwh = (device.powerWatts * dailyActiveHours * device.quantity) / 1000;
+        
+        // Add standby power if enabled
+        let standbyKwh = 0;
+        if (includeStandby && device.standbyWatts && device.standbyWatts > 0) {
+          const dailyStandbyHours = 24 - dailyActiveHours;
+          standbyKwh = (device.standbyWatts * dailyStandbyHours * device.quantity) / 1000;
+        }
+        
+        // Calculate total daily kWh for this device
+        const deviceDailyKwh = dailyKwh + standbyKwh;
+        const daysRatio = device.daysPerWeek / 7;
+        
+        // Add to total daily average (accounting for days per week)
+        totalDailyKwh += deviceDailyKwh * daysRatio;
+      });
+      
+      // Calculate periods
+      const dailyCost = totalDailyKwh * rate;
+      const weeklyKwh = totalDailyKwh * 7;
+      const weeklyCost = weeklyKwh * rate;
+      const monthlyKwh = totalDailyKwh * 30.4375; // Average days in month
+      const monthlyCost = monthlyKwh * rate;
+      const yearlyKwh = totalDailyKwh * 365;
+      const yearlyCost = yearlyKwh * rate;
+      
+      // Calculate CO2 emissions
+      const yearlyCO2 = yearlyKwh * co2EmissionFactor;
+      
+      // Set results
+      setCalculationResult({
+        dailyUsage: {
+          kWh: totalDailyKwh,
+          cost: dailyCost
+        },
+        weeklyUsage: {
+          kWh: weeklyKwh,
+          cost: weeklyCost
+        },
+        monthlyUsage: {
+          kWh: monthlyKwh,
+          cost: monthlyCost
+        },
+        yearlyUsage: {
+          kWh: yearlyKwh,
+          cost: yearlyCost
+        },
+        co2Emissions: {
+          yearly: yearlyCO2
+        }
+      });
+      
+      toast({
+        title: "Calculation Complete",
+        description: `Estimated monthly cost: ${formatCurrency(monthlyCost)}`,
+      });
+      
+    } catch (error) {
+      console.error("Calculation error:", error);
+      toast({
+        title: "Calculation Error",
+        description: error instanceof Error ? error.message : "An error occurred during calculation",
+        variant: "destructive",
+      });
+    }
+  };
+  
+  // Format currency based on selected currency
+  const formatCurrency = (amount: number): string => {
+    switch (currency) {
+      case "USD":
+        return `$${amount.toFixed(2)}`;
+      case "EUR":
+        return `€${amount.toFixed(2)}`;
+      case "GBP":
+        return `£${amount.toFixed(2)}`;
+      default:
+        return `${amount.toFixed(2)} ${currency}`;
+    }
+  };
+  
+  // Currency options
+  const currencyOptions = [
+    { id: "USD", name: "US Dollar ($)" },
+    { id: "EUR", name: "Euro (€)" },
+    { id: "GBP", name: "British Pound (£)" },
+    { id: "CAD", name: "Canadian Dollar (C$)" },
+    { id: "AUD", name: "Australian Dollar (A$)" },
+    { id: "INR", name: "Indian Rupee (₹)" },
+    { id: "JPY", name: "Japanese Yen (¥)" },
+  ];
+  
+  return (
+    <div className="min-h-screen bg-black text-white flex flex-col">
+      <Header />
+      <VideoBackground opacity={0.10} />
+      
+      <main className="flex-grow z-10 relative">
+        <section className="py-20 px-6">
+          <Container maxWidth="xl">
+            <div className="mb-8">
+              <div 
+                onClick={() => window.location.href = "/apps"}
+                className="inline-flex items-center text-blue-400 hover:text-blue-300 transition-colors cursor-pointer"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Apps
+              </div>
+            </div>
+            
+            <motion.div
+              className="text-center mb-12"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-600 text-transparent bg-clip-text">
+                Power Usage Calculator
+              </h1>
+              <p className="text-gray-400 max-w-2xl mx-auto">
+                Calculate electricity usage, cost, and environmental impact for all your devices
+              </p>
+            </motion.div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {/* Sidebar: Device Presets */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="md:col-span-1"
+              >
+                <Card className="bg-gray-900 border-gray-800 shadow-lg shadow-blue-900/10 h-full">
+                  <CardHeader className="border-b border-gray-800 pb-4">
+                    <CardTitle className="text-xl text-white flex items-center gap-2">
+                      <BadgePlus className="h-5 w-5 text-blue-400" />
+                      Add Devices
+                    </CardTitle>
+                    <CardDescription className="text-gray-400">
+                      Choose from common device presets
+                    </CardDescription>
+                  </CardHeader>
+                  
+                  <CardContent className="pt-6">
+                    {/* Category Tabs */}
+                    <Tabs 
+                      value={selectedCategory} 
+                      onValueChange={setSelectedCategory}
+                      className="mb-4"
+                    >
+                      <TabsList className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-3 w-full bg-gray-800 p-1">
+                        {categories.map(category => (
+                          <TabsTrigger 
+                            key={category} 
+                            value={category}
+                            className="text-xs data-[state=active]:bg-blue-600 data-[state=active]:text-white py-1"
+                          >
+                            {category.split(" ")[0]}
+                          </TabsTrigger>
+                        ))}
+                      </TabsList>
+                      
+                      {categories.map(category => (
+                        <TabsContent key={category} value={category} className="mt-4 space-y-2">
+                          {devicePresetsByCategory[category].map(preset => (
+                            <div 
+                              key={preset.name}
+                              className="flex justify-between items-center p-3 bg-gray-800 rounded-lg hover:bg-gray-700 cursor-pointer transition-colors group"
+                              onClick={() => addPresetDevice(preset)}
+                            >
+                              <div>
+                                <div className="font-medium text-sm">{preset.name}</div>
+                                <div className="text-xs text-blue-400">{preset.powerWatts} Watts</div>
+                              </div>
+                              <Button 
+                                size="sm" 
+                                variant="ghost"
+                                className="opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                <PlusCircle className="h-4 w-4 text-blue-400" />
+                              </Button>
+                            </div>
+                          ))}
+                        </TabsContent>
+                      ))}
+                    </Tabs>
+                    
+                    <div className="mt-6">
+                      <Button 
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                        onClick={() => addDevice()}
+                      >
+                        <PlusCircle className="h-4 w-4 mr-2" />
+                        Add Custom Device
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+              
+              {/* Main Content: Devices & Calculation */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="md:col-span-2"
+              >
+                <Card className="bg-gray-900 border-gray-800 shadow-lg shadow-blue-900/10 mb-8">
+                  <CardHeader className="border-b border-gray-800 pb-4">
+                    <CardTitle className="text-xl text-white flex items-center gap-2">
+                      <Settings className="h-5 w-5 text-blue-400" />
+                      Settings
+                    </CardTitle>
+                    <CardDescription className="text-gray-400">
+                      Set electricity rate and other calculation options
+                    </CardDescription>
+                  </CardHeader>
+                  
+                  <CardContent className="space-y-6 pt-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Electricity Rate */}
+                      <div className="space-y-2">
+                        <Label htmlFor="electricity-rate" className="text-gray-300 flex items-center">
+                          <Zap className="h-4 w-4 mr-2 text-blue-400" />
+                          Electricity Rate
+                        </Label>
+                        <div className="flex gap-4">
+                          <div className="relative flex-grow">
+                            <Input
+                              id="electricity-rate"
+                              type="number"
+                              value={electricityRate}
+                              onChange={(e) => setElectricityRate(e.target.value)}
+                              className="bg-gray-800 border-gray-700 focus:border-blue-500 focus:ring-blue-500 text-white pr-16"
+                              step="0.01"
+                              min="0.01"
+                            />
+                            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
+                              per kWh
+                            </div>
+                          </div>
+                          
+                          <div className="w-28">
+                            <Select
+                              value={currency}
+                              onValueChange={setCurrency}
+                            >
+                              <SelectTrigger className="bg-gray-800 border-gray-700 text-white focus:ring-blue-500">
+                                <SelectValue placeholder="Currency" />
+                              </SelectTrigger>
+                              <SelectContent className="bg-gray-800 border-gray-700 text-white">
+                                {currencyOptions.map(option => (
+                                  <SelectItem key={option.id} value={option.id}>
+                                    {option.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                        <p className="text-xs text-gray-500">
+                          The cost of electricity in your area per kilowatt-hour
+                        </p>
+                      </div>
+                      
+                      {/* CO2 Emissions */}
+                      <div className="space-y-2">
+                        <Label htmlFor="co2-factor" className="text-gray-300 flex items-center">
+                          <BarChart3 className="h-4 w-4 mr-2 text-blue-400" />
+                          CO₂ Emission Factor
+                        </Label>
+                        <div className="relative">
+                          <Input
+                            id="co2-factor"
+                            type="number"
+                            value={co2PerKwh}
+                            onChange={(e) => setCo2PerKwh(e.target.value)}
+                            className="bg-gray-800 border-gray-700 focus:border-blue-500 focus:ring-blue-500 text-white pr-16"
+                            step="0.01"
+                            min="0"
+                          />
+                          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
+                            kg/kWh
+                          </div>
+                        </div>
+                        <p className="text-xs text-gray-500">
+                          CO₂ emissions per kWh in your region (avg. 0.5 kg CO₂/kWh)
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {/* Include Standby Power */}
+                    <div className="flex items-center space-x-2">
+                      <Switch 
+                        id="standby-power" 
+                        checked={includeStandby}
+                        onCheckedChange={setIncludeStandby}
+                      />
+                      <Label htmlFor="standby-power" className="text-gray-300">
+                        Include standby power consumption
+                      </Label>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card className="bg-gray-900 border-gray-800 shadow-lg shadow-blue-900/10 mb-8">
+                  <CardHeader className="border-b border-gray-800 pb-4">
+                    <CardTitle className="text-xl text-white flex items-center gap-2">
+                      <Lightbulb className="h-5 w-5 text-blue-400" />
+                      Your Devices
+                    </CardTitle>
+                    <CardDescription className="text-gray-400">
+                      Add and configure your electrical devices
+                    </CardDescription>
+                  </CardHeader>
+                  
+                  <CardContent className="pt-6">
+                    {devices.length === 0 ? (
+                      <div className="text-center py-8 text-gray-400">
+                        <p>No devices added yet. Add devices from the presets or create a custom device.</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-6">
+                        {devices.map((device) => (
+                          <div 
+                            key={device.id} 
+                            className="bg-gray-800/50 rounded-lg p-4 border border-gray-700"
+                          >
+                            <div className="flex justify-between items-start mb-4">
+                              <div className="w-full">
+                                <Input
+                                  value={device.name}
+                                  onChange={(e) => updateDevice(device.id, 'name', e.target.value)}
+                                  className="bg-gray-800 border-gray-700 font-medium text-white mb-2"
+                                  placeholder="Device name"
+                                />
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                  {/* Power Rating */}
+                                  <div className="space-y-1">
+                                    <Label className="text-xs text-gray-400">Power (Watts)</Label>
+                                    <Input
+                                      type="number"
+                                      value={device.powerWatts}
+                                      onChange={(e) => updateDevice(device.id, 'powerWatts', e.target.value)}
+                                      className="bg-gray-800 border-gray-700 text-white"
+                                      min="0"
+                                      step="1"
+                                    />
+                                  </div>
+                                  
+                                  {/* Hours per Day */}
+                                  <div className="space-y-1">
+                                    <Label className="text-xs text-gray-400">Hours/Day</Label>
+                                    <Input
+                                      type="number"
+                                      value={device.hoursPerDay}
+                                      onChange={(e) => updateDevice(device.id, 'hoursPerDay', e.target.value)}
+                                      className="bg-gray-800 border-gray-700 text-white"
+                                      min="0"
+                                      max="24"
+                                      step="0.5"
+                                    />
+                                  </div>
+                                  
+                                  {/* Days per Week */}
+                                  <div className="space-y-1">
+                                    <Label className="text-xs text-gray-400">Days/Week</Label>
+                                    <Input
+                                      type="number"
+                                      value={device.daysPerWeek}
+                                      onChange={(e) => updateDevice(device.id, 'daysPerWeek', e.target.value)}
+                                      className="bg-gray-800 border-gray-700 text-white"
+                                      min="0"
+                                      max="7"
+                                      step="1"
+                                    />
+                                  </div>
+                                  
+                                  {/* Quantity */}
+                                  <div className="space-y-1">
+                                    <Label className="text-xs text-gray-400">Quantity</Label>
+                                    <Input
+                                      type="number"
+                                      value={device.quantity}
+                                      onChange={(e) => updateDevice(device.id, 'quantity', e.target.value)}
+                                      className="bg-gray-800 border-gray-700 text-white"
+                                      min="1"
+                                      step="1"
+                                    />
+                                  </div>
+                                </div>
+                                
+                                {includeStandby && (
+                                  <div className="mt-3">
+                                    <Label className="text-xs text-gray-400">Standby Power (Watts)</Label>
+                                    <div className="mt-1">
+                                      <Slider
+                                        value={[device.standbyWatts || 0]}
+                                        onValueChange={(value) => updateDevice(device.id, 'standbyWatts', value[0])}
+                                        min={0}
+                                        max={50}
+                                        step={0.5}
+                                        className="py-2"
+                                      />
+                                      <div className="text-xs text-gray-500 mt-1">
+                                        {device.standbyWatts || 0} watts when in standby mode
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                              
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                onClick={() => removeDevice(device.id)}
+                                className="text-gray-400 hover:text-red-400 hover:bg-transparent"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                            
+                            <div className="text-xs text-gray-500 mt-1">
+                              Daily power: {((device.powerWatts * device.hoursPerDay * device.quantity) / 1000).toFixed(2)} kWh
+                              {includeStandby && device.standbyWatts && device.standbyWatts > 0 && (
+                                <> + {(((device.standbyWatts) * (24 - device.hoursPerDay) * device.quantity) / 1000).toFixed(2)} kWh standby</>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    <div className="mt-6">
+                      <Button 
+                        onClick={calculatePowerUsage}
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                        disabled={devices.length === 0}
+                      >
+                        <Calculator className="h-4 w-4 mr-2" />
+                        Calculate Power Usage
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                {/* Results Section */}
+                {calculationResult && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <Card className="bg-gray-900 border-gray-800 shadow-lg shadow-blue-900/10">
+                      <CardHeader className="border-b border-gray-800 pb-4">
+                        <CardTitle className="text-xl text-white flex items-center gap-2">
+                          <BarChart3 className="h-5 w-5 text-blue-400" />
+                          Calculation Results
+                        </CardTitle>
+                        <CardDescription className="text-gray-400">
+                          Estimated power consumption and costs
+                        </CardDescription>
+                      </CardHeader>
+                      
+                      <CardContent className="pt-6">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          {/* Daily */}
+                          <div className="bg-gray-800 p-4 rounded-lg">
+                            <div className="text-xs font-medium text-gray-400 mb-1">Daily</div>
+                            <div className="font-semibold text-white">
+                              {calculationResult.dailyUsage.kWh.toFixed(2)} kWh
+                            </div>
+                            <div className="text-sm text-blue-400 font-medium">
+                              {formatCurrency(calculationResult.dailyUsage.cost)}
+                            </div>
+                          </div>
+                          
+                          {/* Weekly */}
+                          <div className="bg-gray-800 p-4 rounded-lg">
+                            <div className="text-xs font-medium text-gray-400 mb-1">Weekly</div>
+                            <div className="font-semibold text-white">
+                              {calculationResult.weeklyUsage.kWh.toFixed(2)} kWh
+                            </div>
+                            <div className="text-sm text-blue-400 font-medium">
+                              {formatCurrency(calculationResult.weeklyUsage.cost)}
+                            </div>
+                          </div>
+                          
+                          {/* Monthly */}
+                          <div className="bg-gray-800 p-4 rounded-lg border-2 border-blue-600/20">
+                            <div className="text-xs font-medium text-gray-400 mb-1">Monthly</div>
+                            <div className="font-semibold text-white text-lg">
+                              {calculationResult.monthlyUsage.kWh.toFixed(2)} kWh
+                            </div>
+                            <div className="text-blue-400 font-bold">
+                              {formatCurrency(calculationResult.monthlyUsage.cost)}
+                            </div>
+                          </div>
+                          
+                          {/* Yearly */}
+                          <div className="bg-gray-800 p-4 rounded-lg">
+                            <div className="text-xs font-medium text-gray-400 mb-1">Yearly</div>
+                            <div className="font-semibold text-white">
+                              {calculationResult.yearlyUsage.kWh.toFixed(2)} kWh
+                            </div>
+                            <div className="text-sm text-blue-400 font-medium">
+                              {formatCurrency(calculationResult.yearlyUsage.cost)}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Environmental Impact */}
+                        <div className="mt-6 bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+                          <h4 className="font-medium mb-2 text-white flex items-center text-sm">
+                            <BarChart3 className="h-4 w-4 mr-2 text-blue-400" />
+                            Environmental Impact
+                          </h4>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="bg-gray-800 p-3 rounded-lg">
+                              <div className="text-xs font-medium text-gray-400 mb-1">CO₂ Emissions (Yearly)</div>
+                              <div className="font-semibold text-white">
+                                {calculationResult.co2Emissions.yearly.toFixed(2)} kg CO₂
+                              </div>
+                              <div className="text-xs text-gray-500 mt-1">
+                                Equivalent to approx. {(calculationResult.co2Emissions.yearly / 120).toFixed(1)} trees needed to offset
+                              </div>
+                            </div>
+                            
+                            <div className="bg-gray-800 p-3 rounded-lg">
+                              <div className="text-xs font-medium text-gray-400 mb-1">Energy Consumption</div>
+                              <div className="font-semibold text-white">
+                                {(calculationResult.monthlyUsage.kWh / (devices.length || 1)).toFixed(2)} kWh/device/month
+                              </div>
+                              <div className="text-xs text-gray-500 mt-1">
+                                Average consumption per device
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Saving Tips */}
+                        <div className="mt-6 bg-blue-600/10 rounded-lg p-4 border border-blue-600/20">
+                          <h4 className="font-medium mb-2 text-white flex items-center">
+                            <Lightbulb className="h-4 w-4 mr-2 text-blue-400" />
+                            Energy Saving Tips
+                          </h4>
+                          <ul className="text-sm text-gray-300 space-y-1">
+                            <li className="flex items-start">
+                              <span className="text-blue-400 mr-2">•</span>
+                              <span>Unplug devices when not in use to eliminate standby power consumption</span>
+                            </li>
+                            <li className="flex items-start">
+                              <span className="text-blue-400 mr-2">•</span>
+                              <span>Replace old appliances with energy-efficient models with lower wattage</span>
+                            </li>
+                            <li className="flex items-start">
+                              <span className="text-blue-400 mr-2">•</span>
+                              <span>Use smart power strips to automatically cut power to devices in standby mode</span>
+                            </li>
+                          </ul>
+                        </div>
+                        
+                        {/* Save Results Button */}
+                        <div className="mt-6">
+                          <Button className="w-full bg-gray-800 hover:bg-gray-700 text-white">
+                            <Save className="h-4 w-4 mr-2" />
+                            Save as PDF Report
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                )}
+              </motion.div>
+            </div>
+          </Container>
+        </section>
+      </main>
+      <Footer />
+    </div>
+  );
+}

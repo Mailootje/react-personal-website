@@ -87,6 +87,13 @@ export default function Apps() {
       tags: ["Utility", "Calculation", "Travel"],
     },
     {
+      id: "power-calculator",
+      title: "Power Usage Calculator",
+      description: "Calculate electricity costs for all your devices and see environmental impact",
+      icon: "💡",
+      tags: ["Utility", "Calculation", "Home"],
+    },
+    {
       id: "timestamp-converter",
       title: "Timestamp Converter",
       description: "Convert Unix timestamps to human-readable formats and vice versa",
