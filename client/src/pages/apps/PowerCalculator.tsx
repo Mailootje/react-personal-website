@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Container } from "@/components/ui/container";
 import { Header } from "@/components/Header";
@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
+import jsPDF from "jspdf";
 import { 
   ArrowLeft, 
   Lightbulb,
@@ -25,6 +26,8 @@ import {
   DollarSign,
   Settings,
   Save,
+  Download,
+  FileDown,
   BadgePlus
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -323,6 +326,236 @@ export default function PowerCalculator() {
     { id: "INR", name: "Indian Rupee (₹)" },
     { id: "JPY", name: "Japanese Yen (¥)" },
   ];
+  
+  // Generate and download PDF report
+  const generatePDFReport = () => {
+    if (!calculationResult) return;
+    
+    try {
+      // Create a new PDF document
+      const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+      
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const margin = 15;
+      const textWidth = pageWidth - (margin * 2);
+      
+      // Add custom branding
+      // Header with logo and title
+      doc.setFillColor(20, 20, 30);
+      doc.rect(0, 0, pageWidth, 35, 'F');
+      
+      // Title
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(22);
+      doc.text('Power Usage Report', margin, 15);
+      
+      // Subtitle with date
+      doc.setFontSize(10);
+      doc.setTextColor(150, 180, 255);
+      doc.text(`Generated on ${new Date().toLocaleDateString()} by Mailo Bedo Power Calculator`, margin, 22);
+      
+      // Line separator
+      doc.setDrawColor(50, 100, 200);
+      doc.setLineWidth(0.5);
+      doc.line(margin, 35, pageWidth - margin, 35);
+      
+      // Summary section
+      doc.setTextColor(50, 50, 50);
+      doc.setFontSize(16);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Power Consumption Summary', margin, 45);
+      
+      // Monthly cost highlight
+      doc.setFillColor(230, 240, 255);
+      doc.rect(margin, 50, textWidth, 20, 'F');
+      
+      doc.setTextColor(50, 100, 180);
+      doc.setFontSize(12);
+      doc.text('Monthly Electricity Cost:', margin + 2, 58);
+      
+      doc.setFontSize(16);
+      doc.setFont('helvetica', 'bold');
+      doc.text(formatCurrency(calculationResult.monthlyUsage.cost), pageWidth - margin - 30, 58);
+      
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(80, 80, 80);
+      doc.text(`(${calculationResult.monthlyUsage.kWh.toFixed(2)} kWh)`, pageWidth - margin - 30, 65);
+      
+      // Consumption table
+      const tableY = 80;
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(50, 50, 50);
+      doc.text('Period', margin, tableY);
+      doc.text('Energy (kWh)', margin + 50, tableY);
+      doc.text('Cost', margin + 100, tableY);
+      
+      // Line under header
+      doc.setDrawColor(200, 200, 200);
+      doc.setLineWidth(0.2);
+      doc.line(margin, tableY + 2, pageWidth - margin, tableY + 2);
+      
+      // Table content
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(70, 70, 70);
+      
+      // Daily row
+      doc.text('Daily', margin, tableY + 10);
+      doc.text(calculationResult.dailyUsage.kWh.toFixed(2), margin + 50, tableY + 10);
+      doc.text(formatCurrency(calculationResult.dailyUsage.cost), margin + 100, tableY + 10);
+      
+      // Weekly row
+      doc.text('Weekly', margin, tableY + 18);
+      doc.text(calculationResult.weeklyUsage.kWh.toFixed(2), margin + 50, tableY + 18);
+      doc.text(formatCurrency(calculationResult.weeklyUsage.cost), margin + 100, tableY + 18);
+      
+      // Monthly row
+      doc.setFont('helvetica', 'bold');
+      doc.text('Monthly', margin, tableY + 26);
+      doc.text(calculationResult.monthlyUsage.kWh.toFixed(2), margin + 50, tableY + 26);
+      doc.text(formatCurrency(calculationResult.monthlyUsage.cost), margin + 100, tableY + 26);
+      
+      // Yearly row
+      doc.setFont('helvetica', 'normal');
+      doc.text('Yearly', margin, tableY + 34);
+      doc.text(calculationResult.yearlyUsage.kWh.toFixed(2), margin + 50, tableY + 34);
+      doc.text(formatCurrency(calculationResult.yearlyUsage.cost), margin + 100, tableY + 34);
+      
+      // Line under table
+      doc.line(margin, tableY + 38, pageWidth - margin, tableY + 38);
+      
+      // Environmental impact
+      doc.setFontSize(16);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(50, 50, 50);
+      doc.text('Environmental Impact', margin, tableY + 48);
+      
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(70, 70, 70);
+      doc.text(`CO₂ Emissions (yearly): ${calculationResult.co2Emissions.yearly.toFixed(2)} kg CO₂`, margin, tableY + 56);
+      doc.text(`Equivalent to approximately ${(calculationResult.co2Emissions.yearly / 120).toFixed(1)} trees needed for offset`, margin, tableY + 64);
+      
+      // Devices section
+      doc.setFontSize(16);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(50, 50, 50);
+      doc.text('Your Devices', margin, tableY + 80);
+      
+      // Devices table
+      let deviceTableY = tableY + 90;
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Device', margin, deviceTableY);
+      doc.text('Power (W)', margin + 60, deviceTableY);
+      doc.text('Hours/Day', margin + 85, deviceTableY);
+      doc.text('Days/Week', margin + 110, deviceTableY);
+      doc.text('Qty', margin + 135, deviceTableY);
+      doc.text('kWh/Month', margin + 150, deviceTableY);
+      
+      // Line under header
+      doc.line(margin, deviceTableY + 2, pageWidth - margin, deviceTableY + 2);
+      
+      // List all devices
+      doc.setFont('helvetica', 'normal');
+      
+      devices.forEach((device, index) => {
+        const y = deviceTableY + 8 + (index * 7);
+        
+        // Calculate device monthly kWh
+        const dailyActiveHours = device.hoursPerDay;
+        const dailyKwh = (device.powerWatts * dailyActiveHours * device.quantity) / 1000;
+        
+        // Add standby power if enabled
+        let standbyKwh = 0;
+        if (includeStandby && device.standbyWatts && device.standbyWatts > 0) {
+          const dailyStandbyHours = 24 - dailyActiveHours;
+          standbyKwh = (device.standbyWatts * dailyStandbyHours * device.quantity) / 1000;
+        }
+        
+        // Calculate total kWh for this device
+        const deviceDailyKwh = dailyKwh + standbyKwh;
+        const daysRatio = device.daysPerWeek / 7;
+        const monthlyKwh = deviceDailyKwh * daysRatio * 30.4375;
+        
+        // Truncate device name if too long
+        const deviceName = device.name.length > 30 ? device.name.substring(0, 27) + '...' : device.name;
+        
+        doc.text(deviceName, margin, y);
+        doc.text(device.powerWatts.toString(), margin + 60, y);
+        doc.text(device.hoursPerDay.toString(), margin + 85, y);
+        doc.text(device.daysPerWeek.toString(), margin + 110, y);
+        doc.text(device.quantity.toString(), margin + 135, y);
+        doc.text(monthlyKwh.toFixed(2), margin + 150, y);
+        
+        // Add standby info if relevant
+        if (includeStandby && device.standbyWatts && device.standbyWatts > 0) {
+          doc.setFontSize(8);
+          doc.setTextColor(120, 120, 120);
+          doc.text(`(+ ${device.standbyWatts}W standby)`, margin + 60, y + 3);
+          doc.setFontSize(10);
+          doc.setTextColor(70, 70, 70);
+        }
+      });
+      
+      // Add energy saving tips
+      const tipsY = deviceTableY + 10 + (devices.length * 7) + 10;
+      
+      // Add a new page if tips would go off the page
+      if (tipsY > 270) {
+        doc.addPage();
+        deviceTableY = 20;
+      }
+      
+      doc.setFillColor(235, 245, 255);
+      doc.rect(margin, tipsY, textWidth, 30, 'F');
+      
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(50, 100, 180);
+      doc.text('Energy Saving Tips', margin + 2, tipsY + 8);
+      
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(70, 70, 70);
+      doc.text('• Unplug devices when not in use to eliminate standby power consumption', margin + 5, tipsY + 16);
+      doc.text('• Replace old appliances with energy-efficient models with lower wattage', margin + 5, tipsY + 22);
+      doc.text('• Use smart power strips to automatically cut power to devices in standby mode', margin + 5, tipsY + 28);
+      
+      // Add footer
+      const footerY = 285;
+      doc.setDrawColor(50, 100, 200);
+      doc.setLineWidth(0.5);
+      doc.line(margin, footerY, pageWidth - margin, footerY);
+      
+      doc.setFontSize(9);
+      doc.setTextColor(100, 100, 100);
+      doc.text('Generated by Mailo Bedo Power Calculator | mailobedo.nl', margin, footerY + 5);
+      doc.text(new Date().toLocaleString(), pageWidth - margin - 40, footerY + 5, { align: 'right' });
+      
+      // Save the PDF
+      const filename = `Power-Usage-Report-${new Date().toISOString().split('T')[0]}.pdf`;
+      doc.save(filename);
+      
+      toast({
+        title: "PDF Generated Successfully",
+        description: `Your report has been saved as ${filename}`,
+      });
+    } catch (error) {
+      console.error("PDF generation error:", error);
+      toast({
+        title: "PDF Generation Error",
+        description: error instanceof Error ? error.message : "An error occurred generating the PDF",
+        variant: "destructive",
+      });
+    }
+  };
   
   return (
     <div className="min-h-screen bg-black text-white flex flex-col">
@@ -882,9 +1115,12 @@ export default function PowerCalculator() {
                         
                         {/* Save Results Button */}
                         <div className="mt-5">
-                          <Button className="w-full bg-gray-800 hover:bg-gray-700 text-white h-10">
-                            <Save className="h-4 w-4 mr-2" />
-                            Save as PDF Report
+                          <Button 
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white h-10"
+                            onClick={generatePDFReport}
+                          >
+                            <FileDown className="h-4 w-4 mr-2" />
+                            Download PDF Report with Branding
                           </Button>
                         </div>
                         
