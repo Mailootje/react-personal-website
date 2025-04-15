@@ -10,10 +10,13 @@ import {
   type InsertConversionCounter,
   counterTokens,
   type CounterToken,
-  type InsertCounterToken
+  type InsertCounterToken,
+  blogPosts,
+  type BlogPost,
+  type InsertBlogPost
 } from "@shared/schema";
 import { drizzle } from 'drizzle-orm/postgres-js';
-import { eq, lt, desc, and } from 'drizzle-orm';
+import { eq, lt, desc, and, isNull, asc, count } from 'drizzle-orm';
 import postgres from 'postgres';
 import { log } from './vite';
 import crypto from 'crypto';
@@ -25,6 +28,17 @@ export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUser(id: number, data: Partial<InsertUser>): Promise<User | undefined>;
+  
+  // Blog post methods
+  createBlogPost(post: InsertBlogPost): Promise<BlogPost>;
+  getBlogPost(id: number): Promise<BlogPost | undefined>;
+  getBlogPostBySlug(slug: string): Promise<BlogPost | undefined>;
+  updateBlogPost(id: number, data: Partial<InsertBlogPost>): Promise<BlogPost | undefined>;
+  deleteBlogPost(id: number): Promise<boolean>;
+  listBlogPosts(limit?: number, offset?: number): Promise<BlogPost[]>;
+  listPublishedBlogPosts(limit?: number, offset?: number): Promise<BlogPost[]>;
+  countBlogPosts(): Promise<number>;
   
   // Link shortener methods
   createShortenedLink(link: InsertShortenedLink): Promise<ShortenedLink>;
@@ -90,6 +104,122 @@ export class DbStorage implements IStorage {
     } catch (error) {
       log(`Error creating user: ${error}`, "storage");
       throw error;
+    }
+  }
+  
+  async updateUser(id: number, data: Partial<InsertUser>): Promise<User | undefined> {
+    try {
+      const result = await this.db.update(users)
+        .set(data)
+        .where(eq(users.id, id))
+        .returning();
+      return result[0];
+    } catch (error) {
+      log(`Error updating user: ${error}`, "storage");
+      return undefined;
+    }
+  }
+  
+  // Blog post methods
+  async createBlogPost(post: InsertBlogPost): Promise<BlogPost> {
+    try {
+      const now = new Date();
+      const result = await this.db.insert(blogPosts)
+        .values({
+          ...post,
+          createdAt: now,
+          updatedAt: now
+        })
+        .returning();
+      return result[0];
+    } catch (error) {
+      log(`Error creating blog post: ${error}`, "storage");
+      throw error;
+    }
+  }
+  
+  async getBlogPost(id: number): Promise<BlogPost | undefined> {
+    try {
+      const result = await this.db.select().from(blogPosts).where(eq(blogPosts.id, id));
+      return result[0];
+    } catch (error) {
+      log(`Error getting blog post: ${error}`, "storage");
+      return undefined;
+    }
+  }
+  
+  async getBlogPostBySlug(slug: string): Promise<BlogPost | undefined> {
+    try {
+      const result = await this.db.select().from(blogPosts).where(eq(blogPosts.slug, slug));
+      return result[0];
+    } catch (error) {
+      log(`Error getting blog post by slug: ${error}`, "storage");
+      return undefined;
+    }
+  }
+  
+  async updateBlogPost(id: number, data: Partial<InsertBlogPost>): Promise<BlogPost | undefined> {
+    try {
+      const result = await this.db.update(blogPosts)
+        .set({
+          ...data,
+          updatedAt: new Date()
+        })
+        .where(eq(blogPosts.id, id))
+        .returning();
+      return result[0];
+    } catch (error) {
+      log(`Error updating blog post: ${error}`, "storage");
+      return undefined;
+    }
+  }
+  
+  async deleteBlogPost(id: number): Promise<boolean> {
+    try {
+      await this.db.delete(blogPosts).where(eq(blogPosts.id, id));
+      return true;
+    } catch (error) {
+      log(`Error deleting blog post: ${error}`, "storage");
+      return false;
+    }
+  }
+  
+  async listBlogPosts(limit: number = 50, offset: number = 0): Promise<BlogPost[]> {
+    try {
+      const result = await this.db.select()
+        .from(blogPosts)
+        .orderBy(desc(blogPosts.createdAt))
+        .limit(limit)
+        .offset(offset);
+      return result;
+    } catch (error) {
+      log(`Error listing blog posts: ${error}`, "storage");
+      return [];
+    }
+  }
+  
+  async listPublishedBlogPosts(limit: number = 50, offset: number = 0): Promise<BlogPost[]> {
+    try {
+      const result = await this.db.select()
+        .from(blogPosts)
+        .where(eq(blogPosts.published, true))
+        .orderBy(desc(blogPosts.createdAt))
+        .limit(limit)
+        .offset(offset);
+      return result;
+    } catch (error) {
+      log(`Error listing published blog posts: ${error}`, "storage");
+      return [];
+    }
+  }
+  
+  async countBlogPosts(): Promise<number> {
+    try {
+      const result = await this.db.select({ count: count() }).from(blogPosts);
+      return result[0]?.count || 0;
+    } catch (error) {
+      log(`Error counting blog posts: ${error}`, "storage");
+      return 0;
     }
   }
   
@@ -288,20 +418,26 @@ export class MemStorage implements IStorage {
   private shortenedLinks: Map<string, ShortenedLink>;
   private conversionCounters: Map<string, ConversionCounter>;
   private counterTokens: Map<string, CounterToken>;
+  private blogPosts: Map<number, BlogPost>;
+  private blogPostsBySlug: Map<string, number>;
   private currentUserId: number;
   private currentLinkId: number;
   private currentCounterId: number;
   private currentTokenId: number;
+  private currentBlogPostId: number;
 
   constructor() {
     this.users = new Map();
     this.shortenedLinks = new Map();
     this.conversionCounters = new Map();
     this.counterTokens = new Map();
+    this.blogPosts = new Map();
+    this.blogPostsBySlug = new Map();
     this.currentUserId = 1;
     this.currentLinkId = 1;
     this.currentCounterId = 1;
     this.currentTokenId = 1;
+    this.currentBlogPostId = 1;
     
     // Schedule cleanup of expired items every hour
     setInterval(() => {
@@ -330,11 +466,106 @@ export class MemStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.currentUserId++;
-    const user: User = { ...insertUser, id };
+    const now = new Date();
+    const user: User = { 
+      ...insertUser, 
+      id, 
+      createdAt: now,
+      email: insertUser.email || null,
+      isAdmin: insertUser.isAdmin || false
+    };
     this.users.set(id, user);
     return user;
   }
   
+  async updateUser(id: number, data: Partial<InsertUser>): Promise<User | undefined> {
+    const user = this.users.get(id);
+    if (!user) return undefined;
+    
+    const updatedUser: User = { ...user, ...data };
+    this.users.set(id, updatedUser);
+    return updatedUser;
+  }
+  
+  // Blog post methods
+  async createBlogPost(post: InsertBlogPost): Promise<BlogPost> {
+    const id = this.currentBlogPostId++;
+    const now = new Date();
+    
+    const blogPost: BlogPost = {
+      ...post,
+      id,
+      createdAt: now,
+      updatedAt: now,
+      excerpt: post.excerpt || null,
+      imageUrl: post.imageUrl || null,
+      published: post.published !== undefined ? post.published : true,
+      authorId: post.authorId || null
+    };
+    
+    this.blogPosts.set(id, blogPost);
+    this.blogPostsBySlug.set(post.slug, id);
+    
+    return blogPost;
+  }
+  
+  async getBlogPost(id: number): Promise<BlogPost | undefined> {
+    return this.blogPosts.get(id);
+  }
+  
+  async getBlogPostBySlug(slug: string): Promise<BlogPost | undefined> {
+    const id = this.blogPostsBySlug.get(slug);
+    if (!id) return undefined;
+    return this.blogPosts.get(id);
+  }
+  
+  async updateBlogPost(id: number, data: Partial<InsertBlogPost>): Promise<BlogPost | undefined> {
+    const post = this.blogPosts.get(id);
+    if (!post) return undefined;
+    
+    // If slug is being updated, update the slug mapping
+    if (data.slug && data.slug !== post.slug) {
+      this.blogPostsBySlug.delete(post.slug);
+      this.blogPostsBySlug.set(data.slug, id);
+    }
+    
+    const updatedPost: BlogPost = {
+      ...post,
+      ...data,
+      updatedAt: new Date()
+    };
+    
+    this.blogPosts.set(id, updatedPost);
+    return updatedPost;
+  }
+  
+  async deleteBlogPost(id: number): Promise<boolean> {
+    const post = this.blogPosts.get(id);
+    if (!post) return false;
+    
+    this.blogPostsBySlug.delete(post.slug);
+    this.blogPosts.delete(id);
+    
+    return true;
+  }
+  
+  async listBlogPosts(limit: number = 50, offset: number = 0): Promise<BlogPost[]> {
+    return Array.from(this.blogPosts.values())
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .slice(offset, offset + limit);
+  }
+  
+  async listPublishedBlogPosts(limit: number = 50, offset: number = 0): Promise<BlogPost[]> {
+    return Array.from(this.blogPosts.values())
+      .filter(post => post.published)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .slice(offset, offset + limit);
+  }
+  
+  async countBlogPosts(): Promise<number> {
+    return this.blogPosts.size;
+  }
+
   async createShortenedLink(link: InsertShortenedLink): Promise<ShortenedLink> {
     const id = this.currentLinkId++;
     const newLink: ShortenedLink = {
