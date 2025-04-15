@@ -1615,6 +1615,135 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   const httpServer = createServer(app);
 
+  // Set up Socket.IO server for voice chat
+  const io = new SocketIOServer(httpServer, {
+    path: '/ws',
+    cors: {
+      origin: '*',
+      methods: ['GET', 'POST']
+    }
+  });
+  
+  // Handle voice chat connections
+  io.on('connection', (socket) => {
+    console.log(`Voice chat connection established: ${socket.id}`);
+    
+    // User joins a voice chat room
+    socket.on('joinRoom', ({ roomId, username }) => {
+      // Create room if it doesn't exist
+      if (!voiceRooms.has(roomId)) {
+        voiceRooms.set(roomId, {
+          id: roomId,
+          name: `Voice Room ${roomId}`,
+          participants: []
+        });
+      }
+      
+      // Add user to room
+      const room = voiceRooms.get(roomId);
+      room?.participants.push({
+        socketId: socket.id,
+        username
+      });
+      
+      // Join the socket room
+      socket.join(roomId);
+      
+      // Notify others in the room
+      socket.to(roomId).emit('userJoined', {
+        socketId: socket.id,
+        username
+      });
+      
+      // Send current participants to the new user
+      socket.emit('roomInfo', {
+        roomId,
+        participants: room?.participants
+      });
+      
+      console.log(`User ${username} joined room ${roomId}`);
+    });
+    
+    // Handle WebRTC signaling
+    socket.on('signal', ({ to, from, signal }) => {
+      console.log(`Signaling from ${from} to ${to}`);
+      io.to(to).emit('signal', {
+        from,
+        signal
+      });
+    });
+    
+    // Handle user leaving
+    socket.on('leaveRoom', ({ roomId, username }) => {
+      leaveRoom(socket.id, roomId);
+      console.log(`User ${username} left room ${roomId}`);
+    });
+    
+    // Handle disconnect
+    socket.on('disconnect', () => {
+      // Find all rooms this socket is in and remove them
+      voiceRooms.forEach((room, roomId) => {
+        if (room.participants.some(p => p.socketId === socket.id)) {
+          leaveRoom(socket.id, roomId);
+        }
+      });
+      console.log(`Voice chat connection closed: ${socket.id}`);
+    });
+  });
+  
+  // Helper function to handle a user leaving a room
+  function leaveRoom(socketId: string, roomId: string) {
+    const room = voiceRooms.get(roomId);
+    if (!room) return;
+    
+    // Find the user
+    const userIndex = room.participants.findIndex(p => p.socketId === socketId);
+    if (userIndex === -1) return;
+    
+    // Remove user from room
+    const user = room.participants[userIndex];
+    room.participants.splice(userIndex, 1);
+    
+    // Notify others
+    io.to(roomId).emit('userLeft', {
+      socketId
+    });
+    
+    // If room is empty, remove it
+    if (room.participants.length === 0) {
+      voiceRooms.delete(roomId);
+    }
+  }
+  
+  // Voice chat rooms API
+  app.get('/api/voice-chat/rooms', (req, res) => {
+    const roomsArray = Array.from(voiceRooms.values()).map(room => ({
+      id: room.id,
+      name: room.name,
+      participantCount: room.participants.length
+    }));
+    
+    res.json(roomsArray);
+  });
+  
+  // Create new voice chat room
+  app.post('/api/voice-chat/rooms', (req, res) => {
+    const { name } = req.body;
+    const roomId = `room-${Date.now()}`;
+    
+    voiceRooms.set(roomId, {
+      id: roomId,
+      name: name || `Voice Room ${roomId}`,
+      participants: []
+    });
+    
+    res.status(201).json({
+      id: roomId,
+      name: voiceRooms.get(roomId)?.name,
+      participantCount: 0
+    });
+  });
+  
   return httpServer;
 }
 
