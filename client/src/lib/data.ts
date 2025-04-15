@@ -50,6 +50,7 @@ export const navigationItems = [
   { name: "Apps", href: "/apps" },
   { name: "Games", href: "/games" },
   { name: "Downloads", href: "/downloads" },
+  { name: "Blog", href: "/blog" },
 ];
 
 export const skills: Skill[] = [

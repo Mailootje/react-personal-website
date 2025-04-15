@@ -75,6 +75,17 @@ function Router() {
       <Route path="/games/pacman" component={PacmanBasic}/>
       <Route path="/games/pacman-simple" component={PacmanSimple}/>
       <Route path="/personal/school/pitch" component={SchoolPitch}/>
+      
+      {/* Blog routes */}
+      <Route path="/blog" component={Blog}/>
+      <Route path="/blog/:slug" component={BlogPost}/>
+      <Route path="/auth" component={AuthPage}/>
+      
+      {/* Admin routes - protected */}
+      <AdminRoute path="/admin/blog" component={BlogAdmin}/>
+      <AdminRoute path="/admin/blog/new" component={BlogForm}/>
+      <AdminRoute path="/admin/blog/edit/:id" component={BlogForm}/>
+      
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
@@ -85,8 +96,10 @@ function App() {
   return (
     <DarkModeProvider>
       <QueryClientProvider client={queryClient}>
-        <Router />
-        <Toaster />
+        <AuthProvider>
+          <Router />
+          <Toaster />
+        </AuthProvider>
       </QueryClientProvider>
     </DarkModeProvider>
   );
