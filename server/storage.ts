@@ -29,6 +29,7 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, data: Partial<InsertUser>): Promise<User | undefined>;
+  listUsers(limit?: number, offset?: number, adminOnly?: boolean): Promise<User[]>;
   
   // Blog post methods
   createBlogPost(post: InsertBlogPost): Promise<BlogPost>;
@@ -117,6 +118,26 @@ export class DbStorage implements IStorage {
     } catch (error) {
       log(`Error updating user: ${error}`, "storage");
       return undefined;
+    }
+  }
+  
+  async listUsers(limit: number = 50, offset: number = 0, adminOnly: boolean = false): Promise<User[]> {
+    try {
+      let query = this.db.select().from(users);
+      
+      if (adminOnly) {
+        query = query.where(eq(users.isAdmin, true));
+      }
+      
+      const result = await query
+        .orderBy(asc(users.username))
+        .limit(limit)
+        .offset(offset);
+      
+      return result;
+    } catch (error) {
+      log(`Error listing users: ${error}`, "storage");
+      return [];
     }
   }
   
@@ -485,6 +506,18 @@ export class MemStorage implements IStorage {
     const updatedUser: User = { ...user, ...data };
     this.users.set(id, updatedUser);
     return updatedUser;
+  }
+  
+  async listUsers(limit: number = 50, offset: number = 0, adminOnly: boolean = false): Promise<User[]> {
+    const users = Array.from(this.users.values());
+    
+    const filteredUsers = adminOnly 
+      ? users.filter(user => user.isAdmin)
+      : users;
+      
+    return filteredUsers
+      .sort((a, b) => a.username.localeCompare(b.username))
+      .slice(offset, offset + limit);
   }
   
   // Blog post methods
