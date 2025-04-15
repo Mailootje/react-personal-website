@@ -89,19 +89,29 @@ export const setupSession = (app: Express) => {
   }
   
   // Configure session middleware
+  log(`Setting up session with store: ${sessionStore ? 'Provided' : 'None'}, ENV: ${process.env.NODE_ENV || 'development'}`, 'auth');
+  
   app.use(session({
     store: sessionStore,
     secret: sessionSecret,
-    resave: false,
+    resave: true, // Changed to true to ensure session is saved even if it wasn't modified
     saveUninitialized: false,
+    rolling: true, // Reset expiration on each request
     cookie: {
-      secure: process.env.NODE_ENV === 'production',
+      secure: false, // Set to false to work in both HTTP and HTTPS
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
-      sameSite: 'lax'
+      sameSite: 'lax',
+      path: '/' // Ensure cookie is available across the entire site
     },
     name: 'mailo_session'
   }));
+  
+  // Add debugging middleware to log session data on each request
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    log(`Request to ${req.method} ${req.url} | Session ID: ${req.sessionID} | UserId: ${req.session?.userId}`, 'session');
+    next();
+  });
 };
 
 // Register auth routes
@@ -141,40 +151,66 @@ export const registerAuthRoutes = (app: Express) => {
   // Login
   app.post('/api/login', async (req: Request, res: Response) => {
     try {
+      log(`Login attempt for username: ${req.body.username}`, 'auth');
+      log(`Initial session state - ID: ${req.sessionID}, exists: ${!!req.session}`, 'auth');
+      
       const { username, password } = req.body;
       
       // Get user
       const user = await storage.getUserByUsername(username);
       if (!user) {
+        log(`Login failed: User ${username} not found`, 'auth');
         return res.status(401).json({ error: 'Invalid credentials' });
       }
       
       // Check password
       const isValid = await verifyPassword(password, user.password);
       if (!isValid) {
+        log(`Login failed: Invalid password for user ${username}`, 'auth');
         return res.status(401).json({ error: 'Invalid credentials' });
       }
       
-      // Set session
-      req.session.userId = user.id;
+      log(`Login validated for user ${user.username} (ID: ${user.id})`, 'auth');
+      log(`Before session update - Session data: ${JSON.stringify(req.session)}`, 'auth');
       
-      // Save session explicitly
-      await new Promise<void>((resolve, reject) => {
-        req.session.save((err) => {
-          if (err) reject(err);
-          else resolve();
+      // Set session
+      if (!req.session) {
+        log('ERROR: Session object is undefined or null!', 'auth');
+        return res.status(500).json({ error: 'Session initialization failed' });
+      }
+      
+      // Clear any existing session data and set new userId
+      req.session.regenerate(async (err) => {
+        if (err) {
+          log(`Error regenerating session: ${err}`, 'auth');
+          return res.status(500).json({ error: 'Session setup failed' });
+        }
+        
+        // Set user ID in the new session
+        req.session.userId = user.id;
+        
+        log(`After userId set - Session data: userId=${req.session.userId}`, 'auth');
+        
+        // Save session explicitly
+        req.session.save((saveErr) => {
+          if (saveErr) {
+            log(`Error saving session: ${saveErr}`, 'auth');
+            return res.status(500).json({ error: 'Session save failed' });
+          }
+          
+          log(`Session saved successfully. New session ID: ${req.sessionID}`, 'auth');
+          
+          // Remove password from response
+          const { password: _, ...userWithoutPassword } = user;
+          
+          // Log success for debugging
+          log(`User ${username} logged in successfully. Session ID: ${req.sessionID}, userId: ${req.session.userId}`, 'auth');
+          
+          res.json(userWithoutPassword);
         });
       });
-      
-      // Remove password from response
-      const { password: _, ...userWithoutPassword } = user;
-      
-      // Log success for debugging
-      log(`User ${username} logged in successfully. Session ID: ${req.sessionID}`, 'auth');
-      
-      res.json(userWithoutPassword);
     } catch (error) {
-      log(`Error logging in: ${error}`, 'auth');
+      log(`Error in login process: ${error}`, 'auth');
       res.status(500).json({ error: 'Error logging in' });
     }
   });
