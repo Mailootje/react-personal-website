@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 // Script to set up an initial admin user for the blog
 
+import readline from 'readline';
+import fetch from 'node-fetch';
+
 async function setupAdmin() {
-  const readline = require('readline');
-  const fetch = require('node-fetch');
-  
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
