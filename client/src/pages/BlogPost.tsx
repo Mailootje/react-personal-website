@@ -46,10 +46,10 @@ export default function BlogPostPage() {
                 </div>
               ) : post ? (
                 <div className="bg-card/50 backdrop-blur-sm rounded-xl overflow-hidden border border-border/50 shadow-lg">
-                  {post.image && (
+                  {post.imageUrl && (
                     <div className="aspect-[21/9] w-full overflow-hidden">
                       <img
-                        src={post.image}
+                        src={post.imageUrl}
                         alt={post.title}
                         className="w-full h-full object-cover"
                       />
