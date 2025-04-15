@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { io, Socket } from 'socket.io-client';
-import { Mic, MicOff, Phone, Users, Plus, X, Lock, Copy } from 'lucide-react';
+import { Mic, MicOff, Phone, Users, Plus, X, Lock, Copy, Monitor, Video, VideoOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
@@ -29,12 +29,14 @@ interface Participant {
   socketId: string;
   username: string;
   isMuted?: boolean;
+  isScreenSharing?: boolean;
 }
 
 interface PeerConnection {
   username: string;
   pc: RTCPeerConnection;
   audioElement: HTMLAudioElement;
+  videoElement?: HTMLVideoElement;
 }
 
 export default function VoiceChat() {
@@ -56,10 +58,14 @@ export default function VoiceChat() {
   const [inviteInputOpen, setInviteInputOpen] = useState<boolean>(false);
   const [inviteCode, setInviteCode] = useState<string>('');
   const [isCreator, setIsCreator] = useState<boolean>(false);
+  const [isScreenSharing, setIsScreenSharing] = useState<boolean>(false);
+  const [showVideoControls, setShowVideoControls] = useState<boolean>(false);
   
   const socketRef = useRef<Socket | null>(null);
   const localStreamRef = useRef<MediaStream | null>(null);
+  const screenStreamRef = useRef<MediaStream | null>(null);
   const peerConnectionsRef = useRef<Map<string, PeerConnection>>(new Map());
+  const videoContainerRef = useRef<HTMLDivElement>(null);
   
   // Connect to socket server and set up local stream
   useEffect(() => {
@@ -298,6 +304,14 @@ export default function VoiceChat() {
         localStreamRef.current = null;
       }
       
+      // Stop screen sharing if active
+      if (screenStreamRef.current) {
+        screenStreamRef.current.getTracks().forEach(track => {
+          track.stop();
+        });
+        screenStreamRef.current = null;
+      }
+      
       // Leave room if connected
       if (currentRoom && socketRef.current) {
         socketRef.current.emit('leaveRoom', { roomId: currentRoom, username });
@@ -344,6 +358,90 @@ export default function VoiceChat() {
         });
         
         console.log(`Broadcasting mute state: ${newMuteState ? 'Muted' : 'Unmuted'}`);
+      }
+    }
+  };
+  
+  // Toggle screen sharing
+  const toggleScreenShare = async () => {
+    if (!currentRoom) {
+      toast({
+        title: 'Join a room first',
+        description: 'You need to join a voice chat room before sharing your screen',
+        variant: 'destructive'
+      });
+      return;
+    }
+    
+    if (isScreenSharing) {
+      // Stop screen sharing
+      if (screenStreamRef.current) {
+        screenStreamRef.current.getTracks().forEach(track => {
+          track.stop();
+        });
+        screenStreamRef.current = null;
+      }
+      
+      setIsScreenSharing(false);
+      
+      // Notify other participants that screen sharing has stopped
+      if (socketRef.current) {
+        socketRef.current.emit('screenShareStateChanged', {
+          roomId: currentRoom,
+          isScreenSharing: false,
+          socketId: socketRef.current.id
+        });
+      }
+      
+      toast({
+        title: 'Screen sharing stopped',
+        description: 'Your screen is no longer being shared'
+      });
+    } else {
+      try {
+        // Start screen sharing
+        const screenStream = await navigator.mediaDevices.getDisplayMedia({
+          video: true,
+          audio: false
+        });
+        
+        screenStreamRef.current = screenStream;
+        
+        // Add tracks to all peer connections
+        peerConnectionsRef.current.forEach(({ pc }) => {
+          screenStream.getTracks().forEach(track => {
+            pc.addTrack(track, screenStream);
+          });
+        });
+        
+        // Handle track ending (user stops sharing)
+        screenStream.getVideoTracks()[0].onended = () => {
+          toggleScreenShare();
+        };
+        
+        setIsScreenSharing(true);
+        setShowVideoControls(true);
+        
+        // Notify other participants
+        if (socketRef.current) {
+          socketRef.current.emit('screenShareStateChanged', {
+            roomId: currentRoom,
+            isScreenSharing: true,
+            socketId: socketRef.current.id
+          });
+        }
+        
+        toast({
+          title: 'Screen sharing started',
+          description: 'Your screen is now being shared with other participants'
+        });
+      } catch (error) {
+        console.error('Error starting screen share:', error);
+        toast({
+          title: 'Screen sharing failed',
+          description: 'Failed to access your screen. Make sure to grant permission.',
+          variant: 'destructive'
+        });
       }
     }
   };
