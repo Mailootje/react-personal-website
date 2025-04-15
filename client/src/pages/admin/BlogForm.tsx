@@ -66,7 +66,7 @@ export default function BlogForm() {
     queryKey: [`/api/admin/blog/posts/${params.id}`],
     enabled: isEditMode,
     queryFn: async () => {
-      return await apiRequest("GET", { url: `/api/admin/blog/posts/${params.id}` });
+      return await apiRequest("GET", `/api/admin/blog/posts/${params.id}`);
     },
   });
 

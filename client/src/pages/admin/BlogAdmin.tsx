@@ -74,7 +74,7 @@ export default function BlogAdmin() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      return apiRequest("DELETE", { url: `/api/admin/blog/posts/${id}` });
+      return apiRequest("DELETE", `/api/admin/blog/posts/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/blog/posts"] });
