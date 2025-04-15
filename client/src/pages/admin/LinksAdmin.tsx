@@ -11,6 +11,7 @@ import {
   ArrowLeft,
   Pencil,
   Save,
+  Link2,
   X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -68,12 +69,18 @@ interface EditLinkFormData {
   originalUrl: string;
 }
 
+interface CreateLinkFormData {
+  originalUrl: string;
+  shortCode?: string;
+}
+
 export default function LinksAdmin() {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [editingLink, setEditingLink] = useState<ShortenedLink | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const limit = 10;
 
   const { data, isLoading, error } = useQuery<LinksResponse>({
@@ -93,7 +100,19 @@ export default function LinksAdmin() {
     },
   });
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<EditLinkFormData>();
+  const { 
+    register: registerEdit, 
+    handleSubmit: handleSubmitEdit, 
+    formState: { errors: editErrors }, 
+    reset: resetEdit 
+  } = useForm<EditLinkFormData>();
+  
+  const {
+    register: registerCreate,
+    handleSubmit: handleSubmitCreate,
+    formState: { errors: createErrors },
+    reset: resetCreate
+  } = useForm<CreateLinkFormData>();
 
   const updateMutation = useMutation({
     mutationFn: async ({ shortCode, data }: { shortCode: string, data: EditLinkFormData }) => {
@@ -142,9 +161,32 @@ export default function LinksAdmin() {
     setCurrentPage(1); // Reset to first page on new search
   };
 
+  const createMutation = useMutation({
+    mutationFn: async (data: CreateLinkFormData) => {
+      // Use our POST /api/links endpoint
+      return apiRequest("POST", "/api/links", data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/links"] });
+      toast({
+        title: "Success",
+        description: "New shortened link has been created",
+      });
+      setCreateDialogOpen(false);
+      resetCreate();
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: `Failed to create link: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleEditClick = (link: ShortenedLink) => {
     setEditingLink(link);
-    reset({ originalUrl: link.originalUrl });
+    resetEdit({ originalUrl: link.originalUrl });
     setEditDialogOpen(true);
   };
 
@@ -155,6 +197,15 @@ export default function LinksAdmin() {
         data: formData
       });
     }
+  };
+  
+  const handleCreateClick = () => {
+    resetCreate({ originalUrl: "" });
+    setCreateDialogOpen(true);
+  };
+  
+  const onSubmitCreate = (formData: CreateLinkFormData) => {
+    createMutation.mutate(formData);
   };
 
   const totalPages = data ? Math.ceil(data.meta.total / limit) : 0;
@@ -178,7 +229,7 @@ export default function LinksAdmin() {
               </div>
 
               <div className="bg-card/50 backdrop-blur-sm rounded-lg border border-border/50 shadow-md overflow-hidden">
-                <div className="p-4 border-b border-border/50">
+                <div className="p-4 border-b border-border/50 flex justify-between">
                   <form onSubmit={handleSearch} className="flex gap-2">
                     <Input
                       placeholder="Search links by URL or code..."
@@ -200,6 +251,13 @@ export default function LinksAdmin() {
                       </Button>
                     )}
                   </form>
+                  
+                  <Button 
+                    onClick={handleCreateClick}
+                    className="bg-primary hover:bg-primary/80"
+                  >
+                    Create New Link
+                  </Button>
                 </div>
 
                 {isLoading ? (
@@ -362,24 +420,24 @@ export default function LinksAdmin() {
             </DialogDescription>
           </DialogHeader>
           
-          <form onSubmit={handleSubmit(onSubmitEdit)}>
+          <form onSubmit={handleSubmitEdit(onSubmitEdit)}>
             <div className="mt-4 space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="originalUrl">Destination URL</Label>
+                <Label htmlFor="edit-originalUrl">Destination URL</Label>
                 <Input
-                  id="originalUrl"
-                  {...register("originalUrl", { 
+                  id="edit-originalUrl"
+                  {...registerEdit("originalUrl", { 
                     required: "Destination URL is required",
                     pattern: {
                       value: /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/,
                       message: "Please enter a valid URL"
                     }
                   })}
-                  className={errors.originalUrl ? "border-red-500" : ""}
+                  className={editErrors.originalUrl ? "border-red-500" : ""}
                   placeholder="https://example.com"
                 />
-                {errors.originalUrl && (
-                  <p className="text-red-500 text-sm">{errors.originalUrl.message}</p>
+                {editErrors.originalUrl && (
+                  <p className="text-red-500 text-sm">{editErrors.originalUrl.message}</p>
                 )}
               </div>
             </div>
@@ -403,6 +461,84 @@ export default function LinksAdmin() {
                   <Save className="h-4 w-4 mr-2" />
                 )}
                 Save Changes
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Create Link Dialog */}
+      <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create New Shortened Link</DialogTitle>
+            <DialogDescription>
+              Create a new shortened URL that redirects to your destination
+            </DialogDescription>
+          </DialogHeader>
+          
+          <form onSubmit={handleSubmitCreate(onSubmitCreate)}>
+            <div className="mt-4 space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="create-originalUrl">Destination URL</Label>
+                <Input
+                  id="create-originalUrl"
+                  {...registerCreate("originalUrl", { 
+                    required: "Destination URL is required",
+                    pattern: {
+                      value: /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/,
+                      message: "Please enter a valid URL"
+                    }
+                  })}
+                  className={createErrors.originalUrl ? "border-red-500" : ""}
+                  placeholder="https://example.com"
+                />
+                {createErrors.originalUrl && (
+                  <p className="text-red-500 text-sm">{createErrors.originalUrl.message}</p>
+                )}
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="shortCode">Custom Short Code (Optional)</Label>
+                <Input
+                  id="shortCode"
+                  {...registerCreate("shortCode", { 
+                    pattern: {
+                      value: /^[a-zA-Z0-9_-]{3,12}$/,
+                      message: "Short code must be 3-12 alphanumeric characters, underscores or hyphens"
+                    }
+                  })}
+                  className={createErrors.shortCode ? "border-red-500" : ""}
+                  placeholder="custom-code"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Leave blank to generate a random short code
+                </p>
+                {createErrors.shortCode && (
+                  <p className="text-red-500 text-sm">{createErrors.shortCode.message}</p>
+                )}
+              </div>
+            </div>
+            
+            <DialogFooter className="mt-6">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setCreateDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={createMutation.isPending}
+                className="bg-primary hover:bg-primary/80"
+              >
+                {createMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                ) : (
+                  <Link2 className="h-4 w-4 mr-2" />
+                )}
+                Create Link
               </Button>
             </DialogFooter>
           </form>
