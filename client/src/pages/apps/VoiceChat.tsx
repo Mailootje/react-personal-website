@@ -20,6 +20,7 @@ interface VoiceRoom {
   id: string;
   name: string;
   participantCount: number;
+  hasPassword: boolean;
 }
 
 interface Participant {

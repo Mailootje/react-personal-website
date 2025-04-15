@@ -63,9 +63,12 @@ const downloadStats: Map<string, DownloadStat> = new Map();
 interface VoiceRoom {
   id: string;
   name: string;
+  hasPassword: boolean;
+  password?: string; // Optional password for protected rooms
   participants: {
     socketId: string;
     username: string;
+    isMuted?: boolean;
   }[];
 }
 
@@ -1629,21 +1632,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.log(`Voice chat connection established: ${socket.id}`);
     
     // User joins a voice chat room
-    socket.on('joinRoom', ({ roomId, username }) => {
-      // Create room if it doesn't exist
+    socket.on('joinRoom', ({ roomId, username, password }) => {
+      // Check if room exists
       if (!voiceRooms.has(roomId)) {
-        voiceRooms.set(roomId, {
-          id: roomId,
-          name: `Voice Room ${roomId}`,
-          participants: []
-        });
+        // We no longer create rooms when joining - rooms must be created explicitly
+        socket.emit('roomJoinError', { message: 'Room does not exist' });
+        return;
+      }
+      
+      const room = voiceRooms.get(roomId)!;
+      
+      // Check if room is password protected and verify password
+      if (room.hasPassword && room.password !== password) {
+        socket.emit('roomJoinError', { message: 'Incorrect password' });
+        return;
       }
       
       // Add user to room
-      const room = voiceRooms.get(roomId);
-      room?.participants.push({
+      room.participants.push({
         socketId: socket.id,
-        username
+        username,
+        isMuted: false
       });
       
       // Join the socket room
@@ -1730,7 +1739,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const roomsArray = Array.from(voiceRooms.values()).map(room => ({
       id: room.id,
       name: room.name,
-      participantCount: room.participants.length
+      participantCount: room.participants.length,
+      hasPassword: room.hasPassword
     }));
     
     res.json(roomsArray);
@@ -1738,19 +1748,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Create new voice chat room
   app.post('/api/voice-chat/rooms', (req, res) => {
-    const { name } = req.body;
+    const { name, password } = req.body;
     const roomId = `room-${Date.now()}`;
+    const hasPassword = Boolean(password);
     
     voiceRooms.set(roomId, {
       id: roomId,
       name: name || `Voice Room ${roomId}`,
+      hasPassword,
+      password: password || undefined,
       participants: []
     });
     
     res.status(201).json({
       id: roomId,
       name: voiceRooms.get(roomId)?.name,
-      participantCount: 0
+      participantCount: 0,
+      hasPassword
     });
   });
   
