@@ -4,12 +4,13 @@ import { storage } from "./storage";
 import path from "path";
 import fs from "fs";
 import { z } from "zod";
-import { insertShortenedLinkSchema, ShortenedLink } from "@shared/schema";
+import { insertShortenedLinkSchema, ShortenedLink, insertBlogPostSchema } from "@shared/schema";
 import { log } from "./vite";
 import QRCode from 'qrcode';
 import https from 'https';
 import crypto from 'crypto';
 import fetch from 'node-fetch';
+import { setupSession, registerAuthRoutes, isAuthenticated, isAdmin } from './auth';
 
 interface PhotoItem {
   id: string;
@@ -1192,6 +1193,157 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Set up session and authentication
+  setupSession(app);
+  registerAuthRoutes(app);
+  
+  // Blog routes
+  
+  // Get published blog posts
+  app.get('/api/blog/posts', async (req: Request, res: Response) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 10;
+      const offset = parseInt(req.query.offset as string) || 0;
+      
+      const posts = await storage.listPublishedBlogPosts(limit, offset);
+      const total = await storage.countBlogPosts();
+      
+      res.json({
+        posts,
+        meta: {
+          total,
+          limit,
+          offset
+        }
+      });
+    } catch (error) {
+      log(`Error getting blog posts: ${error}`, 'blog');
+      res.status(500).json({ error: 'Failed to retrieve blog posts' });
+    }
+  });
+  
+  // Get a single blog post by slug
+  app.get('/api/blog/posts/:slug', async (req: Request, res: Response) => {
+    try {
+      const { slug } = req.params;
+      const post = await storage.getBlogPostBySlug(slug);
+      
+      if (!post) {
+        return res.status(404).json({ error: 'Blog post not found' });
+      }
+      
+      if (!post.published) {
+        // If post is not published, only admin can see it
+        if (!req.session?.userId) {
+          return res.status(404).json({ error: 'Blog post not found' });
+        }
+        
+        const user = await storage.getUser(req.session.userId);
+        if (!user?.isAdmin) {
+          return res.status(404).json({ error: 'Blog post not found' });
+        }
+      }
+      
+      res.json(post);
+    } catch (error) {
+      log(`Error getting blog post: ${error}`, 'blog');
+      res.status(500).json({ error: 'Failed to retrieve blog post' });
+    }
+  });
+  
+  // Admin routes for blog management
+  
+  // Get all blog posts (admin only)
+  app.get('/api/admin/blog/posts', isAdmin, async (req: Request, res: Response) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 20;
+      const offset = parseInt(req.query.offset as string) || 0;
+      
+      const posts = await storage.listBlogPosts(limit, offset);
+      const total = await storage.countBlogPosts();
+      
+      res.json({
+        posts,
+        meta: {
+          total,
+          limit,
+          offset
+        }
+      });
+    } catch (error) {
+      log(`Error getting admin blog posts: ${error}`, 'blog');
+      res.status(500).json({ error: 'Failed to retrieve blog posts' });
+    }
+  });
+  
+  // Create a new blog post (admin only)
+  app.post('/api/admin/blog/posts', isAdmin, async (req: Request, res: Response) => {
+    try {
+      const postData = req.body;
+      
+      // Validate post data
+      const validatedData = insertBlogPostSchema.parse(postData);
+      
+      // Set author to current user
+      validatedData.authorId = req.session?.userId || null;
+      
+      // Create blog post
+      const newPost = await storage.createBlogPost(validatedData);
+      
+      res.status(201).json(newPost);
+    } catch (error) {
+      log(`Error creating blog post: ${error}`, 'blog');
+      res.status(400).json({ error: 'Failed to create blog post', details: error.message });
+    }
+  });
+  
+  // Update a blog post (admin only)
+  app.put('/api/admin/blog/posts/:id', isAdmin, async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const postData = req.body;
+      
+      // Check if post exists
+      const existingPost = await storage.getBlogPost(id);
+      if (!existingPost) {
+        return res.status(404).json({ error: 'Blog post not found' });
+      }
+      
+      // Update blog post
+      const updatedPost = await storage.updateBlogPost(id, postData);
+      
+      res.json(updatedPost);
+    } catch (error) {
+      log(`Error updating blog post: ${error}`, 'blog');
+      res.status(400).json({ error: 'Failed to update blog post', details: error.message });
+    }
+  });
+  
+  // Delete a blog post (admin only)
+  app.delete('/api/admin/blog/posts/:id', isAdmin, async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      
+      // Check if post exists
+      const existingPost = await storage.getBlogPost(id);
+      if (!existingPost) {
+        return res.status(404).json({ error: 'Blog post not found' });
+      }
+      
+      // Delete blog post
+      const success = await storage.deleteBlogPost(id);
+      
+      if (success) {
+        res.status(204).end();
+      } else {
+        res.status(500).json({ error: 'Failed to delete blog post' });
+      }
+    } catch (error) {
+      log(`Error deleting blog post: ${error}`, 'blog');
+      res.status(500).json({ error: 'Failed to delete blog post' });
+    }
+  });
+  
   const httpServer = createServer(app);
 
   return httpServer;

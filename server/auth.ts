@@ -56,7 +56,7 @@ export const verifyPassword = async (password: string, hash: string): Promise<bo
 // Configure and initialize session
 export const setupSession = (app: Express) => {
   // Generate a random secret for sessions
-  const sessionSecret = process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex');
+  const sessionSecret = process.env.SESSION_SECRET || require('crypto').randomBytes(32).toString('hex');
   
   let sessionStore;
   if (process.env.DATABASE_URL) {
