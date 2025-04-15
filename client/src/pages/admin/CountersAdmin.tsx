@@ -204,10 +204,10 @@ export default function CountersAdmin() {
                     <ArrowUp className="h-5 w-5 mr-2 text-green-500" />
                     Top Counter
                   </h3>
-                  {data?.counters.length > 0 ? (
+                  {data?.counters && data.counters.length > 0 ? (
                     <>
                       {(() => {
-                        const topCounter = [...(data?.counters || [])].sort((a, b) => b.count - a.count)[0];
+                        const topCounter = [...(data.counters)].sort((a, b) => b.count - a.count)[0];
                         return (
                           <div className="space-y-2">
                             <p className="text-muted-foreground text-sm">{topCounter.name}</p>
@@ -224,7 +224,7 @@ export default function CountersAdmin() {
                 
                 <div className="bg-card/50 backdrop-blur-sm rounded-lg border border-border/50 shadow-md p-6">
                   <h3 className="text-lg font-semibold mb-2">Total Conversions</h3>
-                  {data?.counters.length > 0 ? (
+                  {data?.counters && data.counters.length > 0 ? (
                     <p className="text-3xl font-bold">
                       {data.counters.reduce((sum, counter) => sum + counter.count, 0).toLocaleString()}
                     </p>
@@ -235,7 +235,7 @@ export default function CountersAdmin() {
                 
                 <div className="bg-card/50 backdrop-blur-sm rounded-lg border border-border/50 shadow-md p-6">
                   <h3 className="text-lg font-semibold mb-2">Counter Types</h3>
-                  {data?.counters.length > 0 ? (
+                  {data?.counters && data.counters.length > 0 ? (
                     <p className="text-3xl font-bold">{data.counters.length}</p>
                   ) : (
                     <p className="text-muted-foreground">No data available</p>

@@ -89,10 +89,10 @@ export function Header() {
           {/* Admin link for logged-in users */}
           {user && (
             <Link
-              href="/admin/blog"
+              href="/admin"
               className="text-text hover:text-primary transition-colors font-medium"
             >
-              Admin
+              Admin Dashboard
             </Link>
           )}
         </nav>
