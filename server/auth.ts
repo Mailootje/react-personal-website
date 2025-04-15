@@ -19,6 +19,8 @@ const SALT_ROUNDS = 10;
 
 // Middleware to check if user is authenticated
 export const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
+  log(`Session check: Session ID=${req.sessionID}, userId=${req.session?.userId}`, 'auth');
+  
   if (req.session && req.session.userId) {
     return next();
   }
@@ -27,15 +29,26 @@ export const isAuthenticated = (req: Request, res: Response, next: NextFunction)
 
 // Middleware to check if user is admin
 export const isAdmin = async (req: Request, res: Response, next: NextFunction) => {
+  log(`Admin check: Session ID=${req.sessionID}, userId=${req.session?.userId}`, 'auth');
+  
   if (!req.session || !req.session.userId) {
+    log('Admin check failed: No session or no userId', 'auth');
     return res.status(401).json({ error: 'Not authenticated' });
   }
   
   try {
     const user = await storage.getUser(req.session.userId);
-    if (!user || !user.isAdmin) {
+    if (!user) {
+      log(`Admin check failed: User ${req.session.userId} not found`, 'auth');
+      return res.status(401).json({ error: 'Not authenticated' });
+    }
+    
+    if (!user.isAdmin) {
+      log(`Admin check failed: User ${user.username} is not an admin`, 'auth');
       return res.status(403).json({ error: 'Not authorized' });
     }
+    
+    log(`Admin check passed: User ${user.username} (ID: ${user.id})`, 'auth');
     next();
   } catch (error) {
     log(`Error in isAdmin middleware: ${error}`, 'auth');
@@ -84,8 +97,10 @@ export const setupSession = (app: Express) => {
     cookie: {
       secure: process.env.NODE_ENV === 'production',
       httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 24 * 7 // 1 week
-    }
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
+      sameSite: 'lax'
+    },
+    name: 'mailo_session'
   }));
 };
 
@@ -143,8 +158,19 @@ export const registerAuthRoutes = (app: Express) => {
       // Set session
       req.session.userId = user.id;
       
+      // Save session explicitly
+      await new Promise<void>((resolve, reject) => {
+        req.session.save((err) => {
+          if (err) reject(err);
+          else resolve();
+        });
+      });
+      
       // Remove password from response
       const { password: _, ...userWithoutPassword } = user;
+      
+      // Log success for debugging
+      log(`User ${username} logged in successfully. Session ID: ${req.sessionID}`, 'auth');
       
       res.json(userWithoutPassword);
     } catch (error) {
@@ -166,13 +192,22 @@ export const registerAuthRoutes = (app: Express) => {
 
   // Get current user
   app.get('/api/me', async (req: Request, res: Response) => {
-    if (!req.session || !req.session.userId) {
-      return res.status(401).json({ error: 'Not authenticated' });
+    log(`GET /api/me - Session ID: ${req.sessionID}, Has session: ${!!req.session}, UserId: ${req.session?.userId}`, 'auth');
+    
+    if (!req.session) {
+      log('No session object found - session middleware issue', 'auth');
+      return res.status(401).json({ error: 'Not authenticated - No session' });
+    }
+    
+    if (!req.session.userId) {
+      log('User ID not found in session', 'auth');
+      return res.status(401).json({ error: 'Not authenticated - No user ID' });
     }
     
     try {
       const user = await storage.getUser(req.session.userId);
       if (!user) {
+        log(`User with ID ${req.session.userId} not found in database`, 'auth');
         req.session.destroy((err) => {
           if (err) {
             log(`Error destroying invalid session: ${err}`, 'auth');
@@ -180,6 +215,8 @@ export const registerAuthRoutes = (app: Express) => {
         });
         return res.status(401).json({ error: 'User not found' });
       }
+      
+      log(`User ${user.username} (ID: ${user.id}) authenticated successfully`, 'auth');
       
       // Remove password from response
       const { password: _, ...userWithoutPassword } = user;
