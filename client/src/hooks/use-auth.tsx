@@ -14,11 +14,16 @@ type AuthContextType = {
   error: Error | null;
   loginMutation: UseMutationResult<User, Error, LoginData>;
   logoutMutation: UseMutationResult<void, Error, void>;
+  registerMutation: UseMutationResult<User, Error, RegisterData>;
 };
 
 type LoginData = {
   username: string;
   password: string;
+};
+
+type RegisterData = LoginData & {
+  email?: string;
 };
 
 export const AuthContext = createContext<AuthContextType | null>(null);
@@ -36,8 +41,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginData) => {
-      const res = await apiRequest("POST", "/api/login", credentials);
-      return await res.json();
+      return await apiRequest<User>("POST", { 
+        url: "/api/login", 
+        body: credentials 
+      });
     },
     onSuccess: (user: User) => {
       queryClient.setQueryData(["/api/me"], user);
@@ -55,9 +62,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
   });
 
+  const registerMutation = useMutation({
+    mutationFn: async (userData: RegisterData) => {
+      return await apiRequest<User>("POST", { 
+        url: "/api/register", 
+        body: userData 
+      });
+    },
+    onSuccess: (user: User) => {
+      queryClient.setQueryData(["/api/me"], user);
+      toast({
+        title: "Registration successful",
+        description: `Welcome, ${user.username}!`,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Registration failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      await apiRequest("POST", "/api/logout");
+      await apiRequest("POST", { url: "/api/logout" });
     },
     onSuccess: () => {
       queryClient.setQueryData(["/api/me"], null);
@@ -83,6 +113,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         error,
         loginMutation,
         logoutMutation,
+        registerMutation,
       }}
     >
       {children}

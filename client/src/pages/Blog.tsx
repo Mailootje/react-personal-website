@@ -1,184 +1,93 @@
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useLocation } from "wouter";
-import { format } from "date-fns";
-import { Loader2 } from "lucide-react";
-import Container from "@/components/Container";
-import SectionHeading from "@/components/SectionHeading";
+import { Link } from "wouter";
 import { VideoBackground } from "@/components/VideoBackground";
+import { Loader2 } from "lucide-react";
+import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { BlogPost } from "@shared/schema";
-import { useAuth } from "@/hooks/use-auth";
-
-interface BlogResponse {
-  posts: BlogPost[];
-  meta: {
-    total: number;
-    limit: number;
-    offset: number;
-  };
-}
+import Container from "@/components/Container";
+import SectionHeading from "@/components/SectionHeading";
 
 export default function Blog() {
-  const [, navigate] = useLocation();
-  const { user } = useAuth();
-  const [page, setPage] = useState(1);
-  const limit = 10;
-  const offset = (page - 1) * limit;
-
-  const {
-    data,
-    isLoading,
-    error,
-  } = useQuery<BlogResponse>({
-    queryKey: ["/api/blog/posts", limit, offset],
-    queryFn: async () => {
-      const response = await fetch(`/api/blog/posts?limit=${limit}&offset=${offset}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch blog posts");
-      }
-      return response.json();
-    },
+  const { data: posts, isLoading, error } = useQuery<BlogPost[]>({
+    queryKey: ["/api/blog/posts"],
   });
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4">
-        <h2 className="text-2xl font-bold text-red-500 mb-4">Error Loading Blog</h2>
-        <p className="text-gray-700 mb-6">{error.message}</p>
-        <Button onClick={() => window.location.reload()}>Try Again</Button>
-      </div>
-    );
-  }
-
-  const { posts, meta } = data || { posts: [], meta: { total: 0, limit, offset } };
-  const totalPages = Math.ceil(meta.total / limit);
-
   return (
-    <div className="min-h-screen">
-      <VideoBackground opacity={0.3} />
-      
-      <Container className="py-16">
-        <div className="mb-12 flex flex-col md:flex-row md:justify-between md:items-center">
-          <SectionHeading
-            subtitle="My Thoughts & Ideas"
-            title="Blog"
-            center={false}
-            isDark
-          />
-          
-          {user?.isAdmin && (
-            <Button 
-              className="mt-6 md:mt-0"
-              onClick={() => navigate("/admin/blog")}
-            >
-              Manage Blog
-            </Button>
-          )}
-        </div>
-
-        {posts.length === 0 ? (
-          <div className="bg-black/50 backdrop-blur-sm rounded-lg p-8 text-center">
-            <h3 className="text-xl font-semibold mb-4">No Posts Yet</h3>
-            <p className="text-gray-300">
-              There are no blog posts available at the moment. Check back soon for new content!
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-8">
-            {posts.map((post) => (
-              <BlogPostCard 
-                key={post.id} 
-                post={post} 
-                onClick={() => navigate(`/blog/${post.slug}`)} 
+    <div className="min-h-screen pt-20 pb-16">
+      <VideoBackground opacity={0.2} isGlobal>
+        <div className="z-10 relative">
+          <div className="py-16">
+            <Container>
+              <SectionHeading
+                subtitle="STAY UPDATED"
+                title="Blog"
+                center
               />
-            ))}
-          </div>
-        )}
 
-        {totalPages > 1 && (
-          <div className="mt-12 flex justify-center">
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                disabled={page === 1}
-                onClick={() => setPage(page - 1)}
-              >
-                Previous
-              </Button>
-              
-              <Button variant="outline" disabled className="pointer-events-none">
-                {page} of {totalPages}
-              </Button>
-              
-              <Button
-                variant="outline"
-                disabled={page === totalPages}
-                onClick={() => setPage(page + 1)}
-              >
-                Next
-              </Button>
-            </div>
+              <div className="mt-12">
+                {isLoading ? (
+                  <div className="flex justify-center items-center py-20">
+                    <Loader2 className="h-12 w-12 animate-spin text-primary" />
+                  </div>
+                ) : error ? (
+                  <div className="text-center py-20">
+                    <p className="text-lg text-red-500 mb-4">Failed to load blog posts</p>
+                    <Button variant="outline" onClick={() => window.location.reload()}>
+                      Try Again
+                    </Button>
+                  </div>
+                ) : posts && posts.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {posts.map((post) => (
+                      <Link key={post.id} href={`/blog/${post.slug}`}>
+                        <a className="group block">
+                          <div className="bg-card/50 backdrop-blur-sm rounded-lg overflow-hidden border border-border/50 shadow-lg hover:shadow-xl transition-all duration-200 h-full flex flex-col">
+                            {post.image && (
+                              <div className="aspect-video overflow-hidden">
+                                <img
+                                  src={post.image}
+                                  alt={post.title}
+                                  className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300"
+                                />
+                              </div>
+                            )}
+                            <div className="p-5 flex-1 flex flex-col">
+                              <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
+                                {post.title}
+                              </h3>
+                              <div className="text-sm text-muted-foreground mb-3">
+                                {format(new Date(post.createdAt), 'MMMM d, yyyy')}
+                              </div>
+                              <p className="text-muted-foreground flex-1">
+                                {post.content.substring(0, 120)}
+                                {post.content.length > 120 ? '...' : ''}
+                              </p>
+                              <div className="mt-4 pt-4 border-t border-border/50">
+                                <span className="text-primary text-sm font-medium flex items-center">
+                                  Read More
+                                  <svg className="ml-1 w-4 h-4 group-hover:translate-x-1 transition-transform" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                                  </svg>
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </a>
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-20">
+                    <p className="text-lg text-muted-foreground">No blog posts found</p>
+                    <p className="mt-2 text-muted-foreground">Check back later for new content</p>
+                  </div>
+                )}
+              </div>
+            </Container>
           </div>
-        )}
-      </Container>
-    </div>
-  );
-}
-
-interface BlogPostCardProps {
-  post: BlogPost;
-  onClick: () => void;
-}
-
-function BlogPostCard({ post, onClick }: BlogPostCardProps) {
-  // Format date to a readable format
-  const formattedDate = post.createdAt 
-    ? format(new Date(post.createdAt), 'MMMM dd, yyyy')
-    : 'Unknown date';
-  
-  return (
-    <div 
-      className="bg-black/50 backdrop-blur-sm rounded-lg overflow-hidden cursor-pointer hover:bg-black/60 transition-all"
-      onClick={onClick}
-    >
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {post.imageUrl && (
-          <div className="md:col-span-1">
-            <div className="w-full h-[200px] md:h-full min-h-[160px] relative">
-              <img 
-                src={post.imageUrl} 
-                alt={post.title} 
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-            </div>
-          </div>
-        )}
-        
-        <div className={post.imageUrl ? "md:col-span-3 p-6" : "md:col-span-4 p-6"}>
-          <h3 className="text-2xl font-bold mb-3">{post.title}</h3>
-          
-          <div className="text-sm text-gray-400 mb-4">
-            {formattedDate}
-          </div>
-          
-          <p className="text-gray-300 mb-4">
-            {post.excerpt || post.content.substring(0, 150) + '...'}
-          </p>
-          
-          <Button className="mt-2" size="sm">
-            Read More
-          </Button>
         </div>
-      </div>
+      </VideoBackground>
     </div>
   );
 }
