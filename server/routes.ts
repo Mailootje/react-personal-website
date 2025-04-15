@@ -54,6 +54,21 @@ interface DownloadStat {
 // In-memory storage for download stats
 const downloadStats: Map<string, DownloadStat> = new Map();
 
+// Import socket.io for voice chat
+import { Server as SocketIOServer } from 'socket.io';
+
+// Voice chat room management
+interface VoiceRoom {
+  id: string;
+  name: string;
+  participants: {
+    socketId: string;
+    username: string;
+  }[];
+}
+
+const voiceRooms: Map<string, VoiceRoom> = new Map();
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Proxy route for weather map tiles
   app.get("/api/weather/map/:type/:z/:x/:y", async (req: Request, res: Response) => {
