@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { io, Socket } from 'socket.io-client';
-import { Mic, MicOff, Phone, Users, Plus, X, Lock } from 'lucide-react';
+import { Mic, MicOff, Phone, Users, Plus, X, Lock, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
@@ -695,8 +695,9 @@ export default function VoiceChat() {
     <div className="flex flex-col min-h-screen">
       <div className="flex-1 bg-background pt-20">
         <Container className="py-8">
-          {/* Render password dialog */}
+          {/* Render dialogs */}
           <PasswordDialog />
+          <InviteCodeDialog />
           
           <SectionHeading
             subtitle="VOICE CHAT"
@@ -910,7 +911,11 @@ export default function VoiceChat() {
                         Select a room from the list to start chatting
                       </p>
                       
-                      <div className="flex justify-center">
+                      <div className="flex justify-center space-x-4">
+                        <Button variant="outline" onClick={() => setInviteInputOpen(true)}>
+                          Join with invite code
+                        </Button>
+                        
                         <Dialog open={isCreateRoomOpen} onOpenChange={setIsCreateRoomOpen}>
                           <DialogTrigger asChild>
                             <Button>
