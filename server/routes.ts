@@ -1657,6 +1657,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         isMuted: false
       });
       
+      // Set creator if this is the first person joining
+      if (room.participants.length === 1 && !room.creatorId) {
+        room.creatorId = socket.id;
+      }
+      
       // Join the socket room
       socket.join(roomId);
       
@@ -1774,12 +1779,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const { name, password } = req.body;
     const roomId = `room-${Date.now()}`;
     const hasPassword = Boolean(password);
+    const inviteCode = generateInviteCode(); // Generate a unique invite code
     
     voiceRooms.set(roomId, {
       id: roomId,
       name: name || `Voice Room ${roomId}`,
       hasPassword,
       password: password || undefined,
+      inviteCode,
       participants: []
     });
     
@@ -1787,7 +1794,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       id: roomId,
       name: voiceRooms.get(roomId)?.name,
       participantCount: 0,
-      hasPassword
+      hasPassword,
+      inviteCode
     });
   });
   
