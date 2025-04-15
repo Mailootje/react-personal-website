@@ -65,6 +65,8 @@ interface VoiceRoom {
   name: string;
   hasPassword: boolean;
   password?: string; // Optional password for protected rooms
+  inviteCode: string; // Invite code for easy joining
+  creatorId?: string; // Socket ID of the room creator
   participants: {
     socketId: string;
     username: string;
@@ -1740,10 +1742,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       id: room.id,
       name: room.name,
       participantCount: room.participants.length,
-      hasPassword: room.hasPassword
+      hasPassword: room.hasPassword,
+      inviteCode: room.inviteCode
     }));
     
     res.json(roomsArray);
+  });
+  
+  // Get room by invite code
+  app.get('/api/voice-chat/rooms/invite/:code', (req, res) => {
+    const { code } = req.params;
+    
+    // Find room with matching invite code
+    const room = Array.from(voiceRooms.values()).find(r => r.inviteCode === code);
+    
+    if (!room) {
+      return res.status(404).json({ message: 'Room not found with this invite code' });
+    }
+    
+    res.json({
+      id: room.id,
+      name: room.name,
+      participantCount: room.participants.length,
+      hasPassword: room.hasPassword,
+      inviteCode: room.inviteCode
+    });
   });
   
   // Create new voice chat room
@@ -1780,6 +1803,18 @@ function formatTitle(filename: string): string {
   return name.split(" ")
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
+}
+
+// Generate a random invite code for voice chat rooms
+function generateInviteCode(length = 8): string {
+  const charset = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Removed similar looking characters
+  let inviteCode = '';
+  
+  for (let i = 0; i < length; i++) {
+    inviteCode += charset.charAt(Math.floor(Math.random() * charset.length));
+  }
+  
+  return inviteCode;
 }
 
 // Process forecast data to create daily summaries from 3-hour forecast
