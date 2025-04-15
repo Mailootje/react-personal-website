@@ -42,6 +42,9 @@ import BlogPost from "@/pages/BlogPost";
 import AuthPage from "@/pages/auth-page";
 import BlogAdmin from "@/pages/admin/BlogAdmin";
 import BlogForm from "@/pages/admin/BlogForm";
+import AdminDashboard from "@/pages/admin/AdminDashboard";
+import LinksAdmin from "@/pages/admin/LinksAdmin";
+import CountersAdmin from "@/pages/admin/CountersAdmin";
 
 function Router() {
   return (
@@ -82,9 +85,12 @@ function Router() {
       <Route path="/auth" component={AuthPage}/>
       
       {/* Admin routes - protected */}
+      <AdminRoute path="/admin" component={AdminDashboard}/>
       <AdminRoute path="/admin/blog" component={BlogAdmin}/>
       <AdminRoute path="/admin/blog/new" component={BlogForm}/>
       <AdminRoute path="/admin/blog/edit/:id" component={BlogForm}/>
+      <AdminRoute path="/admin/links" component={LinksAdmin}/>
+      <AdminRoute path="/admin/counters" component={CountersAdmin}/>
       
       {/* Fallback to 404 */}
       <Route component={NotFound} />
