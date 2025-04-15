@@ -74,19 +74,54 @@ export function MobileMenu({ isOpen, onClose, items }: MobileMenuProps) {
               )
             ))}
             
-            {/* Admin link for logged-in users */}
+            {/* Admin links for logged-in users */}
             {user && (
-              <Link href="/admin/blog">
-                <motion.div
-                  className="text-text hover:text-primary transition-colors font-medium py-2 cursor-pointer"
-                  onClick={onClose}
-                  initial={{ x: -20, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  Admin
-                </motion.div>
-              </Link>
+              <>
+                <Link href="/admin">
+                  <motion.div
+                    className="text-text hover:text-primary transition-colors font-medium py-2 cursor-pointer"
+                    onClick={onClose}
+                    initial={{ x: -20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    Admin Dashboard
+                  </motion.div>
+                </Link>
+                <Link href="/admin/blog">
+                  <motion.div
+                    className="text-text hover:text-primary transition-colors font-medium py-2 cursor-pointer pl-4 text-sm"
+                    onClick={onClose}
+                    initial={{ x: -20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    ⟢ Blog Manager
+                  </motion.div>
+                </Link>
+                <Link href="/admin/links">
+                  <motion.div
+                    className="text-text hover:text-primary transition-colors font-medium py-2 cursor-pointer pl-4 text-sm"
+                    onClick={onClose}
+                    initial={{ x: -20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    ⟢ Shortened Links
+                  </motion.div>
+                </Link>
+                <Link href="/admin/counters">
+                  <motion.div
+                    className="text-text hover:text-primary transition-colors font-medium py-2 cursor-pointer pl-4 text-sm"
+                    onClick={onClose}
+                    initial={{ x: -20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    ⟢ Conversion Counters
+                  </motion.div>
+                </Link>
+              </>
             )}
           </div>
         </motion.div>
