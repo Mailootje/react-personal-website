@@ -153,7 +153,34 @@ export default function VoiceChat() {
       peerConnection.ontrack = (event) => {
         const peerConnection = peerConnectionsRef.current.get(socketId);
         if (peerConnection) {
+          // Handle audio tracks
           peerConnection.audioElement.srcObject = event.streams[0];
+          
+          // Check if this is a video track (screen sharing)
+          const videoTracks = event.streams[0].getVideoTracks();
+          if (videoTracks.length > 0) {
+            console.log('Received video track from', username);
+            
+            // Create video element if it doesn't exist
+            if (!peerConnection.videoElement && videoContainerRef.current) {
+              const videoElement = document.createElement('video');
+              videoElement.autoplay = true;
+              videoElement.playsInline = true;
+              videoElement.className = 'w-full h-full object-contain';
+              videoElement.srcObject = event.streams[0];
+              
+              // Clear existing videos and add this one
+              while (videoContainerRef.current.firstChild) {
+                videoContainerRef.current.removeChild(videoContainerRef.current.firstChild);
+              }
+              
+              videoContainerRef.current.appendChild(videoElement);
+              peerConnection.videoElement = videoElement;
+              
+              // Show video controls
+              setShowVideoControls(true);
+            }
+          }
         }
       };
       
@@ -211,6 +238,32 @@ export default function VoiceChat() {
         // Handle incoming tracks
         pc.ontrack = (event) => {
           audioElement.srcObject = event.streams[0];
+          
+          // Check if this is a video track (screen sharing)
+          const videoTracks = event.streams[0].getVideoTracks();
+          if (videoTracks.length > 0) {
+            console.log('Received video track from participant');
+            
+            // Create video element if it doesn't exist
+            if (videoContainerRef.current) {
+              const videoElement = document.createElement('video');
+              videoElement.autoplay = true;
+              videoElement.playsInline = true;
+              videoElement.className = 'w-full h-full object-contain';
+              videoElement.srcObject = event.streams[0];
+              
+              // Clear existing videos and add this one
+              while (videoContainerRef.current.firstChild) {
+                videoContainerRef.current.removeChild(videoContainerRef.current.firstChild);
+              }
+              
+              videoContainerRef.current.appendChild(videoElement);
+              peerConnection.videoElement = videoElement;
+              
+              // Show video controls
+              setShowVideoControls(true);
+            }
+          }
         };
         
         // Store peer connection
@@ -285,6 +338,44 @@ export default function VoiceChat() {
             : p
         )
       );
+    });
+    
+    // Handle screen sharing state changes
+    socketRef.current.on('screenShareStateChanged', ({ socketId, isScreenSharing }) => {
+      console.log(`Participant ${socketId} ${isScreenSharing ? 'started' : 'stopped'} screen sharing`);
+      
+      // Update the participant's UI state
+      setParticipants(prev => 
+        prev.map(p => 
+          p.socketId === socketId 
+            ? { ...p, isScreenSharing } 
+            : p
+        )
+      );
+      
+      // Toggle video display area as needed
+      if (isScreenSharing) {
+        setShowVideoControls(true);
+      } else {
+        // Check if any participant is still screen sharing
+        const anyScreenSharing = participants.some(
+          p => p.socketId !== socketId && p.isScreenSharing
+        );
+        
+        if (!anyScreenSharing && !isScreenSharing) {
+          // No one is screen sharing anymore
+          if (videoContainerRef.current) {
+            while (videoContainerRef.current.firstChild) {
+              videoContainerRef.current.removeChild(videoContainerRef.current.firstChild);
+            }
+          }
+          
+          // Only hide the video container if we're not sharing our own screen
+          if (!isScreenSharing) {
+            setShowVideoControls(false);
+          }
+        }
+      }
     });
     
     // Clean up function
@@ -927,6 +1018,25 @@ export default function VoiceChat() {
                     </div>
                     
                     <div className="flex-1 border border-border/50 rounded-md bg-background p-4 mb-4 overflow-y-auto">
+                      {/* Video container for screen sharing */}
+                      {showVideoControls && (
+                        <div 
+                          ref={videoContainerRef} 
+                          className="w-full bg-black rounded-md mb-4 relative aspect-video overflow-hidden"
+                        >
+                          {isScreenSharing && (
+                            <div className="absolute top-2 right-2 bg-black/70 text-white px-2 py-1 rounded text-xs">
+                              You are sharing your screen
+                            </div>
+                          )}
+                          {participants.some(p => p.isScreenSharing) && !isScreenSharing && (
+                            <div className="absolute top-2 right-2 bg-black/70 text-white px-2 py-1 rounded text-xs">
+                              {participants.find(p => p.isScreenSharing)?.username} is sharing their screen
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {/* Current user */}
                         <div className="flex flex-col items-center p-3 rounded-md bg-accent/30">
@@ -1004,6 +1114,19 @@ export default function VoiceChat() {
                           <MicOff className="h-5 w-5" />
                         ) : (
                           <Mic className="h-5 w-5" />
+                        )}
+                      </Button>
+                      
+                      <Button
+                        variant={isScreenSharing ? "default" : "outline"}
+                        size="icon"
+                        onClick={toggleScreenShare}
+                        className="rounded-full h-12 w-12"
+                      >
+                        {isScreenSharing ? (
+                          <VideoOff className="h-5 w-5" />
+                        ) : (
+                          <Monitor className="h-5 w-5" />
                         )}
                       </Button>
                       
