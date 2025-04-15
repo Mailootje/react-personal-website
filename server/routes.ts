@@ -1380,6 +1380,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Update shortened link
+  app.put('/api/admin/links/:shortCode', isAdmin, async (req: Request, res: Response) => {
+    try {
+      const shortCode = req.params.shortCode;
+      const linkData = req.body;
+      
+      // Validate request data
+      if (!linkData.originalUrl) {
+        return res.status(400).json({ error: 'Original URL is required' });
+      }
+      
+      // Validate URL format
+      try {
+        new URL(linkData.originalUrl);
+      } catch (e) {
+        return res.status(400).json({ error: 'Invalid URL format' });
+      }
+      
+      const updatedLink = await storage.updateShortenedLink(shortCode, {
+        originalUrl: linkData.originalUrl
+      });
+      
+      if (!updatedLink) {
+        return res.status(404).json({ error: 'Link not found' });
+      }
+      
+      res.json(updatedLink);
+    } catch (error: any) {
+      log(`Error updating link: ${error}`, "routes");
+      res.status(500).json({ error: 'Failed to update link' });
+    }
+  });
+
   app.delete('/api/admin/links/:shortCode', isAdmin, async (req: Request, res: Response) => {
     try {
       const shortCode = req.params.shortCode;

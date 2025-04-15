@@ -44,6 +44,7 @@ export interface IStorage {
   // Link shortener methods
   createShortenedLink(link: InsertShortenedLink): Promise<ShortenedLink>;
   getShortenedLinkByCode(shortCode: string): Promise<ShortenedLink | undefined>;
+  updateShortenedLink(shortCode: string, data: Partial<InsertShortenedLink>): Promise<ShortenedLink | undefined>;
   incrementLinkClicks(shortCode: string): Promise<void>;
   cleanupExpiredLinks(): Promise<void>;
   getRecentLinks(limit: number): Promise<ShortenedLink[]>;
@@ -274,6 +275,23 @@ export class DbStorage implements IStorage {
       }
     } catch (error) {
       log(`Error incrementing link clicks: ${error}`, "storage");
+    }
+  }
+  
+  async updateShortenedLink(shortCode: string, data: Partial<InsertShortenedLink>): Promise<ShortenedLink | undefined> {
+    try {
+      const link = await this.getShortenedLinkByCode(shortCode);
+      if (!link) return undefined;
+      
+      const result = await this.db.update(shortenedLinks)
+        .set(data)
+        .where(eq(shortenedLinks.shortCode, shortCode))
+        .returning();
+        
+      return result[0];
+    } catch (error) {
+      log(`Error updating shortened link: ${error}`, "storage");
+      return undefined;
     }
   }
   
@@ -622,6 +640,15 @@ export class MemStorage implements IStorage {
       link.clicks += 1;
       this.shortenedLinks.set(shortCode, link);
     }
+  }
+  
+  async updateShortenedLink(shortCode: string, data: Partial<InsertShortenedLink>): Promise<ShortenedLink | undefined> {
+    const link = this.shortenedLinks.get(shortCode);
+    if (!link) return undefined;
+    
+    const updatedLink: ShortenedLink = { ...link, ...data };
+    this.shortenedLinks.set(shortCode, updatedLink);
+    return updatedLink;
   }
   
   async cleanupExpiredLinks(): Promise<void> {
