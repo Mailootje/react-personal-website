@@ -3,11 +3,13 @@ import { Link, useLocation } from "wouter";
 import { navigationItems } from "@/lib/data";
 import { MobileMenu } from "./MobileMenu";
 import { scrollToElement } from "@/lib/utils";
+import { useAuth } from "@/hooks/use-auth";
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [location] = useLocation();
+  const { user } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -82,6 +84,16 @@ export function Header() {
                 {item.name}
               </Link>
             ),
+          )}
+          
+          {/* Admin link for logged-in users */}
+          {user && (
+            <Link
+              href="/admin/blog"
+              className="text-text hover:text-primary transition-colors font-medium"
+            >
+              Admin
+            </Link>
           )}
         </nav>
 

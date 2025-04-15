@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation } from "wouter";
 import { scrollToElement } from "@/lib/utils";
+import { useAuth } from "@/hooks/use-auth";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -10,6 +11,7 @@ interface MobileMenuProps {
 
 export function MobileMenu({ isOpen, onClose, items }: MobileMenuProps) {
   const [location] = useLocation();
+  const { user } = useAuth();
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     // If it's a regular page link, not a hash/anchor
@@ -71,6 +73,21 @@ export function MobileMenu({ isOpen, onClose, items }: MobileMenuProps) {
                 </Link>
               )
             ))}
+            
+            {/* Admin link for logged-in users */}
+            {user && (
+              <Link href="/admin/blog">
+                <motion.div
+                  className="text-text hover:text-primary transition-colors font-medium py-2 cursor-pointer"
+                  onClick={onClose}
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  Admin
+                </motion.div>
+              </Link>
+            )}
           </div>
         </motion.div>
       )}
