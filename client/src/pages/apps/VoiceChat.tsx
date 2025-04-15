@@ -25,6 +25,7 @@ interface VoiceRoom {
 interface Participant {
   socketId: string;
   username: string;
+  isMuted?: boolean;
 }
 
 interface PeerConnection {
@@ -242,6 +243,29 @@ export default function VoiceChat() {
       setParticipants(prev => prev.filter(p => p.socketId !== socketId));
     });
     
+    // Handle participant mute state changes
+    socketRef.current.on('participantMuteChanged', ({ socketId, isMuted }) => {
+      console.log(`Participant ${socketId} ${isMuted ? 'muted' : 'unmuted'}`);
+      
+      // Update the participant's audio track if available
+      const peerConnection = peerConnectionsRef.current.get(socketId);
+      if (peerConnection && peerConnection.audioElement.srcObject) {
+        const audioTracks = (peerConnection.audioElement.srcObject as MediaStream).getAudioTracks();
+        audioTracks.forEach(track => {
+          track.enabled = !isMuted;
+        });
+      }
+      
+      // Update the participant's UI state
+      setParticipants(prev => 
+        prev.map(p => 
+          p.socketId === socketId 
+            ? { ...p, isMuted } 
+            : p
+        )
+      );
+    });
+    
     // Clean up function
     return () => {
       // Close all peer connections
@@ -287,11 +311,25 @@ export default function VoiceChat() {
   // Toggle mute state
   const toggleMute = () => {
     if (localStreamRef.current) {
+      // Update local audio track state
       localStreamRef.current.getAudioTracks().forEach(track => {
         track.enabled = isMuted;
       });
       
-      setIsMuted(!isMuted);
+      // Update mute state
+      const newMuteState = !isMuted;
+      setIsMuted(newMuteState);
+      
+      // Broadcast mute state to all participants in the room
+      if (currentRoom && socketRef.current) {
+        socketRef.current.emit('muteStateChanged', {
+          roomId: currentRoom,
+          isMuted: newMuteState,
+          socketId: socketRef.current.id
+        });
+        
+        console.log(`Broadcasting mute state: ${newMuteState ? 'Muted' : 'Unmuted'}`);
+      }
     }
   };
   
@@ -577,7 +615,9 @@ export default function VoiceChat() {
                                 </span>
                               </div>
                               <span className="font-medium">{participant.username}</span>
-                              <span className="text-xs text-muted-foreground">Connected</span>
+                              <span className="text-xs text-muted-foreground">
+                                {participant.isMuted ? 'Muted' : 'Speaking'}
+                              </span>
                             </div>
                           ))
                         }

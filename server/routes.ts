@@ -1679,6 +1679,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`User ${username} left room ${roomId}`);
     });
     
+    // Handle mute state changes
+    socket.on('muteStateChanged', ({ roomId, isMuted, socketId }) => {
+      console.log(`User ${socketId} ${isMuted ? 'muted' : 'unmuted'} in room ${roomId}`);
+      // Forward the mute state change to everyone in the room
+      socket.to(roomId).emit('participantMuteChanged', {
+        socketId,
+        isMuted
+      });
+    });
+    
     // Handle disconnect
     socket.on('disconnect', () => {
       // Find all rooms this socket is in and remove them
