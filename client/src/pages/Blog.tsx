@@ -54,10 +54,10 @@ export default function Blog() {
                     {posts.map((post) => (
                       <Link key={post.id} href={`/blog/${post.slug}`} className="group block">
                           <div className="bg-card/50 backdrop-blur-sm rounded-lg overflow-hidden border border-border/50 shadow-lg hover:shadow-xl transition-all duration-200 h-full flex flex-col">
-                            {post.imageUrl && (
+                            {(post.imageUrl || (post.imageData && post.imageType)) && (
                               <div className="aspect-video overflow-hidden">
                                 <img
-                                  src={post.imageUrl}
+                                  src={post.imageUrl || `data:${post.imageType};base64,${post.imageData}`}
                                   alt={post.title}
                                   className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300"
                                 />

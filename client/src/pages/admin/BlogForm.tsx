@@ -37,6 +37,8 @@ const blogFormSchema = insertBlogPostSchema.extend({
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug can only contain lowercase letters, numbers, and hyphens"),
   excerpt: z.string().nullable().optional(),
   imageUrl: z.string().nullable().optional(),
+  imageData: z.string().nullable().optional(),
+  imageType: z.string().nullable().optional(),
   published: z.boolean().default(false),
 });
 
@@ -48,6 +50,8 @@ export default function BlogForm() {
   const { toast } = useToast();
   const isEditMode = Boolean(params.id);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Setup form with default values
   const form = useForm<BlogFormData>({
@@ -58,6 +62,8 @@ export default function BlogForm() {
       content: "",
       excerpt: "",
       imageUrl: "",
+      imageData: "",
+      imageType: "",
       published: false,
     },
   });
@@ -80,11 +86,18 @@ export default function BlogForm() {
         content: post.content,
         excerpt: post.excerpt,
         imageUrl: post.imageUrl,
+        imageData: post.imageData || "",
+        imageType: post.imageType || "",
         published: post.published,
       });
 
+      // Set preview URL based on either image URL or image data
       if (post.imageUrl) {
         setPreviewUrl(post.imageUrl);
+      } else if (post.imageData && post.imageType) {
+        // Create a data URL from the stored image data
+        const dataUrl = `data:${post.imageType};base64,${post.imageData}`;
+        setPreviewUrl(dataUrl);
       }
     }
   }, [post, form]);
@@ -164,7 +177,59 @@ export default function BlogForm() {
   // Handle image URL change and update preview
   const handleImageUrlChange = (url: string) => {
     form.setValue("imageUrl", url, { shouldValidate: true });
+    // Clear image data when using URL
+    form.setValue("imageData", "", { shouldValidate: false });
+    form.setValue("imageType", "", { shouldValidate: false });
     setPreviewUrl(url || null);
+  };
+  
+  // Handle image file selection and upload
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    
+    try {
+      setIsUploading(true);
+      
+      // Convert the image to WebP format
+      const { base64Data, mimeType } = await convertToWebP(file);
+      
+      // Store the image data in the form
+      form.setValue("imageData", base64Data, { shouldValidate: true });
+      form.setValue("imageType", mimeType, { shouldValidate: true });
+      
+      // Clear the image URL field as we're using direct image data
+      form.setValue("imageUrl", "", { shouldValidate: true });
+      
+      // Create a preview URL
+      const dataUrl = `data:${mimeType};base64,${base64Data}`;
+      setPreviewUrl(dataUrl);
+      
+      toast({
+        title: "Image uploaded",
+        description: "Image will be stored directly in the database",
+      });
+    } catch (error) {
+      toast({
+        title: "Upload failed",
+        description: error instanceof Error ? error.message : "Failed to process image",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+  
+  // Remove the current image
+  const handleRemoveImage = () => {
+    form.setValue("imageUrl", "", { shouldValidate: true });
+    form.setValue("imageData", "", { shouldValidate: false });
+    form.setValue("imageType", "", { shouldValidate: false });
+    setPreviewUrl(null);
   };
 
   return (
@@ -289,27 +354,92 @@ export default function BlogForm() {
                         )}
                       />
 
-                      <FormField
-                        control={form.control}
-                        name="imageUrl"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Image URL (Optional)</FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="https://example.com/image.jpg"
-                                {...field}
-                                value={field.value || ""}
-                                onChange={(e) => handleImageUrlChange(e.target.value)}
+                      <div className="space-y-4">
+                        <div>
+                          <h3 className="text-sm font-medium mb-2">Featured Image</h3>
+                          <div className="flex flex-col space-y-3">
+                            {/* Image upload */}
+                            <div>
+                              <div className="flex items-center gap-3">
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  onClick={() => fileInputRef.current?.click()}
+                                  disabled={isUploading}
+                                  className="gap-2"
+                                >
+                                  {isUploading ? (
+                                    <>
+                                      <Loader2 className="h-4 w-4 animate-spin" />
+                                      Uploading...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Upload className="h-4 w-4" />
+                                      Upload Image
+                                    </>
+                                  )}
+                                </Button>
+                                
+                                {previewUrl && (
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="icon"
+                                    onClick={handleRemoveImage}
+                                    className="text-destructive"
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </Button>
+                                )}
+                              </div>
+                              <input
+                                type="file"
+                                ref={fileInputRef}
+                                accept="image/*"
+                                onChange={handleImageUpload}
+                                className="hidden"
                               />
-                            </FormControl>
-                            <FormDescription>
-                              Direct link to featured image (JPG, PNG, WebP)
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                              <p className="text-xs text-muted-foreground mt-2">
+                                Images will be converted to WebP format for optimal performance
+                              </p>
+                            </div>
+                            
+                            {/* OR separator */}
+                            <div className="relative">
+                              <div className="absolute inset-0 flex items-center">
+                                <span className="w-full border-t border-border/50" />
+                              </div>
+                              <div className="relative flex justify-center text-xs">
+                                <span className="bg-card px-2 text-muted-foreground">OR</span>
+                              </div>
+                            </div>
+                            
+                            {/* Image URL input */}
+                            <FormField
+                              control={form.control}
+                              name="imageUrl"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Image URL</FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      placeholder="https://example.com/image.jpg"
+                                      {...field}
+                                      value={field.value || ""}
+                                      onChange={(e) => handleImageUrlChange(e.target.value)}
+                                    />
+                                  </FormControl>
+                                  <FormDescription>
+                                    Direct link to featured image (JPG, PNG, WebP)
+                                  </FormDescription>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                        </div>
+                      </div>
 
                       <FormField
                         control={form.control}
