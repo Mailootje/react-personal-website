@@ -11,7 +11,8 @@ import {
   X,
   Eye,
   FilterX,
-  Search 
+  Search,
+  ArrowLeft
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -104,6 +105,11 @@ export default function BlogAdmin() {
     <div className="pt-20 pb-16 min-h-screen">
       <Container>
         <div className="py-8">
+          <Link href="/admin" className="inline-flex items-center text-primary hover:text-primary/80 mb-4 transition-colors">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Admin Dashboard
+          </Link>
+          
           <div className="flex justify-between items-center mb-6">
             <SectionHeading
               subtitle="ADMIN PANEL"
