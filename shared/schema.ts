@@ -28,7 +28,9 @@ export const blogPosts = pgTable("blog_posts", {
   slug: text("slug").notNull().unique(),
   content: text("content").notNull(),
   excerpt: text("excerpt"),
-  imageUrl: text("image_url"),
+  imageUrl: text("image_url"), // Keep for backward compatibility
+  imageData: text("image_data"), // Store base64 encoded image data
+  imageType: text("image_type"), // Store the MIME type of the image
   published: boolean("published").default(true).notNull(),
   authorId: integer("author_id").references(() => users.id),
   createdAt: timestamp("created_at").notNull().defaultNow(),
@@ -41,6 +43,8 @@ export const insertBlogPostSchema = createInsertSchema(blogPosts).pick({
   content: true,
   excerpt: true,
   imageUrl: true,
+  imageData: true,
+  imageType: true,
   published: true,
   authorId: true,
 });

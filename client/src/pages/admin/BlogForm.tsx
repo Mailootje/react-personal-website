@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
 import { z } from "zod";
-import { ArrowLeft, Save, Loader2, ExternalLink, Upload } from "lucide-react";
+import { ArrowLeft, Save, Loader2, ExternalLink, Upload, Image, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -25,6 +25,7 @@ import Container from "@/components/Container";
 import SectionHeading from "@/components/SectionHeading";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
+import { convertToWebP, createObjectURLFromBase64 } from "@/lib/imageUtils";
 
 // Extend the insert schema with extra validations
 const blogFormSchema = insertBlogPostSchema.extend({
