@@ -45,7 +45,11 @@ export default function VoiceChat() {
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [isJoiningRoom, setIsJoiningRoom] = useState<boolean>(false);
   const [newRoomName, setNewRoomName] = useState<string>('');
+  const [newRoomPassword, setNewRoomPassword] = useState<string>('');
   const [isCreateRoomOpen, setIsCreateRoomOpen] = useState<boolean>(false);
+  const [passwordInputOpen, setPasswordInputOpen] = useState<boolean>(false);
+  const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
+  const [roomPassword, setRoomPassword] = useState<string>('');
   
   const socketRef = useRef<Socket | null>(null);
   const localStreamRef = useRef<MediaStream | null>(null);
@@ -334,8 +338,32 @@ export default function VoiceChat() {
     }
   };
   
+  // Handle password prompt and room joining
+  const handleJoinRoom = (roomId: string) => {
+    const room = rooms.find(r => r.id === roomId);
+    
+    if (!room) {
+      toast({
+        title: 'Room not found',
+        description: 'The voice chat room you are trying to join does not exist',
+        variant: 'destructive'
+      });
+      return;
+    }
+    
+    // If room has password, open password dialog
+    if (room.hasPassword) {
+      setSelectedRoomId(roomId);
+      setRoomPassword('');
+      setPasswordInputOpen(true);
+    } else {
+      // No password, join directly
+      joinRoom(roomId);
+    }
+  };
+  
   // Join a voice chat room
-  const joinRoom = async (roomId: string) => {
+  const joinRoom = async (roomId: string, password?: string) => {
     if (!username || !socketRef.current) {
       toast({
         title: 'Enter a username',
@@ -369,7 +397,27 @@ export default function VoiceChat() {
     }
     
     try {
-      socketRef.current.emit('joinRoom', { roomId, username });
+      // Add socket error handler for room join errors
+      const handleRoomJoinError = (error: { message: string }) => {
+        toast({
+          title: 'Failed to join room',
+          description: error.message,
+          variant: 'destructive'
+        });
+        setIsJoiningRoom(false);
+        socketRef.current?.off('roomJoinError', handleRoomJoinError);
+      };
+      
+      socketRef.current.on('roomJoinError', handleRoomJoinError);
+      
+      // Send join request with password if provided
+      socketRef.current.emit('joinRoom', { roomId, username, password });
+      
+      // Set timeout to remove error handler if successful
+      setTimeout(() => {
+        socketRef.current?.off('roomJoinError', handleRoomJoinError);
+      }, 3000);
+      
       setCurrentRoom(roomId);
       
       toast({
@@ -422,12 +470,19 @@ export default function VoiceChat() {
     }
     
     try {
+      const requestBody: { name: string; password?: string } = { name: newRoomName };
+      
+      // Only include password if it's not empty
+      if (newRoomPassword.trim()) {
+        requestBody.password = newRoomPassword.trim();
+      }
+      
       const response = await fetch('/api/voice-chat/rooms', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ name: newRoomName })
+        body: JSON.stringify(requestBody)
       });
       
       if (!response.ok) {
@@ -438,15 +493,16 @@ export default function VoiceChat() {
       
       toast({
         title: 'Room created',
-        description: `${newRoomName} has been created`
+        description: `${newRoomName} has been created${newRoomPassword ? ' with password protection' : ''}`
       });
       
       setRooms(prev => [...prev, room]);
       setIsCreateRoomOpen(false);
       setNewRoomName('');
+      setNewRoomPassword('');
       
-      // Join the newly created room
-      joinRoom(room.id);
+      // Join the newly created room (we don't need password since we're the creator)
+      joinRoom(room.id, newRoomPassword);
     } catch (error) {
       console.error('Error creating room:', error);
       toast({
@@ -501,10 +557,58 @@ export default function VoiceChat() {
     );
   }
   
+  // Password dialog component
+  const PasswordDialog = () => (
+    <Dialog open={passwordInputOpen} onOpenChange={setPasswordInputOpen}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Enter Room Password</DialogTitle>
+          <DialogDescription>
+            This voice chat room is password protected
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4 py-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Password</label>
+            <Input
+              type="password"
+              placeholder="Enter room password"
+              value={roomPassword}
+              onChange={(e) => setRoomPassword(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && roomPassword.trim()) {
+                  setPasswordInputOpen(false);
+                  joinRoom(selectedRoomId!, roomPassword);
+                }
+              }}
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setPasswordInputOpen(false)}>
+            Cancel
+          </Button>
+          <Button 
+            onClick={() => {
+              setPasswordInputOpen(false);
+              joinRoom(selectedRoomId!, roomPassword);
+            }}
+            disabled={!roomPassword.trim()}
+          >
+            Join Room
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+  
   return (
     <div className="flex flex-col min-h-screen">
       <div className="flex-1 bg-background pt-20">
         <Container className="py-8">
+          {/* Render password dialog */}
+          <PasswordDialog />
+          
           <SectionHeading
             subtitle="VOICE CHAT"
             title="Live Conversations"
@@ -528,11 +632,24 @@ export default function VoiceChat() {
                       </DialogHeader>
                       <div className="space-y-4 py-4">
                         <div className="space-y-2">
+                          <label className="text-sm font-medium">Room Name</label>
                           <Input
                             placeholder="Room name"
                             value={newRoomName}
                             onChange={(e) => setNewRoomName(e.target.value)}
                           />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">Password (Optional)</label>
+                          <Input
+                            type="password"
+                            placeholder="Leave empty for public room"
+                            value={newRoomPassword}
+                            onChange={(e) => setNewRoomPassword(e.target.value)}
+                          />
+                          <p className="text-sm text-muted-foreground">
+                            Add a password to create a private room
+                          </p>
                         </div>
                       </div>
                       <DialogFooter>
@@ -561,7 +678,7 @@ export default function VoiceChat() {
                         className={`flex justify-between items-center p-3 rounded-md hover:bg-accent/50 cursor-pointer transition-colors ${
                           currentRoom === room.id ? 'bg-accent text-accent-foreground' : ''
                         }`}
-                        onClick={() => joinRoom(room.id)}
+                        onClick={() => handleJoinRoom(room.id)}
                       >
                         <div>
                           <h4 className="font-medium">{room.name}</h4>
@@ -686,11 +803,24 @@ export default function VoiceChat() {
                             </DialogHeader>
                             <div className="space-y-4 py-4">
                               <div className="space-y-2">
+                                <label className="text-sm font-medium">Room Name</label>
                                 <Input
                                   placeholder="Room name"
                                   value={newRoomName}
                                   onChange={(e) => setNewRoomName(e.target.value)}
                                 />
+                              </div>
+                              <div className="space-y-2">
+                                <label className="text-sm font-medium">Password (Optional)</label>
+                                <Input
+                                  type="password"
+                                  placeholder="Leave empty for public room"
+                                  value={newRoomPassword}
+                                  onChange={(e) => setNewRoomPassword(e.target.value)}
+                                />
+                                <p className="text-sm text-muted-foreground">
+                                  Add a password to create a private room
+                                </p>
                               </div>
                             </div>
                             <DialogFooter>
