@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { BlogPost } from "@shared/schema";
 import Container from "@/components/Container";
 import { useAuth } from "@/hooks/use-auth";
+import { apiRequest } from "@/lib/queryClient";
 
 export default function BlogPostPage() {
   const [match, params] = useRoute("/blog/:slug");
@@ -16,6 +17,9 @@ export default function BlogPostPage() {
   const { data: post, isLoading, error } = useQuery<BlogPost>({
     queryKey: [`/api/blog/posts/${slug}`],
     enabled: Boolean(slug),
+    queryFn: async () => {
+      return await apiRequest("GET", `/api/blog/posts/${slug}`);
+    },
   });
   
   if (!match) return null;
@@ -26,11 +30,9 @@ export default function BlogPostPage() {
         <div className="z-10 relative">
           <div className="py-16">
             <Container maxWidth="lg">
-              <Link href="/blog">
-                <a className="inline-flex items-center text-primary hover:text-primary/80 mb-6 transition-colors">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back to Blog
-                </a>
+              <Link href="/blog" className="inline-flex items-center text-primary hover:text-primary/80 mb-6 transition-colors">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Blog
               </Link>
 
               {isLoading ? (
@@ -64,10 +66,8 @@ export default function BlogPostPage() {
                       <span>{format(new Date(post.createdAt), 'MMMM d, yyyy')}</span>
                       
                       {user?.isAdmin && (
-                        <Link href={`/admin/blog/edit/${post.id}`}>
-                          <a className="ml-4 text-sm text-primary hover:text-primary/80 transition-colors">
-                            Edit Post
-                          </a>
+                        <Link href={`/admin/blog/edit/${post.id}`} className="ml-4 text-sm text-primary hover:text-primary/80 transition-colors">
+                          Edit Post
                         </Link>
                       )}
                     </div>
@@ -82,10 +82,8 @@ export default function BlogPostPage() {
               ) : (
                 <div className="text-center py-20">
                   <p className="text-lg text-muted-foreground">Blog post not found</p>
-                  <Link href="/blog">
-                    <a className="mt-4 inline-block text-primary hover:text-primary/80 transition-colors">
-                      Back to all posts
-                    </a>
+                  <Link href="/blog" className="mt-4 inline-block text-primary hover:text-primary/80 transition-colors">
+                    Back to all posts
                   </Link>
                 </div>
               )}

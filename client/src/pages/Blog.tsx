@@ -9,9 +9,11 @@ import Container from "@/components/Container";
 import SectionHeading from "@/components/SectionHeading";
 
 export default function Blog() {
-  const { data: posts, isLoading, error } = useQuery<BlogPost[]>({
+  const { data, isLoading, error } = useQuery<{ posts: BlogPost[], meta: { total: number, limit: number, offset: number } }>({
     queryKey: ["/api/blog/posts"],
   });
+  
+  const posts = data?.posts;
 
   return (
     <div className="min-h-screen pt-20 pb-16">
@@ -40,8 +42,7 @@ export default function Blog() {
                 ) : posts && posts.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {posts.map((post) => (
-                      <Link key={post.id} href={`/blog/${post.slug}`}>
-                        <a className="group block">
+                      <Link key={post.id} href={`/blog/${post.slug}`} className="group block">
                           <div className="bg-card/50 backdrop-blur-sm rounded-lg overflow-hidden border border-border/50 shadow-lg hover:shadow-xl transition-all duration-200 h-full flex flex-col">
                             {post.imageUrl && (
                               <div className="aspect-video overflow-hidden">
@@ -73,7 +74,6 @@ export default function Blog() {
                               </div>
                             </div>
                           </div>
-                        </a>
                       </Link>
                     ))}
                   </div>
