@@ -1345,6 +1345,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Admin routes for shortened links
+  app.post('/api/admin/links', isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { originalUrl, shortCode } = req.body;
+      
+      if (!originalUrl) {
+        return res.status(400).json({ error: "Original URL is required" });
+      }
+      
+      // If shortCode is provided, check if it already exists
+      if (shortCode) {
+        const existingLink = await storage.getShortenedLinkByCode(shortCode);
+        if (existingLink) {
+          return res.status(409).json({ error: "Short code already in use" });
+        }
+      }
+      
+      // Generate a code if not provided
+      const finalShortCode = shortCode || generateShortCode();
+      
+      // Set expiration (default to never expire for admin-created links)
+      const expiresAt = null;
+      
+      // Create the shortened link
+      const newLink = await storage.createShortenedLink({
+        originalUrl,
+        shortCode: finalShortCode,
+        expiresAt
+      });
+      
+      // Return the created link
+      res.status(201).json({
+        ...newLink,
+        shortUrl: `${req.protocol}://${req.get('host')}/s/${newLink.shortCode}`
+      });
+      
+    } catch (error) {
+      log(`Error creating link: ${error}`, "routes");
+      res.status(500).json({ error: "Failed to create link" });
+    }
+  });
+  
   app.get('/api/admin/links', isAdmin, async (req: Request, res: Response) => {
     try {
       const limit = parseInt(req.query.limit as string) || 10;

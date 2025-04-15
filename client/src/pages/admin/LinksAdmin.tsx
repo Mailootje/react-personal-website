@@ -163,8 +163,8 @@ export default function LinksAdmin() {
 
   const createMutation = useMutation({
     mutationFn: async (data: CreateLinkFormData) => {
-      // Use our POST /api/links endpoint
-      return apiRequest("POST", "/api/links", data);
+      // Use the admin endpoint
+      return apiRequest("POST", "/api/admin/links", data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/links"] });
