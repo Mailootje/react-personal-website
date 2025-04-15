@@ -15,15 +15,17 @@ type RequestOptions = {
 
 export async function apiRequest<T = any>(
   method: string, 
-  options: RequestOptions
+  url: string,
+  body?: any,
+  headers?: Record<string, string>
 ): Promise<T> {
-  const res = await fetch(options.url, {
+  const res = await fetch(url, {
     method,
     headers: {
       "Content-Type": "application/json",
-      ...options.headers
+      ...headers
     },
-    body: options.body ? JSON.stringify(options.body) : undefined,
+    body: body ? JSON.stringify(body) : undefined,
     credentials: "include",
   });
 
