@@ -190,6 +190,58 @@ export const registerAuthRoutes = (app: Express) => {
       res.status(500).json({ error: 'Error getting user information' });
     }
   });
+  
+  // Admin profile update endpoint
+  app.put('/api/admin/profile', isAdmin, async (req: Request, res: Response) => {
+    try {
+      if (!req.session?.userId) {
+        return res.status(401).json({ error: 'Not authenticated' });
+      }
+      
+      const userId = req.session.userId;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      
+      // Check if current password is correct
+      const { currentPassword, newPassword, ...userData } = req.body;
+      
+      if (!currentPassword) {
+        return res.status(400).json({ error: 'Current password is required' });
+      }
+      
+      const isPasswordValid = await verifyPassword(currentPassword, user.password);
+      if (!isPasswordValid) {
+        return res.status(401).json({ error: 'Current password is incorrect' });
+      }
+      
+      // Update user data
+      const updateData: Partial<InsertUser> = {
+        ...userData
+      };
+      
+      // Update password if a new one is provided
+      if (newPassword) {
+        updateData.password = await hashPassword(newPassword);
+      }
+      
+      // Update user in storage
+      const updatedUser = await storage.updateUser(userId, updateData);
+      
+      if (!updatedUser) {
+        return res.status(404).json({ error: 'Failed to update user' });
+      }
+      
+      // Return updated user without password
+      const { password: _, ...userWithoutPassword } = updatedUser;
+      res.json(userWithoutPassword);
+    } catch (error) {
+      log(`Error updating user profile: ${error}`, 'auth');
+      res.status(500).json({ error: 'Failed to update profile' });
+    }
+  });
 
   // Create initial admin if none exists
   app.post('/api/setup-admin', async (req: Request, res: Response) => {

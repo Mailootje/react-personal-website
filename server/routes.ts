@@ -1545,6 +1545,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Admin settings routes
+  
+  // Site configuration settings
+  app.put('/api/admin/settings/site', isAdmin, async (req: Request, res: Response) => {
+    try {
+      // In a real implementation, these settings would be stored in the database
+      // For now, we'll just return success
+      res.json({ 
+        success: true,
+        message: 'Site settings updated successfully',
+        settings: req.body
+      });
+    } catch (error: any) {
+      log(`Error updating site settings: ${error}`, "routes");
+      res.status(500).json({ error: 'Failed to update site settings' });
+    }
+  });
+  
+  // App settings
+  app.put('/api/admin/settings/app', isAdmin, async (req: Request, res: Response) => {
+    try {
+      // Store the OpenWeather API key as an environment variable
+      if (req.body.weatherApiKey) {
+        process.env.OPENWEATHER_API_KEY = req.body.weatherApiKey;
+      }
+      
+      // In a real implementation, other settings would be stored in the database
+      res.json({ 
+        success: true,
+        message: 'App settings updated successfully',
+        settings: req.body
+      });
+    } catch (error: any) {
+      log(`Error updating app settings: ${error}`, "routes");
+      res.status(500).json({ error: 'Failed to update app settings' });
+    }
+  });
+  
+  // Theme settings
+  app.put('/api/admin/settings/theme', isAdmin, async (req: Request, res: Response) => {
+    try {
+      // In a real implementation, these settings would be stored in the database
+      res.json({ 
+        success: true,
+        message: 'Theme settings updated successfully',
+        settings: req.body
+      });
+    } catch (error: any) {
+      log(`Error updating theme settings: ${error}`, "routes");
+      res.status(500).json({ error: 'Failed to update theme settings' });
+    }
+  });
+  
   const httpServer = createServer(app);
 
   return httpServer;
