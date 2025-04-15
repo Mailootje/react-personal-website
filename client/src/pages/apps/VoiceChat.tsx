@@ -507,7 +507,15 @@ export default function VoiceChat() {
         screenStreamRef.current = null;
       }
       
+      // Clear the video container when stopping screen share
+      if (videoContainerRef.current) {
+        while (videoContainerRef.current.firstChild) {
+          videoContainerRef.current.removeChild(videoContainerRef.current.firstChild);
+        }
+      }
+      
       setIsScreenSharing(false);
+      setShowVideoControls(false);
       
       // Notify other participants that screen sharing has stopped
       if (socketRef.current) {
@@ -531,6 +539,29 @@ export default function VoiceChat() {
         });
         
         screenStreamRef.current = screenStream;
+        
+        // Create video element to display our own screen share
+        if (videoContainerRef.current) {
+          // Clear existing video elements first
+          while (videoContainerRef.current.firstChild) {
+            videoContainerRef.current.removeChild(videoContainerRef.current.firstChild);
+          }
+          
+          // Create and add our video element
+          const videoElement = document.createElement('video');
+          videoElement.autoplay = true;
+          videoElement.muted = true; // Mute our own video to prevent echo
+          videoElement.playsInline = true;
+          videoElement.className = 'w-full h-full object-contain';
+          videoElement.srcObject = screenStream;
+          videoContainerRef.current.appendChild(videoElement);
+          
+          // Add label indicating it's our screen
+          const label = document.createElement('div');
+          label.className = 'absolute bottom-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-xs';
+          label.textContent = 'Your screen';
+          videoContainerRef.current.appendChild(label);
+        }
         
         // Add tracks to all peer connections
         peerConnectionsRef.current.forEach(({ pc }) => {
