@@ -3,14 +3,18 @@
  */
 
 /**
- * Converts an image to WebP format
+ * Converts an image to WebP format with optional resizing
  * @param imageFile - The image file to convert
  * @param quality - The quality of the WebP image (0-1)
+ * @param maxWidth - Maximum width of the resulting image (preserves aspect ratio)
+ * @param maxHeight - Maximum height of the resulting image (preserves aspect ratio)
  * @returns Promise with base64 encoded WebP image and MIME type
  */
 export async function convertToWebP(
   imageFile: File,
-  quality = 0.8
+  quality = 0.8,
+  maxWidth = 1600,
+  maxHeight = 1200
 ): Promise<{ base64Data: string; mimeType: string }> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -21,9 +25,21 @@ export async function convertToWebP(
       img.src = event.target?.result as string;
       
       img.onload = () => {
+        // Calculate dimensions while maintaining aspect ratio
+        let width = img.width;
+        let height = img.height;
+        
+        // Resize if needed
+        if (width > maxWidth || height > maxHeight) {
+          const ratio = Math.min(maxWidth / width, maxHeight / height);
+          width = Math.floor(width * ratio);
+          height = Math.floor(height * ratio);
+        }
+        
+        // Create canvas with new dimensions
         const canvas = document.createElement('canvas');
-        canvas.width = img.width;
-        canvas.height = img.height;
+        canvas.width = width;
+        canvas.height = height;
         
         const ctx = canvas.getContext('2d');
         if (!ctx) {
@@ -31,8 +47,8 @@ export async function convertToWebP(
           return;
         }
         
-        // Draw image to canvas
-        ctx.drawImage(img, 0, 0);
+        // Draw image to canvas with new dimensions
+        ctx.drawImage(img, 0, 0, width, height);
         
         // Convert to WebP
         try {

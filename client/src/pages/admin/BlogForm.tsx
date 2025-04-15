@@ -191,6 +191,17 @@ export default function BlogForm() {
     try {
       setIsUploading(true);
       
+      // Check file size (max 5MB)
+      const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+      if (file.size > MAX_SIZE) {
+        throw new Error(`Image is too large. Maximum size is 5MB.`);
+      }
+      
+      // Check file type
+      if (!file.type.startsWith('image/')) {
+        throw new Error('Selected file is not an image.');
+      }
+      
       // Convert the image to WebP format
       const { base64Data, mimeType } = await convertToWebP(file);
       
@@ -400,9 +411,14 @@ export default function BlogForm() {
                                 onChange={handleImageUpload}
                                 className="hidden"
                               />
-                              <p className="text-xs text-muted-foreground mt-2">
-                                Images will be converted to WebP format for optimal performance
-                              </p>
+                              <div className="text-xs text-muted-foreground mt-2 space-y-1">
+                                <p>Images will be automatically:</p>
+                                <ul className="list-disc pl-4 space-y-0.5">
+                                  <li>Resized if larger than 1600×1200px</li>
+                                  <li>Converted to WebP format for optimal performance</li>
+                                  <li>Stored directly in the database (max 5MB)</li>
+                                </ul>
+                              </div>
                             </div>
                             
                             {/* OR separator */}
