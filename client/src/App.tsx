@@ -45,6 +45,7 @@ import BlogForm from "@/pages/admin/BlogForm";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import LinksAdmin from "@/pages/admin/LinksAdmin";
 import CountersAdmin from "@/pages/admin/CountersAdmin";
+import SettingsAdmin from "@/pages/admin/SettingsAdmin";
 
 function Router() {
   return (
@@ -91,6 +92,7 @@ function Router() {
       <AdminRoute path="/admin/blog/edit/:id" component={BlogForm}/>
       <AdminRoute path="/admin/links" component={LinksAdmin}/>
       <AdminRoute path="/admin/counters" component={CountersAdmin}/>
+      <AdminRoute path="/admin/settings" component={SettingsAdmin}/>
       
       {/* Fallback to 404 */}
       <Route component={NotFound} />
