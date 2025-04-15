@@ -118,24 +118,8 @@ export default function LinksAdmin() {
 
   const deleteMutation = useMutation({
     mutationFn: async (shortCode: string) => {
-      const response = await fetch(`/api/admin/links/${shortCode}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      
-      if (!response.ok) {
-        if (response.headers.get("content-type")?.includes("application/json")) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || "Failed to delete link");
-        } else {
-          throw new Error(`Server returned ${response.status}`);
-        }
-      }
-      
-      // We don't return any data since the endpoint returns 204 No Content
-      return;
+      // Use apiRequest with parseJson=false to handle 204 No Content responses
+      return apiRequest("DELETE", `/api/admin/links/${shortCode}`, undefined, undefined, false);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/links"] });

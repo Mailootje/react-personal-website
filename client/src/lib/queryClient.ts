@@ -17,7 +17,8 @@ export async function apiRequest<T = any>(
   method: string, 
   url: string,
   body?: any,
-  headers?: Record<string, string>
+  headers?: Record<string, string>,
+  parseJson: boolean = true
 ): Promise<T> {
   const res = await fetch(url, {
     method,
@@ -30,7 +31,12 @@ export async function apiRequest<T = any>(
   });
 
   await throwIfResNotOk(res);
-  return res.json();
+  
+  if (parseJson && res.status !== 204) {
+    return res.json();
+  }
+  
+  return (null as unknown) as T;
 }
 
 type UnauthorizedBehavior = "returnNull" | "throw";
