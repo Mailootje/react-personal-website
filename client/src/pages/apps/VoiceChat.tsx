@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { io, Socket } from 'socket.io-client';
-import { Mic, MicOff, Phone, Users, Plus, X } from 'lucide-react';
+import { Mic, MicOff, Phone, Users, Plus, X, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
@@ -10,7 +10,8 @@ import {
   DialogHeader, 
   DialogTitle,
   DialogTrigger,
-  DialogFooter
+  DialogFooter,
+  DialogDescription
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import Container from '@/components/Container';
@@ -684,7 +685,9 @@ export default function VoiceChat() {
                           <h4 className="font-medium flex items-center">
                             {room.name}
                             {room.hasPassword && (
-                              <Lock className="h-3 w-3 ml-2 text-muted-foreground" />
+                              <span className="ml-2 text-muted-foreground">
+                                <Lock className="h-3 w-3" />
+                              </span>
                             )}
                           </h4>
                           <p className="text-sm text-muted-foreground flex items-center">
