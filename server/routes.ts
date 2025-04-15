@@ -1,5 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
+import { Server as SocketIOServer } from "socket.io";
+import { WebSocket } from "ws";
 import { storage } from "./storage";
 import path from "path";
 import fs from "fs";
@@ -11,6 +13,9 @@ import https from 'https';
 import crypto from 'crypto';
 import fetch from 'node-fetch';
 import { setupSession, registerAuthRoutes, isAuthenticated, isAdmin } from './auth';
+
+// Map to store voice chat rooms
+const voiceRooms = new Map<string, VoiceRoom>();
 
 interface PhotoItem {
   id: string;
@@ -54,9 +59,6 @@ interface DownloadStat {
 // In-memory storage for download stats
 const downloadStats: Map<string, DownloadStat> = new Map();
 
-// Import socket.io for voice chat
-import { Server as SocketIOServer } from 'socket.io';
-
 // Voice chat room management
 interface VoiceRoom {
   id: string;
@@ -66,8 +68,6 @@ interface VoiceRoom {
     username: string;
   }[];
 }
-
-const voiceRooms: Map<string, VoiceRoom> = new Map();
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Proxy route for weather map tiles
