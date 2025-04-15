@@ -171,11 +171,9 @@ export default function BlogForm() {
       <Container>
         <div className="py-8">
           <div className="mb-6">
-            <Link href="/admin/blog">
-              <a className="inline-flex items-center text-primary hover:text-primary/80 mb-4 transition-colors">
+            <Link href="/admin/blog" className="inline-flex items-center text-primary hover:text-primary/80 mb-4 transition-colors">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Blog List
-              </a>
             </Link>
             <SectionHeading
               subtitle="ADMIN PANEL"
