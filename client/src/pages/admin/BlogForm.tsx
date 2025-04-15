@@ -21,11 +21,11 @@ import {
 } from "@/components/ui/form";
 import { BlogPost, insertBlogPostSchema } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { convertToWebP, createObjectURLFromBase64 } from "@/lib/imageUtils";
 import Container from "@/components/Container";
 import SectionHeading from "@/components/SectionHeading";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
-import { convertToWebP, createObjectURLFromBase64 } from "@/lib/imageUtils";
 
 // Extend the insert schema with extra validations
 const blogFormSchema = insertBlogPostSchema.extend({
