@@ -155,11 +155,13 @@ export default function VoiceChat() {
       const offer = await peerConnection.createOffer();
       await peerConnection.setLocalDescription(offer);
       
-      socketRef.current.emit('signal', {
-        to: socketId,
-        from: socketRef.current.id,
-        signal: { type: 'offer', sdp: peerConnection.localDescription }
-      });
+      if (socketRef.current) {
+        socketRef.current.emit('signal', {
+          to: socketId,
+          from: socketRef.current.id,
+          signal: { type: 'offer', sdp: peerConnection.localDescription }
+        });
+      }
     });
     
     // Handle WebRTC signaling
@@ -221,11 +223,13 @@ export default function VoiceChat() {
         const answer = await peerConnection.pc.createAnswer();
         await peerConnection.pc.setLocalDescription(answer);
         
-        socketRef.current.emit('signal', {
-          to: from,
-          from: socketRef.current.id,
-          signal: { type: 'answer', sdp: peerConnection.pc.localDescription }
-        });
+        if (socketRef.current) {
+          socketRef.current.emit('signal', {
+            to: from,
+            from: socketRef.current.id,
+            signal: { type: 'answer', sdp: peerConnection.pc.localDescription }
+          });
+        }
       } else if (signal.type === 'answer') {
         await peerConnection.pc.setRemoteDescription(new RTCSessionDescription(signal.sdp));
       } else if (signal.type === 'ice-candidate') {
@@ -634,6 +638,12 @@ export default function VoiceChat() {
               placeholder="Enter room password"
               value={roomPassword}
               onChange={(e) => setRoomPassword(e.target.value)}
+              onKeyDown={(e) => {
+                // Prevent form submission on Enter key
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                }
+              }}
             />
           </div>
         </div>
@@ -673,6 +683,12 @@ export default function VoiceChat() {
               value={inviteCode}
               onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
               className="font-mono"
+              onKeyDown={(e) => {
+                // Prevent form submission on Enter key
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                }
+              }}
             />
           </div>
         </div>
