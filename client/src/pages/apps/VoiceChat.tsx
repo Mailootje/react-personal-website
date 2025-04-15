@@ -52,6 +52,10 @@ export default function VoiceChat() {
   const [passwordInputOpen, setPasswordInputOpen] = useState<boolean>(false);
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
   const [roomPassword, setRoomPassword] = useState<string>('');
+  const [currentInviteCode, setCurrentInviteCode] = useState<string | null>(null);
+  const [inviteInputOpen, setInviteInputOpen] = useState<boolean>(false);
+  const [inviteCode, setInviteCode] = useState<string>('');
+  const [isCreator, setIsCreator] = useState<boolean>(false);
   
   const socketRef = useRef<Socket | null>(null);
   const localStreamRef = useRef<MediaStream | null>(null);
@@ -453,6 +457,8 @@ export default function VoiceChat() {
     
     setCurrentRoom(null);
     setParticipants([]);
+    setCurrentInviteCode(null);
+    setIsCreator(false);
     
     toast({
       title: 'Left voice chat',
@@ -492,6 +498,14 @@ export default function VoiceChat() {
       }
       
       const room = await response.json();
+      
+      // Save the invite code
+      if (room.inviteCode) {
+        setCurrentInviteCode(room.inviteCode);
+      }
+      
+      // Mark as room creator
+      setIsCreator(true);
       
       toast({
         title: 'Room created',
@@ -559,6 +573,49 @@ export default function VoiceChat() {
     );
   }
   
+  // Add a function to join room by invite code
+  const joinRoomByInviteCode = async () => {
+    if (!inviteCode.trim()) {
+      toast({
+        title: "Invite code required",
+        description: "Please enter a valid invite code",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    try {
+      const response = await fetch(`/api/voice-chat/rooms/invite/${inviteCode}`);
+      
+      if (!response.ok) {
+        throw new Error("Invalid invite code");
+      }
+      
+      const room = await response.json();
+      
+      // Close invite dialog
+      setInviteInputOpen(false);
+      setInviteCode("");
+      
+      // If room has password, prompt for it
+      if (room.hasPassword) {
+        setSelectedRoomId(room.id);
+        setRoomPassword('');
+        setPasswordInputOpen(true);
+      } else {
+        // No password, join directly
+        joinRoom(room.id);
+      }
+      
+    } catch (error) {
+      toast({
+        title: "Invalid invite code",
+        description: "Could not find a room with that invite code",
+        variant: "destructive"
+      });
+    }
+  };
+
   // Password dialog component
   const PasswordDialog = () => (
     <Dialog open={passwordInputOpen} onOpenChange={setPasswordInputOpen}>
@@ -590,6 +647,42 @@ export default function VoiceChat() {
               joinRoom(selectedRoomId!, roomPassword);
             }}
             disabled={!roomPassword.trim()}
+          >
+            Join Room
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+  
+  // Invite code dialog component
+  const InviteCodeDialog = () => (
+    <Dialog open={inviteInputOpen} onOpenChange={setInviteInputOpen}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Join with Invite Code</DialogTitle>
+          <DialogDescription>
+            Enter the invite code shared with you
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4 py-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Invite Code</label>
+            <Input
+              placeholder="Enter invite code"
+              value={inviteCode}
+              onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
+              className="font-mono"
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setInviteInputOpen(false)}>
+            Cancel
+          </Button>
+          <Button 
+            onClick={joinRoomByInviteCode}
+            disabled={!inviteCode.trim()}
           >
             Join Room
           </Button>
@@ -755,7 +848,32 @@ export default function VoiceChat() {
                       {participants.length <= 1 && (
                         <div className="text-center py-8 text-muted-foreground mt-4">
                           <p>Waiting for others to join...</p>
-                          <p className="text-sm">Share the room name with friends to chat together</p>
+                          {isCreator && currentInviteCode && (
+                            <div className="mt-4 p-3 bg-primary/5 rounded-md">
+                              <p className="font-medium text-sm mb-1">Invite Code:</p>
+                              <div className="flex items-center justify-center gap-2">
+                                <code className="px-2 py-1 bg-background rounded text-sm font-mono">
+                                  {currentInviteCode}
+                                </code>
+                                <Button 
+                                  size="icon" 
+                                  variant="ghost" 
+                                  className="h-6 w-6" 
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(currentInviteCode);
+                                    toast({
+                                      title: "Copied to clipboard",
+                                      description: "Your invite code has been copied to clipboard"
+                                    });
+                                  }}
+                                >
+                                  <Copy className="h-3 w-3" />
+                                </Button>
+                              </div>
+                              <p className="text-xs mt-2">Share this code with others to invite them</p>
+                            </div>
+                          )}
+                          <p className="text-sm mt-4">Share the room name with friends to chat together</p>
                         </div>
                       )}
                     </div>
