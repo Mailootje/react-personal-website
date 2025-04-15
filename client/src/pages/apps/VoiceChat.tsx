@@ -681,7 +681,12 @@ export default function VoiceChat() {
                         onClick={() => handleJoinRoom(room.id)}
                       >
                         <div>
-                          <h4 className="font-medium">{room.name}</h4>
+                          <h4 className="font-medium flex items-center">
+                            {room.name}
+                            {room.hasPassword && (
+                              <Lock className="h-3 w-3 ml-2 text-muted-foreground" />
+                            )}
+                          </h4>
                           <p className="text-sm text-muted-foreground flex items-center">
                             <Users className="h-3 w-3 mr-1" />
                             {room.participantCount} participants
