@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
 import { z } from "zod";
-import { ArrowLeft, Save, Loader2, ExternalLink, Upload, Image, X } from "lucide-react";
+import { ArrowLeft, Save, Loader2, ExternalLink, Upload, Image, X, FileText, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -26,6 +26,9 @@ import Container from "@/components/Container";
 import SectionHeading from "@/components/SectionHeading";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 // Extend the insert schema with extra validations
 const blogFormSchema = insertBlogPostSchema.extend({
@@ -327,15 +330,53 @@ export default function BlogForm() {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>Content</FormLabel>
-                            <FormControl>
-                              <Textarea
-                                placeholder="Enter post content..."
-                                className="h-64 font-mono"
-                                {...field}
-                              />
-                            </FormControl>
+                            <Tabs defaultValue="write" className="w-full">
+                              <TabsList className="grid w-full grid-cols-2 mb-2">
+                                <TabsTrigger value="write" className="flex items-center gap-2">
+                                  <FileText className="h-4 w-4" />
+                                  Write
+                                </TabsTrigger>
+                                <TabsTrigger value="preview" className="flex items-center gap-2">
+                                  <Eye className="h-4 w-4" />
+                                  Preview
+                                </TabsTrigger>
+                              </TabsList>
+                              <TabsContent value="write">
+                                <FormControl>
+                                  <Textarea
+                                    placeholder="Enter post content..."
+                                    className="h-64 font-mono"
+                                    {...field}
+                                  />
+                                </FormControl>
+                              </TabsContent>
+                              <TabsContent value="preview">
+                                <div className="h-64 overflow-auto p-4 border rounded-md bg-background">
+                                  <div className="prose dark:prose-invert max-w-none">
+                                    <ReactMarkdown
+                                      remarkPlugins={[remarkGfm]}
+                                      components={{
+                                        h1: ({node, ...props}) => <h1 className="text-3xl font-bold mt-8 mb-4" {...props} />,
+                                        h2: ({node, ...props}) => <h2 className="text-2xl font-bold mt-6 mb-3" {...props} />,
+                                        h3: ({node, ...props}) => <h3 className="text-xl font-bold mt-5 mb-2" {...props} />,
+                                        p: ({node, ...props}) => <p className="mb-4" {...props} />,
+                                        blockquote: ({node, ...props}) => (
+                                          <blockquote className="border-l-4 border-primary/70 pl-4 italic my-4" {...props} />
+                                        ),
+                                        ul: ({node, ...props}) => <ul className="list-disc pl-6 mb-4" {...props} />,
+                                        ol: ({node, ...props}) => <ol className="list-decimal pl-6 mb-4" {...props} />,
+                                        li: ({node, ...props}) => <li className="mb-1" {...props} />
+                                      }}
+                                    >
+                                      {field.value || '*No content yet*'}
+                                    </ReactMarkdown>
+                                  </div>
+                                </div>
+                              </TabsContent>
+                            </Tabs>
                             <FormDescription>
-                              Supports line breaks for paragraphs
+                              Supports Markdown formatting. Use # for headings, * for italic, ** for bold, 
+                              ``` for code blocks, &gt; for blockquotes, - for lists.
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
