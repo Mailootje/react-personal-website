@@ -456,6 +456,9 @@ export default function VoiceChat() {
     }
   };
   
+  // State for input before committing the username
+  const [usernameInput, setUsernameInput] = useState<string>('');
+  
   // If username is not set, show setup screen
   if (!username) {
     return (
@@ -473,14 +476,19 @@ export default function VoiceChat() {
                 <h3 className="text-lg font-medium mb-4">Enter your display name</h3>
                 <Input 
                   placeholder="Your name" 
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  value={usernameInput}
+                  onChange={(e) => setUsernameInput(e.target.value)}
                   className="mb-4"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && usernameInput.trim()) {
+                      setUsername(usernameInput.trim());
+                    }
+                  }}
                 />
                 <Button 
                   className="w-full"
-                  disabled={!username.trim()}
-                  onClick={() => setUsername(username.trim())}
+                  disabled={!usernameInput.trim()}
+                  onClick={() => setUsername(usernameInput.trim())}
                 >
                   Continue
                 </Button>
