@@ -91,10 +91,7 @@ export default function BlogForm() {
   // Create mutation for new posts
   const createMutation = useMutation({
     mutationFn: async (data: BlogFormData) => {
-      return apiRequest<BlogPost>("POST", { 
-        url: "/api/admin/blog/posts",
-        body: data
-      });
+      return apiRequest<BlogPost>("POST", "/api/admin/blog/posts", data);
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/blog/posts"] });
@@ -117,10 +114,7 @@ export default function BlogForm() {
   // Update mutation for existing posts
   const updateMutation = useMutation({
     mutationFn: async (data: BlogFormData) => {
-      return apiRequest<BlogPost>("PUT", { 
-        url: `/api/admin/blog/posts/${params.id}`,
-        body: data
-      });
+      return apiRequest<BlogPost>("PUT", `/api/admin/blog/posts/${params.id}`, data);
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/blog/posts"] });

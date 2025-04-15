@@ -68,9 +68,7 @@ export default function BlogAdmin() {
         queryParams.append("search", searchTerm);
       }
       
-      return apiRequest("GET", { 
-        url: `/api/admin/blog/posts?${queryParams.toString()}` 
-      });
+      return apiRequest("GET", `/api/admin/blog/posts?${queryParams.toString()}`);
     },
   });
 
