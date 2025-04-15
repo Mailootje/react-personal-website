@@ -366,7 +366,10 @@ export default function BlogForm() {
                                         ),
                                         ul: ({node, ...props}) => <ul className="list-disc pl-6 mb-4" {...props} />,
                                         ol: ({node, ...props}) => <ol className="list-decimal pl-6 mb-4" {...props} />,
-                                        li: ({node, ...props}) => <li className="mb-1" {...props} />
+                                        li: ({node, ...props}) => <li className="mb-1" {...props} />,
+                                        strong: ({node, ...props}) => <strong className="font-bold" {...props} />,
+                                        em: ({node, ...props}) => <em className="italic" {...props} />,
+                                        a: ({node, ...props}) => <a className="text-primary hover:underline" {...props} />
                                       }}
                                     >
                                       {field.value || '*No content yet*'}

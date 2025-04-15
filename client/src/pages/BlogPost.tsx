@@ -90,7 +90,9 @@ export default function BlogPostPage() {
                           ul: ({node, ...props}) => <ul className="list-disc pl-6 mb-4 text-white" {...props} />,
                           ol: ({node, ...props}) => <ol className="list-decimal pl-6 mb-4 text-white" {...props} />,
                           li: ({node, ...props}) => <li className="mb-1 text-white" {...props} />,
-                          a: ({node, ...props}) => <a className="text-primary hover:underline" {...props} />
+                          a: ({node, ...props}) => <a className="text-primary hover:underline" {...props} />,
+                          strong: ({node, ...props}) => <strong className="font-bold text-white" {...props} />,
+                          em: ({node, ...props}) => <em className="italic text-white" {...props} />
                         }}
                       >
                         {post.content}
