@@ -166,12 +166,24 @@ export default function VoiceChat() {
               }
               
               videoContainerRef.current.appendChild(videoElement);
-              if (peerConnection) {
-                peerConnection.videoElement = videoElement;
-              }
+              
+              // Add a label to indicate whose screen is being shared
+              const label = document.createElement('div');
+              label.className = 'absolute bottom-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-xs';
+              label.textContent = `${username}'s screen`;
+              videoContainerRef.current.appendChild(label);
+              
+              // Update peer connection with video element
+              peerConnectionsRef.current.set(socketId, {
+                ...peerConnection,
+                videoElement
+              });
               
               // Show video controls
               setShowVideoControls(true);
+            } else if (peerConnection.videoElement) {
+              // Update existing video element
+              peerConnection.videoElement.srcObject = event.streams[0];
             }
           }
         }
@@ -363,6 +375,22 @@ export default function VoiceChat() {
       if (isScreenSharing) {
         setShowVideoControls(true);
       } else {
+        // If this participant stopped sharing, clean up their video element
+        const peerConnection = peerConnectionsRef.current.get(socketId);
+        if (peerConnection && peerConnection.videoElement) {
+          // Remove the video element from the DOM
+          peerConnection.videoElement.srcObject = null;
+          if (peerConnection.videoElement.parentNode === videoContainerRef.current) {
+            videoContainerRef.current?.removeChild(peerConnection.videoElement);
+          }
+          
+          // Update the peer connection to remove the video element
+          peerConnectionsRef.current.set(socketId, {
+            ...peerConnection,
+            videoElement: undefined
+          });
+        }
+        
         // Check if any participant is still screen sharing
         const anyScreenSharing = participants.some(
           p => p.socketId !== socketId && p.isScreenSharing
