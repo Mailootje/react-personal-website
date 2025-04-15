@@ -29,6 +29,7 @@ import { Link } from "wouter";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import type { Components } from 'react-markdown';
 
 // Extend the insert schema with extra validations
 const blogFormSchema = insertBlogPostSchema.extend({
@@ -376,7 +377,7 @@ export default function BlogForm() {
                             </Tabs>
                             <FormDescription>
                               Supports Markdown formatting. Use # for headings, * for italic, ** for bold, 
-                              ``` for code blocks, &gt; for blockquotes, - for lists.
+                              {'```'} for code blocks, {'>'} for blockquotes, - for lists.
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
