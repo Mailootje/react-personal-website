@@ -1,21 +1,13 @@
-import { useState, useEffect, useRef } from 'react';
-import { useLocation } from 'wouter';
-import { io, Socket } from 'socket.io-client';
-import { Mic, MicOff, Phone, Users, Plus, X, Lock, Copy, Monitor, Video, VideoOff } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-  DialogDescription
-} from '@/components/ui/dialog';
-import { useToast } from '@/hooks/use-toast';
+import { useEffect, useRef, useState } from 'react';
 import Container from '@/components/Container';
 import SectionHeading from '@/components/SectionHeading';
+import { Button } from "@/components/ui/button";
+import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Mic, MicOff, Phone, Plus, Copy, Lock, Monitor, VideoOff } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { io, Socket } from 'socket.io-client';
 
 interface VoiceRoom {
   id: string;
@@ -40,79 +32,67 @@ interface PeerConnection {
 }
 
 export default function VoiceChat() {
-  const [location, navigate] = useLocation();
   const { toast } = useToast();
+  
+  // State
   const [username, setUsername] = useState<string>('');
-  const [currentRoom, setCurrentRoom] = useState<string | null>(null);
   const [rooms, setRooms] = useState<VoiceRoom[]>([]);
+  const [currentRoom, setCurrentRoom] = useState<string | null>(null);
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [isJoiningRoom, setIsJoiningRoom] = useState<boolean>(false);
+  const [isCreateRoomOpen, setIsCreateRoomOpen] = useState<boolean>(false);
   const [newRoomName, setNewRoomName] = useState<string>('');
   const [newRoomPassword, setNewRoomPassword] = useState<string>('');
-  const [isCreateRoomOpen, setIsCreateRoomOpen] = useState<boolean>(false);
-  const [passwordInputOpen, setPasswordInputOpen] = useState<boolean>(false);
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
   const [roomPassword, setRoomPassword] = useState<string>('');
-  const [currentInviteCode, setCurrentInviteCode] = useState<string | null>(null);
+  const [passwordInputOpen, setPasswordInputOpen] = useState<boolean>(false);
   const [inviteInputOpen, setInviteInputOpen] = useState<boolean>(false);
   const [inviteCode, setInviteCode] = useState<string>('');
+  const [currentInviteCode, setCurrentInviteCode] = useState<string | null>(null);
   const [isCreator, setIsCreator] = useState<boolean>(false);
   const [isScreenSharing, setIsScreenSharing] = useState<boolean>(false);
   const [showVideoControls, setShowVideoControls] = useState<boolean>(false);
   
+  // Refs
   const socketRef = useRef<Socket | null>(null);
   const localStreamRef = useRef<MediaStream | null>(null);
   const screenStreamRef = useRef<MediaStream | null>(null);
   const peerConnectionsRef = useRef<Map<string, PeerConnection>>(new Map());
-  const videoContainerRef = useRef<HTMLDivElement>(null);
+  const videoContainerRef = useRef<HTMLDivElement | null>(null);
   
-  // Connect to socket server and set up local stream
+  // Initialize socket connection and get local media stream
   useEffect(() => {
     if (!username) return;
     
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${protocol}//${window.location.host}`;
+    // Create socket connection
+    socketRef.current = io('/');
     
-    socketRef.current = io(wsUrl, { path: '/ws' });
-    
-    // Set up socket event listeners
-    socketRef.current.on('connect', () => {
-      console.log('Connected to voice chat server');
-      
-      // Request microphone access
-      navigator.mediaDevices.getUserMedia({ audio: true, video: false })
-        .then((stream) => {
-          localStreamRef.current = stream;
-          
-          if (isMuted) {
-            stream.getAudioTracks().forEach(track => {
-              track.enabled = false;
-            });
-          }
-          
-          toast({
-            title: 'Microphone connected',
-            description: 'Your microphone is now active'
-          });
-        })
-        .catch((error) => {
-          console.error('Error accessing microphone:', error);
-          toast({
-            title: 'Microphone access denied',
-            description: 'Please allow microphone access to use voice chat',
-            variant: 'destructive'
-          });
+    // Initialize audio stream
+    navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+      .then(stream => {
+        localStreamRef.current = stream;
+        setIsMuted(false);
+      })
+      .catch(error => {
+        console.error('Error accessing microphone:', error);
+        toast({
+          title: 'Microphone access denied',
+          description: 'Please allow microphone access to use voice chat',
+          variant: 'destructive'
         });
+      });
+    
+    // Handle connecting to peers when joining a room
+    socketRef.current.on('connect', () => {
+      console.log('Connected to signaling server');
     });
     
-    // Handle new user joining room
-    socketRef.current.on('userJoined', async ({ socketId, username }) => {
-      console.log(`User joined: ${username} (${socketId})`);
+    // Handle new users joining and create peer connections
+    socketRef.current.on('newUser', async ({ socketId, username }) => {
+      console.log(`New user joined: ${username} (${socketId})`);
       
-      if (!localStreamRef.current) return;
-      
-      // Create new peer connection
+      // Create a peer connection
       const peerConnection = new RTCPeerConnection({
         iceServers: [
           { urls: 'stun:stun.l.google.com:19302' },
@@ -120,14 +100,25 @@ export default function VoiceChat() {
         ]
       });
       
-      // Add local tracks to the connection
-      localStreamRef.current.getTracks().forEach(track => {
-        if (localStreamRef.current) {
-          peerConnection.addTrack(track, localStreamRef.current);
-        }
-      });
+      // Add local tracks to peer connection
+      if (localStreamRef.current) {
+        localStreamRef.current.getTracks().forEach(track => {
+          if (localStreamRef.current) {
+            peerConnection.addTrack(track, localStreamRef.current);
+          }
+        });
+      }
       
-      // Create audio element for remote stream
+      // Add screen sharing tracks if active
+      if (screenStreamRef.current) {
+        screenStreamRef.current.getTracks().forEach(track => {
+          if (screenStreamRef.current) {
+            peerConnection.addTrack(track, screenStreamRef.current);
+          }
+        });
+      }
+      
+      // Create audio element for remote audio
       const audioElement = new Audio();
       audioElement.autoplay = true;
       
@@ -140,8 +131,8 @@ export default function VoiceChat() {
       
       // Handle ICE candidates
       peerConnection.onicecandidate = (event) => {
-        if (event.candidate) {
-          socketRef.current?.emit('signal', {
+        if (event.candidate && socketRef.current) {
+          socketRef.current.emit('signal', {
             to: socketId,
             from: socketRef.current.id,
             signal: { type: 'ice-candidate', ice: event.candidate }
@@ -175,7 +166,9 @@ export default function VoiceChat() {
               }
               
               videoContainerRef.current.appendChild(videoElement);
-              peerConnection.videoElement = videoElement;
+              if (peerConnection) {
+                peerConnection.videoElement = videoElement;
+              }
               
               // Show video controls
               setShowVideoControls(true);
@@ -258,26 +251,39 @@ export default function VoiceChat() {
               }
               
               videoContainerRef.current.appendChild(videoElement);
-              peerConnection.videoElement = videoElement;
+              
+              // Create a new object with videoElement
+              const newPeerConnection = {
+                username: 'Unknown', // Will be updated when we get room info
+                pc,
+                audioElement,
+                videoElement
+              };
+              
+              // Store peer connection with video element
+              peerConnectionsRef.current.set(from, newPeerConnection);
               
               // Show video controls
               setShowVideoControls(true);
+              
+              // Use the updated peerConnection for further operations
+              peerConnection = newPeerConnection;
             }
+          } else {
+            // Store peer connection without video element
+            peerConnectionsRef.current.set(from, {
+              username: 'Unknown', // Will be updated when we get room info
+              pc,
+              audioElement
+            });
+            
+            peerConnection = { username: 'Unknown', pc, audioElement };
           }
         };
-        
-        // Store peer connection
-        peerConnectionsRef.current.set(from, {
-          username: 'Unknown', // Will be updated when we get room info
-          pc,
-          audioElement
-        });
-        
-        peerConnection = { username: 'Unknown', pc, audioElement };
       }
       
       // Handle different signal types
-      if (signal.type === 'offer') {
+      if (signal.type === 'offer' && peerConnection) {
         await peerConnection.pc.setRemoteDescription(new RTCSessionDescription(signal.sdp));
         const answer = await peerConnection.pc.createAnswer();
         await peerConnection.pc.setLocalDescription(answer);
@@ -289,9 +295,9 @@ export default function VoiceChat() {
             signal: { type: 'answer', sdp: peerConnection.pc.localDescription }
           });
         }
-      } else if (signal.type === 'answer') {
+      } else if (signal.type === 'answer' && peerConnection) {
         await peerConnection.pc.setRemoteDescription(new RTCSessionDescription(signal.sdp));
-      } else if (signal.type === 'ice-candidate') {
+      } else if (signal.type === 'ice-candidate' && peerConnection) {
         try {
           await peerConnection.pc.addIceCandidate(new RTCIceCandidate(signal.ice));
         } catch (error) {
@@ -854,14 +860,14 @@ export default function VoiceChat() {
     </Dialog>
   );
   
-  // Invite code dialog component
+  // Invite code input dialog
   const InviteCodeDialog = () => (
     <Dialog open={inviteInputOpen} onOpenChange={setInviteInputOpen}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Join with Invite Code</DialogTitle>
           <DialogDescription>
-            Enter the invite code shared with you
+            Enter the invite code to join a private voice chat room
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
@@ -870,8 +876,7 @@ export default function VoiceChat() {
             <Input
               placeholder="Enter invite code"
               value={inviteCode}
-              onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
-              className="font-mono"
+              onChange={(e) => setInviteCode(e.target.value)}
               onKeyDown={(e) => {
                 // Prevent form submission on Enter key
                 if (e.key === 'Enter') {
@@ -899,120 +904,69 @@ export default function VoiceChat() {
   return (
     <div className="flex flex-col min-h-screen">
       <div className="flex-1 bg-background pt-20">
-        <Container className="py-8">
-          {/* Render dialogs */}
-          <PasswordDialog />
-          <InviteCodeDialog />
-          
+        <Container className="py-16">
           <SectionHeading
             subtitle="VOICE CHAT"
-            title="Live Conversations"
+            title="Connect with Voice"
+            description="Create or join voice chat rooms to talk with friends in real-time"
           />
           
-          <div className="grid md:grid-cols-3 gap-6 mt-8">
-            {/* Room List Section */}
-            <div className="md:col-span-1">
-              <div className="bg-card border border-border rounded-lg shadow-lg p-4">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-medium">Voice Rooms</h3>
-                  <Dialog open={isCreateRoomOpen} onOpenChange={setIsCreateRoomOpen}>
-                    <DialogTrigger asChild>
-                      <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
-                        <Plus className="h-4 w-4" />
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Create a New Voice Room</DialogTitle>
-                      </DialogHeader>
-                      <div className="space-y-4 py-4">
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium">Room Name</label>
-                          <Input
-                            placeholder="Room name"
-                            value={newRoomName}
-                            onChange={(e) => setNewRoomName(e.target.value)}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium">Password (Optional)</label>
-                          <Input
-                            type="password"
-                            placeholder="Leave empty for public room"
-                            value={newRoomPassword}
-                            onChange={(e) => setNewRoomPassword(e.target.value)}
-                          />
-                          <p className="text-sm text-muted-foreground">
-                            Add a password to create a private room
-                          </p>
-                        </div>
-                      </div>
-                      <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsCreateRoomOpen(false)}>
-                          Cancel
-                        </Button>
-                        <Button onClick={createRoom}>
-                          Create Room
-                        </Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
-                </div>
+          <div className="mt-8 bg-card border border-border rounded-lg shadow-lg overflow-hidden">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4">
+              <div className="border-r border-border/50 md:col-span-1 lg:col-span-1 p-4">
+                <h3 className="text-lg font-medium mb-4">Available Rooms</h3>
                 
-                {rooms.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Users className="h-12 w-12 mx-auto mb-2 opacity-20" />
-                    <p>No voice rooms available</p>
-                    <p className="text-sm">Create a new room to get started</p>
+                {isJoiningRoom ? (
+                  <div className="py-8 text-center text-muted-foreground">
+                    <p>Joining room...</p>
                   </div>
                 ) : (
-                  <div className="space-y-2">
-                    {rooms.map((room) => (
-                      <div 
-                        key={room.id}
-                        className={`flex justify-between items-center p-3 rounded-md hover:bg-accent/50 cursor-pointer transition-colors ${
-                          currentRoom === room.id ? 'bg-accent text-accent-foreground' : ''
-                        }`}
-                        onClick={() => handleJoinRoom(room.id)}
-                      >
-                        <div>
-                          <h4 className="font-medium flex items-center">
-                            {room.name}
-                            {room.hasPassword && (
-                              <span className="ml-2 text-muted-foreground">
-                                <Lock className="h-3 w-3" />
-                              </span>
-                            )}
-                          </h4>
-                          <p className="text-sm text-muted-foreground flex items-center">
-                            <Users className="h-3 w-3 mr-1" />
-                            {room.participantCount} participants
-                          </p>
-                        </div>
-                        <Button 
-                          size="sm" 
-                          variant={currentRoom === room.id ? "secondary" : "outline"}
-                          disabled={isJoiningRoom}
-                        >
-                          {currentRoom === room.id ? 'Joined' : 'Join'}
-                        </Button>
+                  <ScrollArea className="h-[calc(100vh-400px)]">
+                    {rooms.length === 0 ? (
+                      <div className="py-8 text-center text-muted-foreground">
+                        <p>No rooms available</p>
+                        <p className="text-sm mt-2">Create a new room to get started</p>
                       </div>
-                    ))}
-                  </div>
+                    ) : (
+                      <div className="space-y-3 pr-4">
+                        {rooms.map(room => (
+                          <div 
+                            key={room.id} 
+                            className={`p-3 rounded-md border transition-colors cursor-pointer ${
+                              currentRoom === room.id 
+                                ? 'bg-primary/10 border-primary/30' 
+                                : 'border-border/50 hover:bg-accent/50'
+                            }`}
+                            onClick={() => handleJoinRoom(room.id)}
+                          >
+                            <div className="flex justify-between items-center mb-2">
+                              <h4 className="font-medium">{room.name}</h4>
+                              {room.hasPassword && (
+                                <Lock className="h-3.5 w-3.5 text-muted-foreground" />
+                              )}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              {room.participantCount} {room.participantCount === 1 ? 'participant' : 'participants'}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </ScrollArea>
                 )}
+                
+                <PasswordDialog />
+                <InviteCodeDialog />
               </div>
-            </div>
-            
-            {/* Active Call Section */}
-            <div className="md:col-span-2">
-              <div className="bg-card border border-border rounded-lg shadow-lg p-4 h-full flex flex-col">
+              
+              <div className="md:col-span-2 lg:col-span-3 p-4">
                 {currentRoom ? (
                   <>
                     <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-lg font-medium">
-                        {rooms.find(r => r.id === currentRoom)?.name || 'Voice Chat'}
+                      <h3 className="font-medium">
+                        {rooms.find(r => r.id === currentRoom)?.name || 'Voice Room'}
                       </h3>
-                      <div className="text-sm text-muted-foreground">
+                      <div className="text-xs text-muted-foreground">
                         {participants.length} participants
                       </div>
                     </div>
