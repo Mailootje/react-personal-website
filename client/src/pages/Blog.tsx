@@ -7,13 +7,20 @@ import { Button } from "@/components/ui/button";
 import { BlogPost } from "@shared/schema";
 import Container from "@/components/Container";
 import SectionHeading from "@/components/SectionHeading";
+import { apiRequest } from "@/lib/queryClient";
 
 export default function Blog() {
   const { data, isLoading, error } = useQuery<{ posts: BlogPost[], meta: { total: number, limit: number, offset: number } }>({
     queryKey: ["/api/blog/posts"],
+    queryFn: async () => {
+      return await apiRequest("GET", "/api/blog/posts");
+    },
   });
   
   const posts = data?.posts;
+  console.log("Blog data:", data);
+  console.log("Posts:", posts);
+  console.log("isLoading:", isLoading);
 
   return (
     <div className="min-h-screen pt-20 pb-16">
