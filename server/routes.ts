@@ -1427,7 +1427,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const pastDate = new Date();
       pastDate.setFullYear(pastDate.getFullYear() - 1);
       
-      // This is a workaround - in a real implementation, we'd add a proper delete method
+      // First, update the link to expire in the past
+      await storage.updateShortenedLink(shortCode, {
+        expiresAt: pastDate
+      });
+      
+      // Then clean up all expired links
       await storage.cleanupExpiredLinks();
       
       res.status(204).end();
