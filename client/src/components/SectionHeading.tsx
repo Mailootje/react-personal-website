@@ -1,9 +1,10 @@
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
-interface SectionHeadingProps {
+export interface SectionHeadingProps {
   subtitle: string;
   title: string;
+  description?: string;
   center?: boolean;
   className?: string;
   isDark?: boolean;
@@ -12,6 +13,7 @@ interface SectionHeadingProps {
 export default function SectionHeading({
   subtitle,
   title,
+  description,
   center = true,
   className,
   isDark = false,
