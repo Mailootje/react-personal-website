@@ -8,7 +8,10 @@ import {
   Search, 
   FilterX,
   Calendar,
-  ArrowLeft
+  ArrowLeft,
+  Pencil,
+  Save,
+  X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,8 +41,19 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
+import { useForm } from "react-hook-form";
 
 interface LinksResponse {
   links: ShortenedLink[];
@@ -50,10 +64,16 @@ interface LinksResponse {
   };
 }
 
+interface EditLinkFormData {
+  originalUrl: string;
+}
+
 export default function LinksAdmin() {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [editingLink, setEditingLink] = useState<ShortenedLink | null>(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const limit = 10;
 
   const { data, isLoading, error } = useQuery<LinksResponse>({
@@ -70,6 +90,29 @@ export default function LinksAdmin() {
       }
       
       return apiRequest("GET", `/api/admin/links?${queryParams.toString()}`);
+    },
+  });
+
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<EditLinkFormData>();
+
+  const updateMutation = useMutation({
+    mutationFn: async ({ shortCode, data }: { shortCode: string, data: EditLinkFormData }) => {
+      return apiRequest("PUT", `/api/admin/links/${shortCode}`, data);
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/links"] });
+      toast({
+        title: "Success",
+        description: `Link "${variables.shortCode}" has been updated.`,
+      });
+      setEditDialogOpen(false);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: `Failed to update link: ${error.message}`,
+        variant: "destructive",
+      });
     },
   });
 
@@ -96,6 +139,21 @@ export default function LinksAdmin() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setCurrentPage(1); // Reset to first page on new search
+  };
+
+  const handleEditClick = (link: ShortenedLink) => {
+    setEditingLink(link);
+    reset({ originalUrl: link.originalUrl });
+    setEditDialogOpen(true);
+  };
+
+  const onSubmitEdit = (formData: EditLinkFormData) => {
+    if (editingLink) {
+      updateMutation.mutate({
+        shortCode: editingLink.shortCode,
+        data: formData
+      });
+    }
   };
 
   const totalPages = data ? Math.ceil(data.meta.total / limit) : 0;
@@ -215,6 +273,14 @@ export default function LinksAdmin() {
                                         <ExternalLink className="h-4 w-4" />
                                       </Button>
                                     </a>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="icon" 
+                                      title="Edit Link"
+                                      onClick={() => handleEditClick(link)}
+                                    >
+                                      <Pencil className="h-4 w-4 text-blue-500" />
+                                    </Button>
                                     <AlertDialog>
                                       <AlertDialogTrigger asChild>
                                         <Button variant="ghost" size="icon" title="Delete">
@@ -284,6 +350,63 @@ export default function LinksAdmin() {
         </div>
       </div>
       <Footer />
+      
+      {/* Edit Link Dialog */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Shortened Link</DialogTitle>
+            <DialogDescription>
+              Update the destination URL for short code: {editingLink?.shortCode}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <form onSubmit={handleSubmit(onSubmitEdit)}>
+            <div className="mt-4 space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="originalUrl">Destination URL</Label>
+                <Input
+                  id="originalUrl"
+                  {...register("originalUrl", { 
+                    required: "Destination URL is required",
+                    pattern: {
+                      value: /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/,
+                      message: "Please enter a valid URL"
+                    }
+                  })}
+                  className={errors.originalUrl ? "border-red-500" : ""}
+                  placeholder="https://example.com"
+                />
+                {errors.originalUrl && (
+                  <p className="text-red-500 text-sm">{errors.originalUrl.message}</p>
+                )}
+              </div>
+            </div>
+            
+            <DialogFooter className="mt-6">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setEditDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={updateMutation.isPending}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                {updateMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                ) : (
+                  <Save className="h-4 w-4 mr-2" />
+                )}
+                Save Changes
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
