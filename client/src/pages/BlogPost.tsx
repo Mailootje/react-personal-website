@@ -53,7 +53,7 @@ export default function BlogPostPage() {
                   </Button>
                 </div>
               ) : post ? (
-                <div className="bg-card/50 backdrop-blur-sm rounded-xl overflow-hidden border border-border/50 shadow-lg">
+                <div className="bg-black/80 backdrop-blur-sm rounded-xl overflow-hidden border border-border/50 shadow-lg">
                   {(post.imageUrl || (post.imageData && post.imageType)) && (
                     <div className="aspect-[21/9] w-full overflow-hidden">
                       <img
@@ -67,7 +67,7 @@ export default function BlogPostPage() {
                   <div className="p-6 md:p-8">
                     <h1 className="text-3xl md:text-4xl font-bold mb-4">{post.title}</h1>
                     
-                    <div className="flex items-center text-muted-foreground mb-6">
+                    <div className="flex items-center text-white/80 mb-6">
                       <Calendar className="h-4 w-4 mr-2" />
                       <span>{format(new Date(post.createdAt), 'MMMM d, yyyy')}</span>
                       
@@ -78,18 +78,18 @@ export default function BlogPostPage() {
                       )}
                     </div>
                     
-                    <div className="prose prose-lg dark:prose-invert max-w-none markdown-content">
+                    <div className="prose prose-lg dark:prose-invert max-w-none markdown-content text-white">
                       <ReactMarkdown 
                         remarkPlugins={[remarkGfm]}
                         components={{
-                          h1: ({node, ...props}) => <h1 className="text-3xl font-bold mt-8 mb-4" {...props} />,
-                          h2: ({node, ...props}) => <h2 className="text-2xl font-bold mt-6 mb-3" {...props} />,
-                          h3: ({node, ...props}) => <h3 className="text-xl font-bold mt-5 mb-2" {...props} />,
-                          p: ({node, ...props}) => <p className="mb-4" {...props} />,
-                          blockquote: ({node, ...props}) => <blockquote className="border-l-4 border-primary/70 pl-4 italic my-4" {...props} />,
-                          ul: ({node, ...props}) => <ul className="list-disc pl-6 mb-4" {...props} />,
-                          ol: ({node, ...props}) => <ol className="list-decimal pl-6 mb-4" {...props} />,
-                          li: ({node, ...props}) => <li className="mb-1" {...props} />,
+                          h1: ({node, ...props}) => <h1 className="text-3xl font-bold mt-8 mb-4 text-white" {...props} />,
+                          h2: ({node, ...props}) => <h2 className="text-2xl font-bold mt-6 mb-3 text-white" {...props} />,
+                          h3: ({node, ...props}) => <h3 className="text-xl font-bold mt-5 mb-2 text-white" {...props} />,
+                          p: ({node, ...props}) => <p className="mb-4 text-white" {...props} />,
+                          blockquote: ({node, ...props}) => <blockquote className="border-l-4 border-primary/70 pl-4 italic my-4 text-white/90" {...props} />,
+                          ul: ({node, ...props}) => <ul className="list-disc pl-6 mb-4 text-white" {...props} />,
+                          ol: ({node, ...props}) => <ol className="list-decimal pl-6 mb-4 text-white" {...props} />,
+                          li: ({node, ...props}) => <li className="mb-1 text-white" {...props} />,
                           a: ({node, ...props}) => <a className="text-primary hover:underline" {...props} />
                         }}
                       >
