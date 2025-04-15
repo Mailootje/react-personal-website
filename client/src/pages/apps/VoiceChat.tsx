@@ -576,12 +576,6 @@ export default function VoiceChat() {
               placeholder="Enter room password"
               value={roomPassword}
               onChange={(e) => setRoomPassword(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && roomPassword.trim()) {
-                  setPasswordInputOpen(false);
-                  joinRoom(selectedRoomId!, roomPassword);
-                }
-              }}
             />
           </div>
         </div>
