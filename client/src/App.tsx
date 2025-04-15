@@ -4,6 +4,8 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { DarkModeProvider } from "@/components/DarkModeProvider";
 import { VideoBackground } from "@/components/VideoBackground";
+import { AuthProvider } from "@/hooks/use-auth";
+import { ProtectedRoute, AdminRoute } from "@/lib/protected-route";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import Photography from "@/pages/Photography";
@@ -35,6 +37,11 @@ import PacmanBasic from "@/pages/games/PacmanBasic";
 import EuroTruckSimulator2 from "@/pages/downloads/EuroTruckSimulator2";
 import AmericanTruckSimulator from "@/pages/downloads/AmericanTruckSimulator";
 import SchoolPitch from "@/pages/personal/school/Pitch";
+import Blog from "@/pages/Blog";
+import BlogPost from "@/pages/BlogPost";
+import AuthPage from "@/pages/auth-page";
+import BlogAdmin from "@/pages/admin/BlogAdmin";
+import BlogForm from "@/pages/admin/BlogForm";
 
 function Router() {
   return (
