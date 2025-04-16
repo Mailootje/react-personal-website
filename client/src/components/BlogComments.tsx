@@ -42,6 +42,9 @@ export function BlogComments({ postId }: BlogCommentsProps) {
   // Fetch comments
   const { data: comments, isLoading, error } = useQuery<Comment[]>({
     queryKey: [`/api/blog/posts/${postId}/comments`],
+    queryFn: async () => {
+      return await apiRequest('GET', `/api/blog/posts/${postId}/comments`);
+    },
     enabled: Boolean(postId),
   });
   
@@ -55,6 +58,11 @@ export function BlogComments({ postId }: BlogCommentsProps) {
       queryClient.invalidateQueries({ queryKey: [`/api/blog/posts/${postId}/comments`] });
       // Also update the post to refresh the comment count
       queryClient.invalidateQueries({ queryKey: ['/api/blog/posts'] });
+      // Update the individual blog post view
+      const slug = window.location.pathname.split('/blog/')[1];
+      if (slug) {
+        queryClient.invalidateQueries({ queryKey: [`/api/blog/posts/${slug}`] });
+      }
       toast({
         title: 'Comment added',
         description: 'Your comment has been added successfully.'
@@ -78,6 +86,9 @@ export function BlogComments({ postId }: BlogCommentsProps) {
       setEditingCommentId(null);
       setEditText('');
       queryClient.invalidateQueries({ queryKey: [`/api/blog/posts/${postId}/comments`] });
+      // No need to update the comment count since we're just editing content
+      // But good to refresh the posts lists to ensure consistency
+      queryClient.invalidateQueries({ queryKey: ['/api/blog/posts'] });
       toast({
         title: 'Comment updated',
         description: 'Your comment has been updated successfully.'
@@ -101,6 +112,11 @@ export function BlogComments({ postId }: BlogCommentsProps) {
       queryClient.invalidateQueries({ queryKey: [`/api/blog/posts/${postId}/comments`] });
       // Also update the post to refresh the comment count
       queryClient.invalidateQueries({ queryKey: ['/api/blog/posts'] });
+      // Update the individual blog post view
+      const slug = window.location.pathname.split('/blog/')[1];
+      if (slug) {
+        queryClient.invalidateQueries({ queryKey: [`/api/blog/posts/${slug}`] });
+      }
       toast({
         title: 'Comment deleted',
         description: 'Your comment has been deleted successfully.'
