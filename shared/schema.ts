@@ -7,7 +7,7 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   email: text("email"),
-  profilePicture: text("profile_picture"), // Will keep for backward compatibility
+  // Removed profilePicture field since we now use profileImageData
   profileImageData: text("profile_image_data"), // Store base64 encoded profile image
   profileImageType: text("profile_image_type"), // Store profile image MIME type
   isAdmin: boolean("is_admin").default(false).notNull(),
@@ -18,7 +18,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
   email: true,
-  profilePicture: true,
+  // Removed profilePicture from schema
   profileImageData: true,
   profileImageType: true,
   isAdmin: true,

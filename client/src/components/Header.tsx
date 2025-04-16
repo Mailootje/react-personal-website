@@ -60,12 +60,6 @@ export function Header() {
                 alt={user.username} 
                 className="w-full h-full object-cover"
               />
-            ) : user?.profilePicture ? (
-              <img 
-                src={user.profilePicture} 
-                alt={user.username} 
-                className="w-full h-full object-cover"
-              />
             ) : (
               <img 
                 src="/assets/images/profile/profile-photo.webp" 
