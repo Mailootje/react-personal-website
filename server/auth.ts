@@ -394,84 +394,131 @@ export const registerAuthRoutes = (app: Express) => {
       }
       
       const userId = req.session.userId;
+      log(`Processing profile picture upload for user ID: ${userId}`, 'auth');
+      
       const user = await storage.getUser(userId);
       
       if (!user) {
+        log(`User with ID ${userId} not found`, 'auth');
         return res.status(404).json({ error: 'User not found' });
       }
       
       // Check if image data was sent
       if (!req.body.image) {
+        log('No image data provided in request body', 'auth');
         return res.status(400).json({ error: 'No image provided' });
       }
       
-      // Import necessary utilities for image processing
-      const { 
-        convertToWebP, 
-        saveProfileImage, 
-        deleteProfileImage, 
-        isValidImageType, 
-        isFileTooLarge 
-      } = require('./imageUtils');
-      
-      // Parse the base64 image
-      const imageData = req.body.image;
-      const matches = imageData.match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
-      
-      if (!matches || matches.length !== 3) {
-        return res.status(400).json({ error: 'Invalid image format' });
-      }
-      
-      const imageType = matches[1];
-      const base64Data = matches[2];
-      const imageBuffer = Buffer.from(base64Data, 'base64');
-      
-      // Validate image type
-      if (!isValidImageType(imageType)) {
-        return res.status(400).json({ 
-          error: 'Invalid image type. Only JPEG, PNG, GIF, and WebP are supported.' 
+      try {
+        // Import necessary utilities for image processing
+        const { 
+          convertToWebP, 
+          saveProfileImage, 
+          deleteProfileImage, 
+          isValidImageType, 
+          isFileTooLarge 
+        } = require('./imageUtils');
+        
+        // Parse the base64 image
+        const imageData = req.body.image;
+        const matches = imageData.match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
+        
+        if (!matches || matches.length !== 3) {
+          log('Invalid image format - failed to parse base64 data', 'auth');
+          return res.status(400).json({ error: 'Invalid image format' });
+        }
+        
+        const imageType = matches[1];
+        const base64Data = matches[2];
+        log(`Image type detected: ${imageType}, processing...`, 'auth');
+        
+        // Create buffer from base64
+        let imageBuffer;
+        try {
+          imageBuffer = Buffer.from(base64Data, 'base64');
+          log(`Created buffer from base64 data, size: ${imageBuffer.length} bytes`, 'auth');
+        } catch (bufferError) {
+          log(`Error creating buffer from base64: ${bufferError}`, 'auth');
+          return res.status(400).json({ error: 'Invalid base64 data' });
+        }
+        
+        // Validate image type
+        if (!isValidImageType(imageType)) {
+          log(`Invalid image type: ${imageType}`, 'auth');
+          return res.status(400).json({ 
+            error: 'Invalid image type. Only JPEG, PNG, GIF, and WebP are supported.' 
+          });
+        }
+        
+        // Validate file size (max 5MB)
+        if (isFileTooLarge(imageBuffer.length)) {
+          log(`Image too large: ${imageBuffer.length} bytes`, 'auth');
+          return res.status(400).json({ 
+            error: 'Image too large. Maximum size is 5MB.' 
+          });
+        }
+        
+        // Convert to WebP, resize to 256x256, and optimize
+        log('Converting image to WebP format...', 'auth');
+        let webpBuffer;
+        try {
+          webpBuffer = await convertToWebP(imageBuffer);
+          log(`Converted to WebP, new size: ${webpBuffer.length} bytes`, 'auth');
+        } catch (conversionError) {
+          log(`Error converting image to WebP: ${conversionError}`, 'auth');
+          return res.status(500).json({ error: 'Failed to process image' });
+        }
+        
+        // Delete old profile picture if exists
+        if (user.profilePicture) {
+          log(`Deleting existing profile picture: ${user.profilePicture}`, 'auth');
+          try {
+            await deleteProfileImage(user.profilePicture);
+          } catch (deleteError) {
+            log(`Warning: Failed to delete old profile picture: ${deleteError}`, 'auth');
+            // Continue with the process even if deletion fails
+          }
+        }
+        
+        // Save the new profile picture
+        log('Saving new profile picture...', 'auth');
+        let profilePicturePath;
+        try {
+          profilePicturePath = await saveProfileImage(webpBuffer);
+          log(`Saved new profile picture at: ${profilePicturePath}`, 'auth');
+        } catch (saveError) {
+          log(`Error saving profile picture: ${saveError}`, 'auth');
+          return res.status(500).json({ error: 'Failed to save image' });
+        }
+        
+        // Update user record with the new profile picture path
+        log(`Updating user record with new profile picture path`, 'auth');
+        const updatedUser = await storage.updateUser(userId, {
+          profilePicture: profilePicturePath
         });
-      }
-      
-      // Validate file size (max 5MB)
-      if (isFileTooLarge(imageBuffer.length)) {
-        return res.status(400).json({ 
-          error: 'Image too large. Maximum size is 5MB.' 
+        
+        if (!updatedUser) {
+          log('Failed to update user record with new profile picture', 'auth');
+          return res.status(500).json({ error: 'Failed to update user profile' });
+        }
+        
+        // Return updated user without password
+        const { password: _, ...userWithoutPassword } = updatedUser;
+        log('Profile picture update successful', 'auth');
+        
+        res.setHeader("Content-Type", "application/json");
+        return res.json({
+          success: true,
+          user: userWithoutPassword,
+          profilePicture: profilePicturePath
         });
+      } catch (processingError) {
+        log(`Error in image processing: ${processingError}`, 'auth');
+        return res.status(500).json({ error: 'Failed to process image' });
       }
-      
-      // Convert to WebP, resize to 256x256, and optimize
-      const webpBuffer = await convertToWebP(imageBuffer);
-      
-      // Delete old profile picture if exists
-      if (user.profilePicture) {
-        await deleteProfileImage(user.profilePicture);
-      }
-      
-      // Save the new profile picture
-      const profilePicturePath = await saveProfileImage(webpBuffer);
-      log(`Saved new profile picture for user ${user.username} at ${profilePicturePath}`, 'auth');
-      
-      // Update user record with the new profile picture path
-      const updatedUser = await storage.updateUser(userId, {
-        profilePicture: profilePicturePath
-      });
-      
-      if (!updatedUser) {
-        return res.status(500).json({ error: 'Failed to update user profile' });
-      }
-      
-      // Return updated user without password
-      const { password: _, ...userWithoutPassword } = updatedUser;
-      res.setHeader("Content-Type", "application/json");
-      res.json({
-        success: true,
-        user: userWithoutPassword,
-        profilePicture: profilePicturePath
-      });
     } catch (error) {
       log(`Error uploading profile picture: ${error}`, 'auth');
-      res.status(500).json({ error: 'Failed to upload profile picture' });
+      return res.status(500).json({ error: 'Failed to upload profile picture' });
     }
   });
   
