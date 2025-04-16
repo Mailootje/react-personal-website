@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { Redirect } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -6,16 +6,31 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2 } from "lucide-react";
+import { Loader2, User, Mail, Lock } from "lucide-react";
 import Container from "@/components/Container";
 
 export default function AuthPage() {
   const { user, isLoading, loginMutation, registerMutation } = useAuth();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [loginUsername, setLoginUsername] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [registerUsername, setRegisterUsername] = useState("");
+  const [registerPassword, setRegisterPassword] = useState("");
   const [email, setEmail] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [activeTab, setActiveTab] = useState("login");
+
+  // Reset form fields when switching tabs
+  useEffect(() => {
+    if (activeTab === "login") {
+      setRegisterUsername("");
+      setRegisterPassword("");
+      setEmail("");
+      setConfirmPassword("");
+    } else {
+      setLoginUsername("");
+      setLoginPassword("");
+    }
+  }, [activeTab]);
 
   // Redirect to home if user is already logged in
   if (user) {
@@ -24,24 +39,31 @@ export default function AuthPage() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    loginMutation.mutate({ username, password });
+    loginMutation.mutate({ 
+      username: loginUsername, 
+      password: loginPassword 
+    });
   };
 
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
-    if (password !== confirmPassword) {
+    if (registerPassword !== confirmPassword) {
       // Toast error is handled by validation
       return;
     }
-    registerMutation.mutate({ username, password, email });
+    registerMutation.mutate({ 
+      username: registerUsername, 
+      password: registerPassword, 
+      email 
+    });
   };
 
   // Determine if register button should be disabled
   const isRegisterDisabled = 
     registerMutation.isPending || 
-    !username.trim() || 
-    !password.trim() || 
-    password !== confirmPassword;
+    !registerUsername.trim() || 
+    !registerPassword.trim() || 
+    registerPassword !== confirmPassword;
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -50,48 +72,55 @@ export default function AuthPage() {
           {/* Left Column - Auth Form */}
           <div className="flex-1 w-full max-w-md">
             <Card className="shadow-xl border-border/40 bg-card/90 backdrop-blur-sm">
-              <CardHeader className="text-center">
-                <CardTitle className="text-2xl font-bold text-accent-foreground">
-                  {activeTab === "login" ? "Welcome Back" : "Create Account"}
-                </CardTitle>
-                <CardDescription>
-                  {activeTab === "login" 
-                    ? "Sign in to access your account" 
-                    : "Register to create a new account"}
-                </CardDescription>
-              </CardHeader>
               <Tabs defaultValue="login" value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="login">Login</TabsTrigger>
                   <TabsTrigger value="register">Register</TabsTrigger>
                 </TabsList>
+                
                 <TabsContent value="login">
+                  <CardHeader className="text-center">
+                    <CardTitle className="text-2xl font-bold text-accent-foreground">
+                      Welcome Back
+                    </CardTitle>
+                    <CardDescription>
+                      Sign in to access your account
+                    </CardDescription>
+                  </CardHeader>
                   <form onSubmit={handleLogin}>
-                    <CardContent className="space-y-4 pt-6">
+                    <CardContent className="space-y-4 pt-2">
                       <div className="space-y-2">
                         <Label htmlFor="login-username">Username</Label>
-                        <Input
-                          id="login-username"
-                          type="text"
-                          placeholder="Username"
-                          value={username}
-                          onChange={(e) => setUsername(e.target.value)}
-                          required
-                        />
+                        <div className="relative">
+                          <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            id="login-username"
+                            type="text"
+                            className="pl-10"
+                            placeholder="Username"
+                            value={loginUsername}
+                            onChange={(e) => setLoginUsername(e.target.value)}
+                            required
+                          />
+                        </div>
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="login-password">Password</Label>
-                        <Input
-                          id="login-password"
-                          type="password"
-                          placeholder="Password"
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          required
-                        />
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            id="login-password"
+                            type="password"
+                            className="pl-10"
+                            placeholder="Password"
+                            value={loginPassword}
+                            onChange={(e) => setLoginPassword(e.target.value)}
+                            required
+                          />
+                        </div>
                       </div>
                     </CardContent>
-                    <CardFooter>
+                    <CardFooter className="pb-6">
                       <Button 
                         type="submit" 
                         className="w-full" 
@@ -111,56 +140,80 @@ export default function AuthPage() {
                 </TabsContent>
 
                 <TabsContent value="register">
+                  <CardHeader className="text-center">
+                    <CardTitle className="text-2xl font-bold text-accent-foreground">
+                      Create Account
+                    </CardTitle>
+                    <CardDescription>
+                      Register to create a new account
+                    </CardDescription>
+                  </CardHeader>
                   <form onSubmit={handleRegister}>
-                    <CardContent className="space-y-4 pt-6">
+                    <CardContent className="space-y-4 pt-2">
                       <div className="space-y-2">
                         <Label htmlFor="register-username">Username</Label>
-                        <Input
-                          id="register-username"
-                          type="text"
-                          placeholder="Choose a username"
-                          value={username}
-                          onChange={(e) => setUsername(e.target.value)}
-                          required
-                        />
+                        <div className="relative">
+                          <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            id="register-username"
+                            type="text"
+                            className="pl-10"
+                            placeholder="Choose a username"
+                            value={registerUsername}
+                            onChange={(e) => setRegisterUsername(e.target.value)}
+                            required
+                          />
+                        </div>
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="register-email">Email (optional)</Label>
-                        <Input
-                          id="register-email"
-                          type="email"
-                          placeholder="your@email.com"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                        />
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            id="register-email"
+                            type="email"
+                            className="pl-10"
+                            placeholder="your@email.com"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                          />
+                        </div>
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="register-password">Password</Label>
-                        <Input
-                          id="register-password"
-                          type="password"
-                          placeholder="Create a password"
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          required
-                        />
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            id="register-password"
+                            type="password"
+                            className="pl-10"
+                            placeholder="Create a password"
+                            value={registerPassword}
+                            onChange={(e) => setRegisterPassword(e.target.value)}
+                            required
+                          />
+                        </div>
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="register-confirm-password">Confirm Password</Label>
-                        <Input
-                          id="register-confirm-password"
-                          type="password"
-                          placeholder="Confirm your password"
-                          value={confirmPassword}
-                          onChange={(e) => setConfirmPassword(e.target.value)}
-                          required
-                        />
-                        {confirmPassword && password !== confirmPassword && (
-                          <p className="text-destructive text-sm mt-1">Passwords do not match</p>
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            id="register-confirm-password"
+                            type="password"
+                            className="pl-10"
+                            placeholder="Confirm your password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            required
+                          />
+                        </div>
+                        {confirmPassword && registerPassword !== confirmPassword && (
+                          <p className="text-destructive text-sm">Passwords do not match</p>
                         )}
                       </div>
                     </CardContent>
-                    <CardFooter>
+                    <CardFooter className="pb-6">
                       <Button 
                         type="submit" 
                         className="w-full" 
