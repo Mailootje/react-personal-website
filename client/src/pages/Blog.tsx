@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { VideoBackground } from "@/components/VideoBackground";
-import { Loader2 } from "lucide-react";
+import { Loader2, MessageSquare } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { BlogPost } from "@shared/schema";
@@ -67,8 +67,14 @@ export default function Blog() {
                               <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
                                 {post.title}
                               </h3>
-                              <div className="text-sm text-muted-foreground mb-3">
-                                {format(new Date(post.createdAt), 'MMMM d, yyyy')}
+                              <div className="flex justify-between text-sm text-muted-foreground mb-3">
+                                <span>{format(new Date(post.createdAt), 'MMMM d, yyyy')}</span>
+                                {'commentsCount' in post && (
+                                  <span className="flex items-center ml-2">
+                                    <MessageSquare className="w-3.5 h-3.5 mr-1" />
+                                    {post.commentsCount || 0}
+                                  </span>
+                                )}
                               </div>
                               <p className="text-muted-foreground flex-1">
                                 {post.content.substring(0, 120)}

@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useRoute, Link } from "wouter";
 import { VideoBackground } from "@/components/VideoBackground";
-import { Loader2, Calendar, ArrowLeft } from "lucide-react";
+import { Loader2, Calendar, ArrowLeft, MessageSquare } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { BlogPost } from "@shared/schema";
@@ -10,6 +10,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { apiRequest } from "@/lib/queryClient";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { BlogComments } from "@/components/BlogComments";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { Components } from 'react-markdown';
@@ -97,6 +98,11 @@ export default function BlogPostPage() {
                       >
                         {post.content}
                       </ReactMarkdown>
+                    </div>
+                    
+                    {/* Comments Section */}
+                    <div className="mt-10 border-t border-border/40 pt-8">
+                      <BlogComments postId={post.id} />
                     </div>
                   </div>
                 </div>
