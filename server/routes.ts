@@ -576,13 +576,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const subcategory = req.query.subcategory as string || null;
       const photos: PhotoItem[] = [];
       
+      console.log(`[photos] Fetching photos for category: ${category}, subcategory: ${subcategory}`);
+      
       // Fetch the gallery JSON from mailobedo.nl
       const response = await fetch("https://mailobedo.nl/gallery/");
       if (!response.ok) {
         throw new Error(`Failed to fetch gallery: ${response.status} ${response.statusText}`);
       }
       
-      const galleryData = await response.json();
+      // Attempt to parse JSON response
+      let galleryData;
+      try {
+        galleryData = await response.json();
+        console.log(`[photos] Gallery data fetched successfully. Categories: ${Object.keys(galleryData).join(', ')}`);
+        console.log(`[photos] Entries in '${category}' category: ${galleryData[category] ? galleryData[category].length : 'category not found'}`);
+      } catch (jsonError) {
+        console.error(`[photos] Error parsing gallery JSON:`, jsonError);
+        throw new Error(`Failed to parse gallery JSON: ${jsonError.message}`);
+      }
       
       // Valid categories that match directly with the JSON response
       const validCategories = ["root", "Belgium", "Germany", "Netherlands", "Spain"];
@@ -639,7 +650,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(photos);
     } catch (error) {
       console.error("Error fetching photos", error);
-      res.status(500).json({ error: "Internal server error" });
+      res.status(500).json({ error: "Internal server error", message: error.message });
     }
   });
   
