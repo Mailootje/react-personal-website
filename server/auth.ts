@@ -463,6 +463,7 @@ export const registerAuthRoutes = (app: Express) => {
       
       // Return updated user without password
       const { password: _, ...userWithoutPassword } = updatedUser;
+      res.setHeader("Content-Type", "application/json");
       res.json({
         success: true,
         user: userWithoutPassword,

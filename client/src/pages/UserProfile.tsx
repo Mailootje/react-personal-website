@@ -86,8 +86,20 @@ export default function UserProfile() {
   // Upload profile picture mutation
   const uploadProfilePictureMutation = useMutation({
     mutationFn: async (data: { image: string }) => {
-      const res = await apiRequest("POST", "/api/profile/picture", data);
-      return await res.json();
+      try {
+        const res = await apiRequest("POST", "/api/profile/picture", data);
+        
+        // Check if the response is JSON
+        const contentType = res.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          return await res.json();
+        } else {
+          throw new Error("Server returned an invalid response format");
+        }
+      } catch (error) {
+        console.error("Error uploading profile picture:", error);
+        throw new Error("Failed to upload profile picture. Please try again.");
+      }
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/me"] });
