@@ -1,19 +1,5 @@
 import sharp from 'sharp';
-import { promises as fs } from 'fs';
-import path from 'path';
-import crypto from 'crypto';
-
-// Ensure the upload directory exists
-const UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads', 'profiles');
-
-export async function ensureUploadDirExists() {
-  try {
-    await fs.mkdir(UPLOAD_DIR, { recursive: true });
-  } catch (error) {
-    console.error('Failed to create upload directory:', error);
-    throw error;
-  }
-}
+// File system imports and upload directory removed as we now store images directly in the database
 
 /**
  * Converts an image buffer to WebP format and resizes it to 256x256
@@ -35,51 +21,7 @@ export async function convertToWebP(imageBuffer: Buffer): Promise<Buffer> {
   }
 }
 
-/**
- * Saves a WebP image to disk and returns the file path
- * @param webpBuffer The buffer containing the WebP image
- * @returns The URL path to the saved image
- */
-export async function saveProfileImage(webpBuffer: Buffer): Promise<string> {
-  await ensureUploadDirExists();
-  
-  // Generate a unique filename
-  const filename = `${crypto.randomBytes(16).toString('hex')}.webp`;
-  const filePath = path.join(UPLOAD_DIR, filename);
-  
-  // Save the file
-  await fs.writeFile(filePath, webpBuffer);
-  
-  // Return the URL path (relative to the public directory)
-  return `/uploads/profiles/${filename}`;
-}
-
-/**
- * Deletes an existing profile image
- * @param profilePicture The path to the profile picture
- */
-export async function deleteProfileImage(profilePicture: string | null | undefined): Promise<void> {
-  if (!profilePicture) return;
-  
-  try {
-    // Extract the filename from the path
-    const filename = profilePicture.split('/').pop();
-    if (!filename) return;
-    
-    // Build the full file path
-    const filePath = path.join(UPLOAD_DIR, filename);
-    
-    // Check if the file exists
-    await fs.access(filePath);
-    
-    // Delete the file
-    await fs.unlink(filePath);
-  } catch (error) {
-    // File may not exist or we don't have permissions
-    console.error('Error deleting profile image:', error);
-    // Don't throw so this doesn't interrupt the update process
-  }
-}
+// File-based image storage functions removed as we now store images directly in the database
 
 /**
  * Validates that a file is an image based on the MIME type
