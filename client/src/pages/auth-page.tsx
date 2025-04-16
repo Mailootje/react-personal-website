@@ -69,8 +69,8 @@ export default function AuthPage() {
     <div className="min-h-screen bg-background flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <Container maxWidth="xl">
         <div className="flex flex-col lg:flex-row gap-10 items-center">
-          {/* Left Column - Auth Form */}
-          <div className="flex-1 w-full max-w-md">
+          {/* Left Column - Auth Form - fixed width and height */}
+          <div className="w-full max-w-md">
             <Card className="shadow-xl border-border/40 bg-card/90 backdrop-blur-sm">
               <Tabs defaultValue="login" value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
@@ -78,8 +78,9 @@ export default function AuthPage() {
                   <TabsTrigger value="register">Register</TabsTrigger>
                 </TabsList>
                 
-                <TabsContent value="login">
-                  <CardHeader className="text-center">
+                {/* Login Tab - Use fixed height content area */}
+                <TabsContent value="login" className="min-h-[400px] flex flex-col">
+                  <CardHeader className="text-center pb-2">
                     <CardTitle className="text-2xl font-bold text-accent-foreground">
                       Welcome Back
                     </CardTitle>
@@ -87,8 +88,8 @@ export default function AuthPage() {
                       Sign in to access your account
                     </CardDescription>
                   </CardHeader>
-                  <form onSubmit={handleLogin}>
-                    <CardContent className="space-y-4 pt-2">
+                  <form onSubmit={handleLogin} className="flex-1 flex flex-col">
+                    <CardContent className="space-y-4 pt-2 flex-1">
                       <div className="space-y-2">
                         <Label htmlFor="login-username">Username</Label>
                         <div className="relative">
@@ -119,8 +120,11 @@ export default function AuthPage() {
                           />
                         </div>
                       </div>
+                      
+                      {/* Spacer div to push button to bottom */}
+                      <div className="flex-1 min-h-[100px]"></div>
                     </CardContent>
-                    <CardFooter className="pb-6">
+                    <CardFooter className="pt-2 pb-6 mt-auto">
                       <Button 
                         type="submit" 
                         className="w-full" 
@@ -139,8 +143,9 @@ export default function AuthPage() {
                   </form>
                 </TabsContent>
 
-                <TabsContent value="register">
-                  <CardHeader className="text-center">
+                {/* Register Tab - Same height as login tab */}
+                <TabsContent value="register" className="min-h-[400px] flex flex-col">
+                  <CardHeader className="text-center pb-2">
                     <CardTitle className="text-2xl font-bold text-accent-foreground">
                       Create Account
                     </CardTitle>
@@ -148,8 +153,8 @@ export default function AuthPage() {
                       Register to create a new account
                     </CardDescription>
                   </CardHeader>
-                  <form onSubmit={handleRegister}>
-                    <CardContent className="space-y-4 pt-2">
+                  <form onSubmit={handleRegister} className="flex-1 flex flex-col">
+                    <CardContent className="space-y-4 pt-2 flex-1">
                       <div className="space-y-2">
                         <Label htmlFor="register-username">Username</Label>
                         <div className="relative">
@@ -213,7 +218,7 @@ export default function AuthPage() {
                         )}
                       </div>
                     </CardContent>
-                    <CardFooter className="pb-6">
+                    <CardFooter className="pt-2 pb-6 mt-auto">
                       <Button 
                         type="submit" 
                         className="w-full" 
