@@ -86,8 +86,8 @@ export function Header() {
             ),
           )}
           
-          {/* Admin link for logged-in users */}
-          {user && (
+          {/* Admin link for admin users only */}
+          {user && user.isAdmin && (
             <Link
               href="/admin"
               className="text-text hover:text-primary transition-colors font-medium"

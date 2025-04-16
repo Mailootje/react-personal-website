@@ -74,8 +74,8 @@ export function MobileMenu({ isOpen, onClose, items }: MobileMenuProps) {
               )
             ))}
             
-            {/* Admin links for logged-in users */}
-            {user && (
+            {/* Admin links for admin users only */}
+            {user && user.isAdmin && (
               <>
                 <Link href="/admin">
                   <motion.div
