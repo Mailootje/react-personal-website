@@ -7,6 +7,12 @@ import { User, InsertUser } from '@shared/schema';
 import connectPgSimple from 'connect-pg-simple';
 import { pool } from './db';
 import crypto from 'crypto';
+import { 
+  convertToWebP,
+  isValidImageType, 
+  isFileTooLarge
+} from './imageUtils';
+import memorystore from 'memorystore';
 
 // Extend Express Request type to include session property
 declare module 'express-session' {
@@ -69,7 +75,7 @@ export const verifyPassword = async (password: string, hash: string): Promise<bo
 // Configure and initialize session
 export const setupSession = (app: Express) => {
   // Generate a random secret for sessions
-  const sessionSecret = process.env.SESSION_SECRET || require('crypto').randomBytes(32).toString('hex');
+  const sessionSecret = process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex');
   
   let sessionStore;
   if (process.env.DATABASE_URL) {
@@ -82,7 +88,7 @@ export const setupSession = (app: Express) => {
     });
   } else {
     // Use in-memory session store for development
-    const MemoryStore = require('memorystore')(session);
+    const MemoryStore = memorystore(session);
     sessionStore = new MemoryStore({
       checkPeriod: 86400000 // Prune expired entries every 24h
     });
@@ -413,8 +419,7 @@ export const registerAuthRoutes = (app: Express) => {
       }
       
       try {
-        // Import necessary utilities for validation
-        const { isValidImageType, isFileTooLarge, convertToWebP } = require('./imageUtils');
+        // Using utility functions imported at the top of the file
         
         // Parse the base64 image
         const imageData = req.body.image;
