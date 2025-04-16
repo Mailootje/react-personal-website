@@ -1228,8 +1228,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const posts = await storage.listPublishedBlogPosts(limit, offset);
       const total = await storage.countBlogPosts();
       
+      // Add comment count to each post
+      const postsWithCommentCounts = await Promise.all(posts.map(async (post) => {
+        const commentsCount = await storage.countCommentsForPost(post.id);
+        return { ...post, commentsCount };
+      }));
+      
       res.json({
-        posts,
+        posts: postsWithCommentCounts,
         meta: {
           total,
           limit,

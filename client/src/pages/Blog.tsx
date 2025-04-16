@@ -11,8 +11,17 @@ import { apiRequest } from "@/lib/queryClient";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 
+// Extended BlogPost type to include comment count
+interface BlogPostWithComments extends BlogPost {
+  commentsCount?: number;
+  author?: {
+    id: number;
+    username: string;
+  };
+}
+
 export default function Blog() {
-  const { data, isLoading, error } = useQuery<{ posts: BlogPost[], meta: { total: number, limit: number, offset: number } }>({
+  const { data, isLoading, error } = useQuery<{ posts: BlogPostWithComments[], meta: { total: number, limit: number, offset: number } }>({
     queryKey: ["/api/blog/posts"],
     queryFn: async () => {
       return await apiRequest("GET", "/api/blog/posts");
@@ -69,12 +78,12 @@ export default function Blog() {
                               </h3>
                               <div className="flex justify-between text-sm text-muted-foreground mb-3">
                                 <span>{format(new Date(post.createdAt), 'MMMM d, yyyy')}</span>
-                                {'commentsCount' in post && (
+                                {post.commentsCount !== undefined ? (
                                   <span className="flex items-center ml-2">
                                     <MessageSquare className="w-3.5 h-3.5 mr-1" />
-                                    {post.commentsCount || 0}
+                                    {post.commentsCount}
                                   </span>
-                                )}
+                                ) : null}
                               </div>
                               <p className="text-muted-foreground flex-1">
                                 {post.content.substring(0, 120)}

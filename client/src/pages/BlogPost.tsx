@@ -15,12 +15,21 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { Components } from 'react-markdown';
 
+// Extended BlogPost type to include comment count and author
+interface BlogPostWithComments extends BlogPost {
+  commentsCount?: number;
+  author?: {
+    id: number;
+    username: string;
+  };
+}
+
 export default function BlogPostPage() {
   const [match, params] = useRoute("/blog/:slug");
   const { user } = useAuth();
   const slug = params?.slug;
   
-  const { data: post, isLoading, error } = useQuery<BlogPost>({
+  const { data: post, isLoading, error } = useQuery<BlogPostWithComments>({
     queryKey: [`/api/blog/posts/${slug}`],
     enabled: Boolean(slug),
     queryFn: async () => {
