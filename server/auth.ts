@@ -410,14 +410,8 @@ export const registerAuthRoutes = (app: Express) => {
       }
       
       try {
-        // Import necessary utilities for image processing
-        const { 
-          convertToWebP, 
-          saveProfileImage, 
-          deleteProfileImage, 
-          isValidImageType, 
-          isFileTooLarge 
-        } = require('./imageUtils');
+        // Import necessary utilities for validation
+        const { isValidImageType, isFileTooLarge, convertToWebP } = require('./imageUtils');
         
         // Parse the base64 image
         const imageData = req.body.image;
@@ -469,36 +463,21 @@ export const registerAuthRoutes = (app: Express) => {
           return res.status(500).json({ error: 'Failed to process image' });
         }
         
-        // Delete old profile picture if exists
-        if (user.profilePicture) {
-          log(`Deleting existing profile picture: ${user.profilePicture}`, 'auth');
-          try {
-            await deleteProfileImage(user.profilePicture);
-          } catch (deleteError) {
-            log(`Warning: Failed to delete old profile picture: ${deleteError}`, 'auth');
-            // Continue with the process even if deletion fails
-          }
-        }
+        // Convert the optimized WebP image back to base64 for storage
+        const webpBase64 = webpBuffer.toString('base64');
+        const webpDataUrl = `data:image/webp;base64,${webpBase64}`;
         
-        // Save the new profile picture
-        log('Saving new profile picture...', 'auth');
-        let profilePicturePath;
-        try {
-          profilePicturePath = await saveProfileImage(webpBuffer);
-          log(`Saved new profile picture at: ${profilePicturePath}`, 'auth');
-        } catch (saveError) {
-          log(`Error saving profile picture: ${saveError}`, 'auth');
-          return res.status(500).json({ error: 'Failed to save image' });
-        }
-        
-        // Update user record with the new profile picture path
-        log(`Updating user record with new profile picture path`, 'auth');
+        // Update user record with the image data stored directly in the database
+        log(`Updating user record with profile image data`, 'auth');
         const updatedUser = await storage.updateUser(userId, {
-          profilePicture: profilePicturePath
+          profileImageData: webpDataUrl,
+          profileImageType: 'image/webp',
+          // Keep the profilePicture field empty or null since we're not saving to filesystem
+          profilePicture: null
         });
         
         if (!updatedUser) {
-          log('Failed to update user record with new profile picture', 'auth');
+          log('Failed to update user record with profile image data', 'auth');
           return res.status(500).json({ error: 'Failed to update user profile' });
         }
         
@@ -509,8 +488,7 @@ export const registerAuthRoutes = (app: Express) => {
         res.setHeader("Content-Type", "application/json");
         return res.json({
           success: true,
-          user: userWithoutPassword,
-          profilePicture: profilePicturePath
+          user: userWithoutPassword
         });
       } catch (processingError) {
         log(`Error in image processing: ${processingError}`, 'auth');

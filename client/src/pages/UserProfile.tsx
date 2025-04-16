@@ -258,6 +258,8 @@ export default function UserProfile() {
                     <Avatar className="w-24 h-24 border-2 border-primary">
                       {imagePreview ? (
                         <AvatarImage src={imagePreview} alt="Profile preview" />
+                      ) : user.profileImageData ? (
+                        <AvatarImage src={user.profileImageData} alt={user.username} />
                       ) : user.profilePicture ? (
                         <AvatarImage src={user.profilePicture} alt={user.username} />
                       ) : (
