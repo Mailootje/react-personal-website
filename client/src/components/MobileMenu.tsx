@@ -91,12 +91,6 @@ export function MobileMenu({ isOpen, onClose, items }: MobileMenuProps) {
                         alt={user.username}
                         className="w-full h-full object-cover" 
                       />
-                    ) : user.profilePicture ? (
-                      <img 
-                        src={user.profilePicture} 
-                        alt={user.username}
-                        className="w-full h-full object-cover" 
-                      />
                     ) : (
                       <div className="bg-primary/20 w-full h-full flex items-center justify-center text-xs text-primary">
                         {user.username.charAt(0).toUpperCase()}

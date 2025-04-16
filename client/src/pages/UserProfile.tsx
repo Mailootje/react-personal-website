@@ -226,8 +226,6 @@ export default function UserProfile() {
                         <AvatarImage src={imagePreview} alt="Profile preview" />
                       ) : user.profileImageData ? (
                         <AvatarImage src={user.profileImageData} alt={user.username} />
-                      ) : user.profilePicture ? (
-                        <AvatarImage src={user.profilePicture} alt={user.username} />
                       ) : (
                         <AvatarFallback className="bg-primary/10">
                           <User className="h-12 w-12 text-primary" />

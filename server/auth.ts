@@ -327,7 +327,7 @@ export const registerAuthRoutes = (app: Express) => {
       const { password: _, ...userWithoutPassword } = user;
       
       // Log profile image information for debugging
-      log(`Profile data: image=${!!user.profileImageData}, picture=${!!user.profilePicture}`, 'auth');
+      log(`Profile data: image=${!!user.profileImageData}`, 'auth');
       
       res.json(userWithoutPassword);
     } catch (error) {
@@ -479,9 +479,7 @@ export const registerAuthRoutes = (app: Express) => {
         log(`Updating user record with profile image data`, 'auth');
         const updatedUser = await storage.updateUser(userId, {
           profileImageData: webpDataUrl,
-          profileImageType: 'image/webp',
-          // Keep the profilePicture field empty or null since we're not saving to filesystem
-          profilePicture: null
+          profileImageType: 'image/webp'
         });
         
         if (!updatedUser) {
