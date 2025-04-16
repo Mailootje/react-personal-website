@@ -54,7 +54,13 @@ export function Header() {
           className="text-xl font-bold text-primary flex items-center space-x-2"
         >
           <span className="w-8 h-8 rounded-full bg-black flex items-center justify-center overflow-hidden border-2 border-primary">
-            {user?.profilePicture ? (
+            {user?.profileImageData ? (
+              <img 
+                src={user.profileImageData} 
+                alt={user.username} 
+                className="w-full h-full object-cover"
+              />
+            ) : user?.profilePicture ? (
               <img 
                 src={user.profilePicture} 
                 alt={user.username} 

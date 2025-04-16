@@ -78,12 +78,31 @@ export function MobileMenu({ isOpen, onClose, items }: MobileMenuProps) {
             {user && (
               <Link href="/profile">
                 <motion.div
-                  className="text-text hover:text-primary transition-colors font-medium py-2 cursor-pointer"
+                  className="text-text hover:text-primary transition-colors font-medium py-2 cursor-pointer flex items-center gap-2"
                   onClick={onClose}
                   initial={{ x: -20, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ duration: 0.3 }}
                 >
+                  <div className="w-6 h-6 rounded-full overflow-hidden border border-primary">
+                    {user.profileImageData ? (
+                      <img 
+                        src={user.profileImageData} 
+                        alt={user.username}
+                        className="w-full h-full object-cover" 
+                      />
+                    ) : user.profilePicture ? (
+                      <img 
+                        src={user.profilePicture} 
+                        alt={user.username}
+                        className="w-full h-full object-cover" 
+                      />
+                    ) : (
+                      <div className="bg-primary/20 w-full h-full flex items-center justify-center text-xs text-primary">
+                        {user.username.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                  </div>
                   Profile
                 </motion.div>
               </Link>

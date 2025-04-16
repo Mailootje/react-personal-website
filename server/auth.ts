@@ -320,6 +320,9 @@ export const registerAuthRoutes = (app: Express) => {
       // Remove password from response
       const { password: _, ...userWithoutPassword } = user;
       
+      // Log profile image information for debugging
+      log(`Profile data: image=${!!user.profileImageData}, picture=${!!user.profilePicture}`, 'auth');
+      
       res.json(userWithoutPassword);
     } catch (error) {
       log(`Error getting current user: ${error}`, 'auth');
