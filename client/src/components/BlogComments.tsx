@@ -210,9 +210,9 @@ export function BlogComments({ postId }: BlogCommentsProps) {
             <Card key={comment.id} className="p-4 bg-black/30 border-border">
               <div className="flex items-start gap-3">
                 <Avatar className="h-10 w-10">
-                  {comment.author.profileImageData && comment.author.profileImageType ? (
+                  {comment.author.profileImageData ? (
                     <AvatarImage 
-                      src={`data:${comment.author.profileImageType};base64,${comment.author.profileImageData}`} 
+                      src={comment.author.profileImageData} 
                       alt={comment.author.username} 
                     />
                   ) : null}
