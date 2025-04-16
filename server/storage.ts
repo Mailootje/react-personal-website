@@ -13,7 +13,10 @@ import {
   type InsertCounterToken,
   blogPosts,
   type BlogPost,
-  type InsertBlogPost
+  type InsertBlogPost,
+  blogComments,
+  type BlogComment,
+  type InsertBlogComment
 } from "@shared/schema";
 import { drizzle } from 'drizzle-orm/postgres-js';
 import { eq, lt, desc, and, isNull, asc, count } from 'drizzle-orm';
@@ -59,6 +62,14 @@ export interface IStorage {
   getCounterToken(token: string): Promise<CounterToken | undefined>;
   useCounterToken(token: string): Promise<boolean>;
   cleanupExpiredTokens(): Promise<void>;
+  
+  // Blog comment methods
+  createBlogComment(comment: InsertBlogComment): Promise<BlogComment>;
+  getBlogComment(id: number): Promise<BlogComment | undefined>;
+  updateBlogComment(id: number, data: Partial<InsertBlogComment>): Promise<BlogComment | undefined>;
+  deleteBlogComment(id: number): Promise<boolean>;
+  listBlogCommentsByPost(blogPostId: number, limit?: number, offset?: number): Promise<BlogComment[]>;
+  countCommentsForPost(blogPostId: number): Promise<number>;
 }
 
 // Database storage implementation using PostgreSQL
@@ -449,6 +460,87 @@ export class DbStorage implements IStorage {
       log(`Error cleaning up expired tokens: ${error}`, "storage");
     }
   }
+  
+  // Blog comment methods
+  async createBlogComment(comment: InsertBlogComment): Promise<BlogComment> {
+    try {
+      const now = new Date();
+      const result = await this.db.insert(blogComments)
+        .values({
+          ...comment,
+          createdAt: now,
+          updatedAt: now
+        })
+        .returning();
+      return result[0];
+    } catch (error) {
+      log(`Error creating blog comment: ${error}`, "storage");
+      throw error;
+    }
+  }
+  
+  async getBlogComment(id: number): Promise<BlogComment | undefined> {
+    try {
+      const result = await this.db.select().from(blogComments).where(eq(blogComments.id, id));
+      return result[0];
+    } catch (error) {
+      log(`Error getting blog comment: ${error}`, "storage");
+      return undefined;
+    }
+  }
+  
+  async updateBlogComment(id: number, data: Partial<InsertBlogComment>): Promise<BlogComment | undefined> {
+    try {
+      const result = await this.db.update(blogComments)
+        .set({
+          ...data,
+          updatedAt: new Date()
+        })
+        .where(eq(blogComments.id, id))
+        .returning();
+      return result[0];
+    } catch (error) {
+      log(`Error updating blog comment: ${error}`, "storage");
+      return undefined;
+    }
+  }
+  
+  async deleteBlogComment(id: number): Promise<boolean> {
+    try {
+      await this.db.delete(blogComments).where(eq(blogComments.id, id));
+      return true;
+    } catch (error) {
+      log(`Error deleting blog comment: ${error}`, "storage");
+      return false;
+    }
+  }
+  
+  async listBlogCommentsByPost(blogPostId: number, limit: number = 50, offset: number = 0): Promise<BlogComment[]> {
+    try {
+      const result = await this.db.select()
+        .from(blogComments)
+        .where(eq(blogComments.blogPostId, blogPostId))
+        .orderBy(desc(blogComments.createdAt))
+        .limit(limit)
+        .offset(offset);
+      return result;
+    } catch (error) {
+      log(`Error listing blog comments by post: ${error}`, "storage");
+      return [];
+    }
+  }
+  
+  async countCommentsForPost(blogPostId: number): Promise<number> {
+    try {
+      const result = await this.db.select({ count: count() })
+        .from(blogComments)
+        .where(eq(blogComments.blogPostId, blogPostId));
+      return result[0]?.count || 0;
+    } catch (error) {
+      log(`Error counting comments for post: ${error}`, "storage");
+      return 0;
+    }
+  }
 }
 
 // Memory storage implementation for backward compatibility
@@ -459,11 +551,13 @@ export class MemStorage implements IStorage {
   private counterTokens: Map<string, CounterToken>;
   private blogPosts: Map<number, BlogPost>;
   private blogPostsBySlug: Map<string, number>;
+  private blogComments: Map<number, BlogComment>;
   private currentUserId: number;
   private currentLinkId: number;
   private currentCounterId: number;
   private currentTokenId: number;
   private currentBlogPostId: number;
+  private currentBlogCommentId: number;
 
   constructor() {
     this.users = new Map();

@@ -1,6 +1,7 @@
 import { pgTable, text, serial, integer, boolean, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+import { relations } from "drizzle-orm";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -109,3 +110,48 @@ export const insertCounterTokenSchema = createInsertSchema(counterTokens).pick({
 
 export type InsertCounterToken = z.infer<typeof insertCounterTokenSchema>;
 export type CounterToken = typeof counterTokens.$inferSelect;
+
+// Blog comments table
+export const blogComments = pgTable("blog_comments", {
+  id: serial("id").primaryKey(),
+  content: text("content").notNull(),
+  blogPostId: integer("blog_post_id").notNull().references(() => blogPosts.id),
+  userId: integer("user_id").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const insertBlogCommentSchema = createInsertSchema(blogComments).pick({
+  content: true,
+  blogPostId: true,
+  userId: true,
+});
+
+export type InsertBlogComment = z.infer<typeof insertBlogCommentSchema>;
+export type BlogComment = typeof blogComments.$inferSelect;
+
+// Set up relations
+
+export const usersRelations = relations(users, ({ many }) => ({
+  blogPosts: many(blogPosts),
+  blogComments: many(blogComments),
+}));
+
+export const blogPostsRelations = relations(blogPosts, ({ one, many }) => ({
+  author: one(users, {
+    fields: [blogPosts.authorId],
+    references: [users.id],
+  }),
+  comments: many(blogComments),
+}));
+
+export const blogCommentsRelations = relations(blogComments, ({ one }) => ({
+  post: one(blogPosts, {
+    fields: [blogComments.blogPostId],
+    references: [blogPosts.id],
+  }),
+  user: one(users, {
+    fields: [blogComments.userId],
+    references: [users.id],
+  }),
+}));
