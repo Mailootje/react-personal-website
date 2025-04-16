@@ -7,6 +7,7 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   email: text("email"),
+  profilePicture: text("profile_picture"),
   isAdmin: boolean("is_admin").default(false).notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
@@ -15,6 +16,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
   email: true,
+  profilePicture: true,
   isAdmin: true,
 });
 
