@@ -327,6 +327,65 @@ export const registerAuthRoutes = (app: Express) => {
     }
   });
   
+  // User profile update endpoint (for regular users)
+  app.put('/api/profile', isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      if (!req.session?.userId) {
+        return res.status(401).json({ error: 'Not authenticated' });
+      }
+      
+      const userId = req.session.userId;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      
+      // Check if current password is correct (only needed for password change)
+      const { currentPassword, newPassword, email } = req.body;
+      const updateData: Partial<InsertUser> = {};
+      
+      // If changing password, verify current password
+      if (newPassword) {
+        if (!currentPassword) {
+          return res.status(400).json({ error: 'Current password is required to set a new password' });
+        }
+        
+        const isPasswordValid = await verifyPassword(currentPassword, user.password);
+        if (!isPasswordValid) {
+          return res.status(401).json({ error: 'Current password is incorrect' });
+        }
+        
+        updateData.password = await hashPassword(newPassword);
+      }
+      
+      // Update email if provided
+      if (email !== undefined) {
+        updateData.email = email;
+      }
+      
+      // If there's nothing to update, return the current user
+      if (Object.keys(updateData).length === 0) {
+        const { password: _, ...userWithoutPassword } = user;
+        return res.json(userWithoutPassword);
+      }
+      
+      // Update user in storage
+      const updatedUser = await storage.updateUser(userId, updateData);
+      
+      if (!updatedUser) {
+        return res.status(404).json({ error: 'Failed to update user' });
+      }
+      
+      // Return updated user without password
+      const { password: _, ...userWithoutPassword } = updatedUser;
+      res.json(userWithoutPassword);
+    } catch (error) {
+      log(`Error updating user profile: ${error}`, 'auth');
+      res.status(500).json({ error: 'Failed to update profile' });
+    }
+  });
+  
   // Admin profile update endpoint
   app.put('/api/admin/profile', isAdmin, async (req: Request, res: Response) => {
     try {

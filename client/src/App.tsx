@@ -41,6 +41,7 @@ import SchoolPitch from "@/pages/personal/school/Pitch";
 import Blog from "@/pages/Blog";
 import BlogPost from "@/pages/BlogPost";
 import AuthPage from "@/pages/auth-page";
+import UserProfile from "@/pages/UserProfile";
 import BlogAdmin from "@/pages/admin/BlogAdmin";
 import BlogForm from "@/pages/admin/BlogForm";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
@@ -86,6 +87,9 @@ function Router() {
       <Route path="/blog" component={Blog}/>
       <Route path="/blog/:slug" component={BlogPost}/>
       <Route path="/auth" component={AuthPage}/>
+      
+      {/* User routes - protected */}
+      <ProtectedRoute path="/profile" component={UserProfile}/>
       
       {/* Admin routes - protected */}
       <AdminRoute path="/admin" component={AdminDashboard}/>

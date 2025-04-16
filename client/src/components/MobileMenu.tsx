@@ -74,6 +74,21 @@ export function MobileMenu({ isOpen, onClose, items }: MobileMenuProps) {
               )
             ))}
             
+            {/* User profile link for logged-in users */}
+            {user && (
+              <Link href="/profile">
+                <motion.div
+                  className="text-text hover:text-primary transition-colors font-medium py-2 cursor-pointer"
+                  onClick={onClose}
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  Profile
+                </motion.div>
+              </Link>
+            )}
+            
             {/* Admin links for admin users only */}
             {user && user.isAdmin && (
               <>

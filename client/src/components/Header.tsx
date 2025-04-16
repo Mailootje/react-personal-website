@@ -86,6 +86,16 @@ export function Header() {
             ),
           )}
           
+          {/* User profile link for logged-in users */}
+          {user && (
+            <Link
+              href="/profile"
+              className="text-text hover:text-primary transition-colors font-medium"
+            >
+              Profile
+            </Link>
+          )}
+          
           {/* Admin link for admin users only */}
           {user && user.isAdmin && (
             <Link
