@@ -71,7 +71,6 @@ interface VoiceRoom {
     socketId: string;
     username: string;
     isMuted?: boolean;
-    isScreenSharing?: boolean;
   }[];
 }
 
@@ -1703,16 +1702,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       socket.to(roomId).emit('participantMuteChanged', {
         socketId,
         isMuted
-      });
-    });
-    
-    // Handle screen sharing state changes
-    socket.on('screenShareStateChanged', ({ roomId, isScreenSharing, socketId }) => {
-      console.log(`User ${socketId} ${isScreenSharing ? 'started' : 'stopped'} screen sharing in room ${roomId}`);
-      // Forward the screen sharing state change to everyone in the room
-      socket.to(roomId).emit('screenShareStateChanged', {
-        socketId,
-        isScreenSharing
       });
     });
     

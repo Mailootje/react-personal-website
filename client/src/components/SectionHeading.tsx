@@ -1,10 +1,9 @@
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
-export interface SectionHeadingProps {
+interface SectionHeadingProps {
   subtitle: string;
   title: string;
-  description?: string;
   center?: boolean;
   className?: string;
   isDark?: boolean;
@@ -13,7 +12,6 @@ export interface SectionHeadingProps {
 export default function SectionHeading({
   subtitle,
   title,
-  description,
   center = true,
   className,
   isDark = false,
@@ -47,18 +45,6 @@ export default function SectionHeading({
         viewport={{ once: true }}
         transition={{ duration: 0.5, delay: 0.2 }}
       />
-      
-      {description && (
-        <motion.p
-          className={cn("max-w-2xl mx-auto mt-4 text-lg", isDark ? "text-gray-300" : "text-gray-600")}
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-        >
-          {description}
-        </motion.p>
-      )}
     </div>
   );
 }
