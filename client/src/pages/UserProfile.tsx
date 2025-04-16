@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { Redirect } from "wouter";
 import Container from "@/components/Container";
@@ -11,7 +11,8 @@ import { toast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, User, Mail, Key, LogOut } from "lucide-react";
+import { Loader2, User, Mail, Key, LogOut, Upload, Camera } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function UserProfile() {
   const queryClient = useQueryClient();
@@ -21,6 +22,8 @@ export default function UserProfile() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [activeTab, setActiveTab] = useState("account");
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Redirect if not logged in
   if (!user) {
@@ -79,6 +82,30 @@ export default function UserProfile() {
       });
     },
   });
+  
+  // Upload profile picture mutation
+  const uploadProfilePictureMutation = useMutation({
+    mutationFn: async (data: { image: string }) => {
+      const res = await apiRequest("POST", "/api/profile/picture", data);
+      return await res.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/me"] });
+      // Clear the preview since we'll show the actual profile picture now
+      setImagePreview(null);
+      toast({
+        title: "Profile picture updated",
+        description: "Your profile picture has been updated successfully",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Update failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
 
   // Handle profile update
   const handleProfileUpdate = (e: React.FormEvent) => {
@@ -109,6 +136,57 @@ export default function UserProfile() {
   const handleLogout = () => {
     logoutMutation.mutate();
   };
+  
+  // Trigger file input click
+  const triggerFileInput = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+  
+  // Handle file selection
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    
+    if (!file) return;
+    
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      toast({
+        title: "Invalid file type",
+        description: "Please select a JPEG, PNG, GIF, or WebP image",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "File too large",
+        description: "Image must be smaller than 5MB",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Create preview
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setImagePreview(event.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+  
+  // Upload profile picture
+  const handleUploadProfilePicture = () => {
+    if (!imagePreview) return;
+    
+    uploadProfilePictureMutation.mutate({
+      image: imagePreview
+    });
+  };
 
   return (
     <div className="min-h-screen pt-20 pb-12 bg-background">
@@ -137,9 +215,75 @@ export default function UserProfile() {
                   <CardTitle className="text-xl text-center">Account Info</CardTitle>
                 </CardHeader>
                 <CardContent className="flex flex-col items-center text-center">
-                  <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mb-4 border-2 border-primary">
-                    <User className="h-12 w-12 text-primary" />
+                  {/* Profile Picture with Upload Button */}
+                  <div className="relative mb-4">
+                    <Avatar className="w-24 h-24 border-2 border-primary">
+                      {imagePreview ? (
+                        <AvatarImage src={imagePreview} alt="Profile preview" />
+                      ) : user.profilePicture ? (
+                        <AvatarImage src={user.profilePicture} alt={user.username} />
+                      ) : (
+                        <AvatarFallback className="bg-primary/10">
+                          <User className="h-12 w-12 text-primary" />
+                        </AvatarFallback>
+                      )}
+                    </Avatar>
+                    
+                    <button 
+                      type="button"
+                      onClick={triggerFileInput}
+                      className="absolute bottom-0 right-0 p-1.5 rounded-full bg-primary text-white hover:bg-primary/90 transition-colors"
+                      aria-label="Upload profile picture"
+                    >
+                      <Camera className="h-4 w-4" />
+                    </button>
+                    
+                    <input 
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/jpeg, image/png, image/gif, image/webp"
+                      className="hidden"
+                      onChange={handleFileChange}
+                    />
                   </div>
+                  
+                  {/* Preview Actions */}
+                  {imagePreview && (
+                    <div className="mb-4 space-y-2 w-full">
+                      <p className="text-xs text-muted-foreground">Preview mode</p>
+                      <div className="flex gap-2">
+                        <Button 
+                          size="sm" 
+                          variant="default" 
+                          className="flex-1"
+                          onClick={handleUploadProfilePicture}
+                          disabled={uploadProfilePictureMutation.isPending}
+                        >
+                          {uploadProfilePictureMutation.isPending ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Saving...
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="mr-2 h-4 w-4" />
+                              Save
+                            </>
+                          )}
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="secondary" 
+                          className="flex-1"
+                          onClick={() => setImagePreview(null)}
+                          disabled={uploadProfilePictureMutation.isPending}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                  
                   <h3 className="text-xl font-semibold mb-1">{user.username}</h3>
                   <p className="text-muted-foreground text-sm mb-2">{user.email || "No email set"}</p>
                   <div className="text-xs text-muted-foreground bg-background/50 px-3 py-1 rounded-full">

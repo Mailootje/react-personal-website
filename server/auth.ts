@@ -386,6 +386,94 @@ export const registerAuthRoutes = (app: Express) => {
     }
   });
   
+  // Profile picture upload endpoint
+  app.post('/api/profile/picture', isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      if (!req.session?.userId) {
+        return res.status(401).json({ error: 'Not authenticated' });
+      }
+      
+      const userId = req.session.userId;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      
+      // Check if image data was sent
+      if (!req.body.image) {
+        return res.status(400).json({ error: 'No image provided' });
+      }
+      
+      // Import necessary utilities for image processing
+      const { 
+        convertToWebP, 
+        saveProfileImage, 
+        deleteProfileImage, 
+        isValidImageType, 
+        isFileTooLarge 
+      } = require('./imageUtils');
+      
+      // Parse the base64 image
+      const imageData = req.body.image;
+      const matches = imageData.match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
+      
+      if (!matches || matches.length !== 3) {
+        return res.status(400).json({ error: 'Invalid image format' });
+      }
+      
+      const imageType = matches[1];
+      const base64Data = matches[2];
+      const imageBuffer = Buffer.from(base64Data, 'base64');
+      
+      // Validate image type
+      if (!isValidImageType(imageType)) {
+        return res.status(400).json({ 
+          error: 'Invalid image type. Only JPEG, PNG, GIF, and WebP are supported.' 
+        });
+      }
+      
+      // Validate file size (max 5MB)
+      if (isFileTooLarge(imageBuffer.length)) {
+        return res.status(400).json({ 
+          error: 'Image too large. Maximum size is 5MB.' 
+        });
+      }
+      
+      // Convert to WebP, resize to 256x256, and optimize
+      const webpBuffer = await convertToWebP(imageBuffer);
+      
+      // Delete old profile picture if exists
+      if (user.profilePicture) {
+        await deleteProfileImage(user.profilePicture);
+      }
+      
+      // Save the new profile picture
+      const profilePicturePath = await saveProfileImage(webpBuffer);
+      log(`Saved new profile picture for user ${user.username} at ${profilePicturePath}`, 'auth');
+      
+      // Update user record with the new profile picture path
+      const updatedUser = await storage.updateUser(userId, {
+        profilePicture: profilePicturePath
+      });
+      
+      if (!updatedUser) {
+        return res.status(500).json({ error: 'Failed to update user profile' });
+      }
+      
+      // Return updated user without password
+      const { password: _, ...userWithoutPassword } = updatedUser;
+      res.json({
+        success: true,
+        user: userWithoutPassword,
+        profilePicture: profilePicturePath
+      });
+    } catch (error) {
+      log(`Error uploading profile picture: ${error}`, 'auth');
+      res.status(500).json({ error: 'Failed to upload profile picture' });
+    }
+  });
+  
   // Admin profile update endpoint
   app.put('/api/admin/profile', isAdmin, async (req: Request, res: Response) => {
     try {
