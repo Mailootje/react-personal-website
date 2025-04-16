@@ -50,21 +50,53 @@ export default function Photography() {
       if (activeCategory === "root") return [];
       
       const endpoint = `/api/photos/subcategories?category=${activeCategory}`;
-      return apiRequest<string[]>(endpoint);
+      
+      try {
+        const response = await fetch(endpoint, {
+          credentials: 'include'
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch subcategories: ${response.status}`);
+        }
+        
+        return await response.json() as string[];
+      } catch (err) {
+        console.error('Error fetching subcategories:', err);
+        return []; // Return empty array on error to prevent UI issues
+      }
     },
     enabled: activeCategory !== "root" // Only run this query if not in root category
   });
 
   // Fetch photos using React Query
-  const { data: photos = [], isError, isLoading } = useQuery({
+  const { data: photos = [], isError, isLoading, error } = useQuery({
     queryKey: ['photos', activeCategory, activeSubcategory],
     queryFn: async () => {
       let endpoint = `/api/photos?category=${activeCategory}`;
       if (activeSubcategory) {
         endpoint += `&subcategory=${activeSubcategory}`;
       }
-      return apiRequest<Photo[]>(endpoint);
-    }
+      
+      try {
+        // Use fetch directly with more error handling
+        const response = await fetch(endpoint, {
+          credentials: 'include'
+        });
+        
+        if (!response.ok) {
+          console.error(`Failed to fetch photos: ${response.status} ${response.statusText}`);
+          const errorText = await response.text();
+          throw new Error(errorText || `API error: ${response.status}`);
+        }
+        
+        return await response.json() as Photo[];
+      } catch (err) {
+        console.error('Error fetching photos:', err);
+        throw err;
+      }
+    },
+    retry: 1
   });
 
   const openPhotoModal = (photo: Photo) => {
@@ -181,9 +213,15 @@ export default function Photography() {
               </div>
             ) : isError ? (
               <div className="flex justify-center py-12">
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative" role="alert">
-                  <p className="font-bold">Error</p>
-                  <p>There was an error loading the images. Please check if the image folders exist or try again later.</p>
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg relative max-w-xl" role="alert">
+                  <p className="font-bold text-lg mb-2">Error Loading Images</p>
+                  <p className="mb-2">There was an error loading the images. Please check your connection or try again later.</p>
+                  {error && (
+                    <div className="mt-2 p-2 bg-red-100 rounded text-sm overflow-auto max-h-40">
+                      <p className="font-semibold">Error details:</p>
+                      <p className="whitespace-pre-wrap">{error.toString()}</p>
+                    </div>
+                  )}
                 </div>
               </div>
             ) : photos.length === 0 ? (
