@@ -1,36 +1,25 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { Redirect } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, User, Mail, Lock } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import Container from "@/components/Container";
 
 export default function AuthPage() {
   const { user, isLoading, loginMutation, registerMutation } = useAuth();
+  const [activeTab, setActiveTab] = useState("login");
+  
+  // Login form state
   const [loginUsername, setLoginUsername] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
+  
+  // Register form state
   const [registerUsername, setRegisterUsername] = useState("");
-  const [registerPassword, setRegisterPassword] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [activeTab, setActiveTab] = useState("login");
-
-  // Reset form fields when switching tabs
-  useEffect(() => {
-    if (activeTab === "login") {
-      setRegisterUsername("");
-      setRegisterPassword("");
-      setEmail("");
-      setConfirmPassword("");
-    } else {
-      setLoginUsername("");
-      setLoginPassword("");
-    }
-  }, [activeTab]);
 
   // Redirect to home if user is already logged in
   if (user) {
@@ -47,13 +36,12 @@ export default function AuthPage() {
 
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
-    if (registerPassword !== confirmPassword) {
-      // Toast error is handled by validation
+    if (password !== confirmPassword) {
       return;
     }
     registerMutation.mutate({ 
       username: registerUsername, 
-      password: registerPassword, 
+      password, 
       email 
     });
   };
@@ -62,72 +50,72 @@ export default function AuthPage() {
   const isRegisterDisabled = 
     registerMutation.isPending || 
     !registerUsername.trim() || 
-    !registerPassword.trim() || 
-    registerPassword !== confirmPassword;
+    !password.trim() || 
+    password !== confirmPassword;
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-background flex items-center justify-center">
       <Container maxWidth="xl">
-        <div className="flex flex-col lg:flex-row gap-10 items-center">
-          {/* Left Column - Auth Form - fixed width and height */}
-          <div className="w-full max-w-md">
-            <Card className="shadow-xl border-border/40 bg-card/90 backdrop-blur-sm">
-              <Tabs defaultValue="login" value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="login">Login</TabsTrigger>
-                  <TabsTrigger value="register">Register</TabsTrigger>
+        <div className="flex flex-col lg:flex-row gap-10 items-center justify-center">
+          {/* Auth Form - fixed width */}
+          <div className="w-full max-w-[420px]">
+            <div className="bg-[#121212] border border-gray-800 rounded-md overflow-hidden shadow-xl">
+              <Tabs 
+                defaultValue="login" 
+                value={activeTab} 
+                onValueChange={setActiveTab} 
+                className="w-full"
+              >
+                <TabsList className="grid w-full grid-cols-2 bg-[#1a1a1a] rounded-none p-0 h-12">
+                  <TabsTrigger 
+                    value="login" 
+                    className="rounded-none h-full data-[state=active]:bg-[#121212] data-[state=active]:shadow-none text-sm"
+                  >
+                    Login
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="register" 
+                    className="rounded-none h-full data-[state=active]:bg-[#121212] data-[state=active]:shadow-none text-sm"
+                  >
+                    Register
+                  </TabsTrigger>
                 </TabsList>
                 
-                {/* Login Tab - Use fixed height content area */}
-                <TabsContent value="login" className="min-h-[400px] flex flex-col">
-                  <CardHeader className="text-center pb-2">
-                    <CardTitle className="text-2xl font-bold text-accent-foreground">
-                      Welcome Back
-                    </CardTitle>
-                    <CardDescription>
-                      Sign in to access your account
-                    </CardDescription>
-                  </CardHeader>
-                  <form onSubmit={handleLogin} className="flex-1 flex flex-col">
-                    <CardContent className="space-y-4 pt-2 flex-1">
-                      <div className="space-y-2">
-                        <Label htmlFor="login-username">Username</Label>
-                        <div className="relative">
-                          <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            id="login-username"
-                            type="text"
-                            className="pl-10"
-                            placeholder="Username"
-                            value={loginUsername}
-                            onChange={(e) => setLoginUsername(e.target.value)}
-                            required
-                          />
-                        </div>
+                {/* Login Tab */}
+                <TabsContent value="login" className="m-0 pt-4">
+                  <div className="px-6 pb-4">
+                    <h2 className="text-xl font-bold text-white text-center">Welcome Back</h2>
+                    <p className="text-gray-400 text-sm text-center mb-6">Sign in to access your account</p>
+                    
+                    <form onSubmit={handleLogin} className="space-y-4">
+                      <div>
+                        <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-1">Username</label>
+                        <Input
+                          id="username"
+                          type="text"
+                          placeholder="Username"
+                          value={loginUsername}
+                          onChange={(e) => setLoginUsername(e.target.value)}
+                          className="bg-[#1a1a1a] border-gray-800 h-10"
+                          required
+                        />
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="login-password">Password</Label>
-                        <div className="relative">
-                          <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            id="login-password"
-                            type="password"
-                            className="pl-10"
-                            placeholder="Password"
-                            value={loginPassword}
-                            onChange={(e) => setLoginPassword(e.target.value)}
-                            required
-                          />
-                        </div>
+                      <div>
+                        <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">Password</label>
+                        <Input
+                          id="password"
+                          type="password"
+                          placeholder="Password"
+                          value={loginPassword}
+                          onChange={(e) => setLoginPassword(e.target.value)}
+                          className="bg-[#1a1a1a] border-gray-800 h-10"
+                          required
+                        />
                       </div>
-                      
-                      {/* Spacer div to push button to bottom */}
-                      <div className="flex-1 min-h-[100px]"></div>
-                    </CardContent>
-                    <CardFooter className="pt-2 pb-6 mt-auto">
+
                       <Button 
                         type="submit" 
-                        className="w-full" 
+                        className="w-full bg-blue-500 hover:bg-blue-600 text-white h-10 mt-4" 
                         disabled={loginMutation.isPending}
                       >
                         {loginMutation.isPending ? (
@@ -139,89 +127,71 @@ export default function AuthPage() {
                           "Sign in"
                         )}
                       </Button>
-                    </CardFooter>
-                  </form>
+                    </form>
+                  </div>
                 </TabsContent>
 
-                {/* Register Tab - Same height as login tab */}
-                <TabsContent value="register" className="min-h-[400px] flex flex-col">
-                  <CardHeader className="text-center pb-2">
-                    <CardTitle className="text-2xl font-bold text-accent-foreground">
-                      Create Account
-                    </CardTitle>
-                    <CardDescription>
-                      Register to create a new account
-                    </CardDescription>
-                  </CardHeader>
-                  <form onSubmit={handleRegister} className="flex-1 flex flex-col">
-                    <CardContent className="space-y-4 pt-2 flex-1">
-                      <div className="space-y-2">
-                        <Label htmlFor="register-username">Username</Label>
-                        <div className="relative">
-                          <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            id="register-username"
-                            type="text"
-                            className="pl-10"
-                            placeholder="Choose a username"
-                            value={registerUsername}
-                            onChange={(e) => setRegisterUsername(e.target.value)}
-                            required
-                          />
-                        </div>
+                {/* Register Tab */}
+                <TabsContent value="register" className="m-0 pt-4">
+                  <div className="px-6 pb-4">
+                    <h2 className="text-xl font-bold text-white text-center">Create Account</h2>
+                    <p className="text-gray-400 text-sm text-center mb-6">Register to create a new account</p>
+                    
+                    <form onSubmit={handleRegister} className="space-y-4">
+                      <div>
+                        <label htmlFor="register-username" className="block text-sm font-medium text-gray-300 mb-1">Username</label>
+                        <Input
+                          id="register-username"
+                          type="text"
+                          placeholder="Choose a username"
+                          value={registerUsername}
+                          onChange={(e) => setRegisterUsername(e.target.value)}
+                          className="bg-[#1a1a1a] border-gray-800 h-10"
+                          required
+                        />
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="register-email">Email (optional)</Label>
-                        <div className="relative">
-                          <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            id="register-email"
-                            type="email"
-                            className="pl-10"
-                            placeholder="your@email.com"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                          />
-                        </div>
+                      <div>
+                        <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">Email (optional)</label>
+                        <Input
+                          id="email"
+                          type="email"
+                          placeholder="your@email.com"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className="bg-[#1a1a1a] border-gray-800 h-10"
+                        />
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="register-password">Password</Label>
-                        <div className="relative">
-                          <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            id="register-password"
-                            type="password"
-                            className="pl-10"
-                            placeholder="Create a password"
-                            value={registerPassword}
-                            onChange={(e) => setRegisterPassword(e.target.value)}
-                            required
-                          />
-                        </div>
+                      <div>
+                        <label htmlFor="register-password" className="block text-sm font-medium text-gray-300 mb-1">Password</label>
+                        <Input
+                          id="register-password"
+                          type="password"
+                          placeholder="Create a password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          className="bg-[#1a1a1a] border-gray-800 h-10"
+                          required
+                        />
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="register-confirm-password">Confirm Password</Label>
-                        <div className="relative">
-                          <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            id="register-confirm-password"
-                            type="password"
-                            className="pl-10"
-                            placeholder="Confirm your password"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            required
-                          />
-                        </div>
-                        {confirmPassword && registerPassword !== confirmPassword && (
-                          <p className="text-destructive text-sm">Passwords do not match</p>
+                      <div>
+                        <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-300 mb-1">Confirm Password</label>
+                        <Input
+                          id="confirm-password"
+                          type="password"
+                          placeholder="Confirm your password"
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          className="bg-[#1a1a1a] border-gray-800 h-10"
+                          required
+                        />
+                        {confirmPassword && password !== confirmPassword && (
+                          <p className="text-red-500 text-xs mt-1">Passwords do not match</p>
                         )}
                       </div>
-                    </CardContent>
-                    <CardFooter className="pt-2 pb-6 mt-auto">
+
                       <Button 
                         type="submit" 
-                        className="w-full" 
+                        className="w-full bg-blue-500 hover:bg-blue-600 text-white h-10 mt-4" 
                         disabled={isRegisterDisabled}
                       >
                         {registerMutation.isPending ? (
@@ -233,39 +203,39 @@ export default function AuthPage() {
                           "Create Account"
                         )}
                       </Button>
-                    </CardFooter>
-                  </form>
+                    </form>
+                  </div>
                 </TabsContent>
               </Tabs>
-            </Card>
+            </div>
           </div>
 
           {/* Right Column - Hero Section */}
-          <div className="flex-1 text-center lg:text-left">
-            <h1 className="text-3xl md:text-4xl font-bold text-primary mb-4">
+          <div className="flex-1 text-center lg:text-left max-w-md">
+            <h1 className="text-3xl font-bold text-blue-500 mb-2">
               {activeTab === "login" ? "Welcome Back" : "Join Our Community"}
             </h1>
-            <p className="text-lg text-muted-foreground mb-6">
+            <p className="text-gray-300 mb-6">
               {activeTab === "login" 
                 ? "Sign in to access personalized features and content." 
                 : "Create an account to join our community and access exclusive features."}
             </p>
-            <div className="bg-card/30 backdrop-blur-sm p-6 rounded-lg border border-border/20">
-              <h3 className="text-xl font-semibold text-foreground mb-3">
+            <div className="bg-[#1a1a1a]/50 p-5 rounded-lg border border-gray-800">
+              <h3 className="text-lg font-semibold text-white mb-3">
                 {activeTab === "login" ? "Account Benefits" : "Why Register?"}
               </h3>
-              <ul className="space-y-2 text-muted-foreground">
+              <ul className="space-y-2 text-gray-400">
                 <li className="flex items-center">
-                  <span className="mr-2">✓</span> Access personalized content
+                  <span className="mr-2 text-green-500">✓</span> Access personalized content
                 </li>
                 <li className="flex items-center">
-                  <span className="mr-2">✓</span> Save your preferences
+                  <span className="mr-2 text-green-500">✓</span> Save your preferences
                 </li>
                 <li className="flex items-center">
-                  <span className="mr-2">✓</span> Join discussion forums
+                  <span className="mr-2 text-green-500">✓</span> Join discussion forums
                 </li>
                 <li className="flex items-center">
-                  <span className="mr-2">✓</span> Get updates on new features
+                  <span className="mr-2 text-green-500">✓</span> Get updates on new features
                 </li>
               </ul>
             </div>
