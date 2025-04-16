@@ -1264,10 +1264,213 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      res.json(post);
+      // Get author details if available
+      let author = null;
+      if (post.authorId) {
+        const user = await storage.getUser(post.authorId);
+        if (user) {
+          author = {
+            id: user.id,
+            username: user.username
+          };
+        }
+      }
+      
+      // Get comments count
+      const commentsCount = await storage.countCommentsForPost(post.id);
+      
+      res.json({ ...post, author, commentsCount });
     } catch (error) {
       log(`Error getting blog post: ${error}`, 'blog');
       res.status(500).json({ error: 'Failed to retrieve blog post' });
+    }
+  });
+  
+  // Get comments for a blog post
+  app.get('/api/blog/posts/:postId/comments', async (req: Request, res: Response) => {
+    try {
+      const postId = parseInt(req.params.postId);
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
+      const offset = req.query.offset ? parseInt(req.query.offset as string) : 0;
+      
+      if (isNaN(postId)) {
+        return res.status(400).json({ error: 'Invalid post ID' });
+      }
+      
+      // Check if post exists and is published (unless user is admin)
+      const post = await storage.getBlogPost(postId);
+      if (!post) {
+        return res.status(404).json({ error: 'Blog post not found' });
+      }
+      
+      if (!post.published) {
+        // If post is not published, only admin can see it
+        if (!req.session?.userId) {
+          return res.status(404).json({ error: 'Blog post not found' });
+        }
+        
+        const user = await storage.getUser(req.session.userId);
+        if (!user?.isAdmin) {
+          return res.status(404).json({ error: 'Blog post not found' });
+        }
+      }
+      
+      // Get comments
+      const comments = await storage.listBlogCommentsByPost(postId, limit, offset);
+      
+      // Get authors for comments
+      const commentsWithAuthors = await Promise.all(comments.map(async (comment) => {
+        const user = await storage.getUser(comment.userId);
+        return {
+          ...comment,
+          author: user ? {
+            id: user.id,
+            username: user.username,
+            profileImageData: user.profileImageData,
+            profileImageType: user.profileImageType,
+          } : null
+        };
+      }));
+      
+      res.json(commentsWithAuthors);
+    } catch (error) {
+      log(`Error getting blog comments: ${error}`, 'blog');
+      res.status(500).json({ error: 'Failed to retrieve blog comments' });
+    }
+  });
+  
+  // Add a comment to a blog post (authenticated users only)
+  app.post('/api/blog/posts/:postId/comments', isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const postId = parseInt(req.params.postId);
+      const userId = req.session!.userId!;
+      const { content } = req.body;
+      
+      if (isNaN(postId)) {
+        return res.status(400).json({ error: 'Invalid post ID' });
+      }
+      
+      if (!content || typeof content !== 'string' || content.trim().length === 0) {
+        return res.status(400).json({ error: 'Comment content is required' });
+      }
+      
+      // Check if post exists and is published
+      const post = await storage.getBlogPost(postId);
+      if (!post) {
+        return res.status(404).json({ error: 'Blog post not found' });
+      }
+      
+      if (!post.published) {
+        // If post is not published, only admin can comment
+        const user = await storage.getUser(userId);
+        if (!user?.isAdmin) {
+          return res.status(404).json({ error: 'Blog post not found' });
+        }
+      }
+      
+      // Create the comment
+      const comment = await storage.createBlogComment({
+        content,
+        blogPostId: postId,
+        userId
+      });
+      
+      // Get the author details
+      const user = await storage.getUser(userId);
+      
+      res.status(201).json({
+        ...comment,
+        author: {
+          id: user!.id,
+          username: user!.username,
+          profileImageData: user!.profileImageData,
+          profileImageType: user!.profileImageType,
+        }
+      });
+    } catch (error) {
+      log(`Error creating blog comment: ${error}`, 'blog');
+      res.status(500).json({ error: 'Failed to create comment' });
+    }
+  });
+  
+  // Update a comment (authenticated users can only update their own comments)
+  app.put('/api/blog/comments/:commentId', isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const commentId = parseInt(req.params.commentId);
+      const userId = req.session!.userId!;
+      const { content } = req.body;
+      
+      if (isNaN(commentId)) {
+        return res.status(400).json({ error: 'Invalid comment ID' });
+      }
+      
+      if (!content || typeof content !== 'string' || content.trim().length === 0) {
+        return res.status(400).json({ error: 'Comment content is required' });
+      }
+      
+      // Get the comment
+      const comment = await storage.getBlogComment(commentId);
+      if (!comment) {
+        return res.status(404).json({ error: 'Comment not found' });
+      }
+      
+      // Check if user is the author of the comment or an admin
+      const user = await storage.getUser(userId);
+      if (comment.userId !== userId && !user?.isAdmin) {
+        return res.status(403).json({ error: 'You do not have permission to modify this comment' });
+      }
+      
+      // Update the comment
+      const updatedComment = await storage.updateBlogComment(commentId, { content });
+      
+      res.json({
+        ...updatedComment,
+        author: {
+          id: user!.id,
+          username: user!.username,
+          profileImageData: user!.profileImageData,
+          profileImageType: user!.profileImageType,
+        }
+      });
+    } catch (error) {
+      log(`Error updating blog comment: ${error}`, 'blog');
+      res.status(500).json({ error: 'Failed to update comment' });
+    }
+  });
+  
+  // Delete a comment (authenticated users can only delete their own comments, admins can delete any)
+  app.delete('/api/blog/comments/:commentId', isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const commentId = parseInt(req.params.commentId);
+      const userId = req.session!.userId!;
+      
+      if (isNaN(commentId)) {
+        return res.status(400).json({ error: 'Invalid comment ID' });
+      }
+      
+      // Get the comment
+      const comment = await storage.getBlogComment(commentId);
+      if (!comment) {
+        return res.status(404).json({ error: 'Comment not found' });
+      }
+      
+      // Check if user is the author of the comment or an admin
+      const user = await storage.getUser(userId);
+      if (comment.userId !== userId && !user?.isAdmin) {
+        return res.status(403).json({ error: 'You do not have permission to delete this comment' });
+      }
+      
+      // Delete the comment
+      const success = await storage.deleteBlogComment(commentId);
+      
+      if (success) {
+        res.status(204).end();
+      } else {
+        res.status(500).json({ error: 'Failed to delete comment' });
+      }
+    } catch (error) {
+      log(`Error deleting blog comment: ${error}`, 'blog');
+      res.status(500).json({ error: 'Failed to delete comment' });
     }
   });
   

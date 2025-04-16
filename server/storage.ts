@@ -566,11 +566,13 @@ export class MemStorage implements IStorage {
     this.counterTokens = new Map();
     this.blogPosts = new Map();
     this.blogPostsBySlug = new Map();
+    this.blogComments = new Map();
     this.currentUserId = 1;
     this.currentLinkId = 1;
     this.currentCounterId = 1;
     this.currentTokenId = 1;
     this.currentBlogPostId = 1;
+    this.currentBlogCommentId = 1;
     
     // Schedule cleanup of expired items every hour
     setInterval(() => {
@@ -855,6 +857,61 @@ export class MemStorage implements IStorage {
     });
     
     log("Expired counter tokens cleaned up", "storage");
+  }
+  
+  // Blog comment methods
+  async createBlogComment(comment: InsertBlogComment): Promise<BlogComment> {
+    const id = this.currentBlogCommentId++;
+    const now = new Date();
+    
+    const blogComment: BlogComment = {
+      ...comment,
+      id,
+      createdAt: now,
+      updatedAt: now
+    };
+    
+    this.blogComments.set(id, blogComment);
+    return blogComment;
+  }
+  
+  async getBlogComment(id: number): Promise<BlogComment | undefined> {
+    return this.blogComments.get(id);
+  }
+  
+  async updateBlogComment(id: number, data: Partial<InsertBlogComment>): Promise<BlogComment | undefined> {
+    const comment = this.blogComments.get(id);
+    if (!comment) return undefined;
+    
+    const updatedComment: BlogComment = {
+      ...comment,
+      ...data,
+      updatedAt: new Date()
+    };
+    
+    this.blogComments.set(id, updatedComment);
+    return updatedComment;
+  }
+  
+  async deleteBlogComment(id: number): Promise<boolean> {
+    const comment = this.blogComments.get(id);
+    if (!comment) return false;
+    
+    this.blogComments.delete(id);
+    return true;
+  }
+  
+  async listBlogCommentsByPost(blogPostId: number, limit: number = 50, offset: number = 0): Promise<BlogComment[]> {
+    return Array.from(this.blogComments.values())
+      .filter(comment => comment.blogPostId === blogPostId)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .slice(offset, offset + limit);
+  }
+  
+  async countCommentsForPost(blogPostId: number): Promise<number> {
+    return Array.from(this.blogComments.values())
+      .filter(comment => comment.blogPostId === blogPostId)
+      .length;
   }
 }
 
