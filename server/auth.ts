@@ -147,6 +147,69 @@ export const registerAuthRoutes = (app: Express) => {
       res.status(500).json({ error: 'Error creating user' });
     }
   });
+  
+  // Public registration endpoint
+  app.post('/api/register', async (req: Request, res: Response) => {
+    try {
+      const { username, password, email } = req.body;
+      
+      // Basic validation
+      if (!username || !password) {
+        return res.status(400).json({ error: 'Username and password are required' });
+      }
+      
+      // Check if username already exists
+      const existingUser = await storage.getUserByUsername(username);
+      if (existingUser) {
+        return res.status(400).json({ error: 'Username already exists' });
+      }
+      
+      // Hash password
+      const hashedPassword = await hashPassword(password);
+      
+      // Create user with regular (non-admin) privileges
+      const newUser = await storage.createUser({
+        username,
+        password: hashedPassword,
+        email,
+        isAdmin: false // Always create regular users through this endpoint
+      });
+      
+      // Automatically log the user in after registration
+      if (!req.session) {
+        log('ERROR: Session object is undefined or null during registration!', 'auth');
+        return res.status(500).json({ error: 'Session initialization failed' });
+      }
+      
+      // Set up session for the new user
+      req.session.regenerate(async (err) => {
+        if (err) {
+          log(`Error regenerating session after registration: ${err}`, 'auth');
+          return res.status(500).json({ error: 'Session setup failed' });
+        }
+        
+        // Set user ID in the new session
+        req.session.userId = newUser.id;
+        
+        // Save session explicitly
+        req.session.save((saveErr) => {
+          if (saveErr) {
+            log(`Error saving session after registration: ${saveErr}`, 'auth');
+            return res.status(500).json({ error: 'Session save failed' });
+          }
+          
+          // Remove password from response
+          const { password: _, ...userWithoutPassword } = newUser;
+          
+          log(`User ${username} registered and logged in successfully. Session ID: ${req.sessionID}`, 'auth');
+          res.status(201).json(userWithoutPassword);
+        });
+      });
+    } catch (error) {
+      log(`Error in registration process: ${error}`, 'auth');
+      res.status(500).json({ error: 'Error during registration' });
+    }
+  });
 
   // Login
   app.post('/api/login', async (req: Request, res: Response) => {
