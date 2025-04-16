@@ -86,44 +86,10 @@ export default function UserProfile() {
   // Upload profile picture mutation
   const uploadProfilePictureMutation = useMutation({
     mutationFn: async (data: { image: string }) => {
-      try {
-        console.log("Starting profile picture upload...");
-        
-        // Make the API request
-        const res = await apiRequest("POST", "/api/profile/picture", data);
-        
-        // Check if the response is OK
-        if (!res.ok) {
-          const errorData = await res.text();
-          console.error("Server error response:", errorData);
-          try {
-            // Try to parse as JSON if possible
-            const jsonError = JSON.parse(errorData);
-            throw new Error(jsonError.error || "Failed to upload profile picture");
-          } catch (e) {
-            // If parsing fails, use the text response or a generic message
-            throw new Error(errorData || "Server returned an error response");
-          }
-        }
-        
-        // Check if the response is JSON
-        const contentType = res.headers.get("content-type");
-        if (contentType && contentType.includes("application/json")) {
-          const jsonData = await res.json();
-          console.log("Upload successful, response:", jsonData);
-          return jsonData;
-        } else {
-          console.error("Invalid content type:", contentType);
-          throw new Error("Server returned an invalid response format");
-        }
-      } catch (error) {
-        console.error("Error uploading profile picture:", error);
-        if (error instanceof Error) {
-          throw error;
-        } else {
-          throw new Error("Failed to upload profile picture. Please try again.");
-        }
-      }
+      console.log("Starting profile picture upload...");
+      
+      // Use the apiRequest helper which handles errors and responses properly
+      return await apiRequest("POST", "/api/profile/picture", data);
     },
     onSuccess: (data) => {
       console.log("Profile picture updated successfully");
