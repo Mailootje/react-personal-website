@@ -1,15 +1,32 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link, useLocation } from "wouter";
-import { navigationItems } from "@/lib/data";
+import { mainNavigationItems, additionalNavigationItems } from "@/lib/data";
 import { MobileMenu } from "./MobileMenu";
 import { scrollToElement } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
+import { motion, AnimatePresence } from "framer-motion";
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [location] = useLocation();
   const { user } = useAuth();
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  
+  // Click outside handler for dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [dropdownRef]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -42,6 +59,10 @@ export function Header() {
     }
   };
 
+  const toggleDropdown = () => {
+    setDropdownOpen(!dropdownOpen);
+  };
+
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -72,8 +93,9 @@ export function Header() {
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex space-x-8">
-          {navigationItems.map((item) =>
+        <nav className="hidden md:flex items-center space-x-8">
+          {/* Main Navigation Items */}
+          {mainNavigationItems.map((item) => (
             item.href.startsWith("#") ? (
               <a
                 key={item.name}
@@ -91,8 +113,47 @@ export function Header() {
               >
                 {item.name}
               </Link>
-            ),
-          )}
+            )
+          ))}
+          
+          {/* More Dropdown Menu */}
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={toggleDropdown}
+              className="flex items-center text-text hover:text-primary transition-colors font-medium"
+              aria-expanded={dropdownOpen}
+              aria-haspopup="true"
+            >
+              More
+              <i className={`ri-arrow-down-s-line ml-1 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`}></i>
+            </button>
+            
+            <AnimatePresence>
+              {dropdownOpen && (
+                <motion.div
+                  className="absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-black border border-gray-800 ring-1 ring-black ring-opacity-5 z-10"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                  role="menu"
+                  aria-orientation="vertical"
+                >
+                  {additionalNavigationItems.map((item) => (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      <div className="block px-4 py-2 text-sm text-text hover:text-primary hover:bg-gray-900 transition-colors">
+                        {item.name}
+                      </div>
+                    </Link>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
           
           {/* User profile link for logged-in users */}
           {user && (
@@ -131,7 +192,6 @@ export function Header() {
       <MobileMenu
         isOpen={mobileMenuOpen}
         onClose={() => setMobileMenuOpen(false)}
-        items={navigationItems}
       />
     </header>
   );

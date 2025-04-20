@@ -2,16 +2,18 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation } from "wouter";
 import { scrollToElement } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
+import { useState } from "react";
+import { mainNavigationItems, additionalNavigationItems } from "@/lib/data";
 
 interface MobileMenuProps {
   isOpen: boolean;
   onClose: () => void;
-  items: { name: string; href: string }[];
 }
 
-export function MobileMenu({ isOpen, onClose, items }: MobileMenuProps) {
+export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const [location] = useLocation();
   const { user } = useAuth();
+  const [isMoreExpanded, setIsMoreExpanded] = useState(false);
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     // If it's a regular page link, not a hash/anchor
@@ -35,6 +37,10 @@ export function MobileMenu({ isOpen, onClose, items }: MobileMenuProps) {
     onClose();
   };
 
+  const toggleMoreSection = () => {
+    setIsMoreExpanded(!isMoreExpanded);
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -46,7 +52,8 @@ export function MobileMenu({ isOpen, onClose, items }: MobileMenuProps) {
           transition={{ duration: 0.3 }}
         >
           <div className="container mx-auto px-6 py-4 flex flex-col space-y-4">
-            {items.map((item) => (
+            {/* Main navigation items */}
+            {mainNavigationItems.map((item) => (
               item.href.startsWith('#') ? (
                 <motion.a
                   key={item.name}
@@ -73,6 +80,47 @@ export function MobileMenu({ isOpen, onClose, items }: MobileMenuProps) {
                 </Link>
               )
             ))}
+            
+            {/* More section with dropdown */}
+            <motion.div
+              className="text-text hover:text-primary transition-colors font-medium py-2 cursor-pointer"
+              onClick={toggleMoreSection}
+              initial={{ x: -20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="flex items-center justify-between">
+                <span>More</span>
+                <i className={`ri-arrow-down-s-line transition-transform ${isMoreExpanded ? 'rotate-180' : ''}`}></i>
+              </div>
+            </motion.div>
+            
+            {/* Additional navigation items (collapsible) */}
+            <AnimatePresence>
+              {isMoreExpanded && (
+                <motion.div
+                  className="flex flex-col pl-4 space-y-3"
+                  initial={{ height: 0, opacity: 0, marginTop: 0 }}
+                  animate={{ height: "auto", opacity: 1, marginTop: 4 }}
+                  exit={{ height: 0, opacity: 0, marginTop: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {additionalNavigationItems.map((item) => (
+                    <Link key={item.name} href={item.href}>
+                      <motion.div
+                        className="text-text hover:text-primary transition-colors font-medium py-1 cursor-pointer text-sm"
+                        onClick={onClose}
+                        initial={{ x: -10, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <span className="text-primary">➤</span> {item.name}
+                      </motion.div>
+                    </Link>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
             
             {/* User profile link for logged-in users */}
             {user && (

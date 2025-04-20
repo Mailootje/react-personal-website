@@ -40,17 +40,28 @@ export const socialLinks: SocialLink[] = [
   },
 ];
 
-export const navigationItems = [
+// Main navigation items shown directly in the navbar
+export const mainNavigationItems = [
   { name: "About", href: "#about" },
   { name: "Skills", href: "#skills" },
   { name: "Projects", href: "#projects" },
   { name: "Resume", href: "#resume" },
   { name: "Contact", href: "#contact" },
+];
+
+// Additional navigation items to be shown in the dropdown menu
+export const additionalNavigationItems = [
   { name: "Photography", href: "/photography" },
   { name: "Apps", href: "/apps" },
   { name: "Games", href: "/games" },
   { name: "Downloads", href: "/downloads" },
   { name: "Blog", href: "/blog" },
+];
+
+// Combined navigation items for backward compatibility
+export const navigationItems = [
+  ...mainNavigationItems,
+  ...additionalNavigationItems
 ];
 
 export const skills: Skill[] = [
